@@ -240,6 +240,7 @@ nav a:hover {
     flex-direction: column;
     align-items: center;
     cursor: pointer;
+    position: relative; /* Fixed: anchor badges to card */
 }
 
 .card-item:hover .card-title {
@@ -469,6 +470,7 @@ nav a:hover {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s ease;
     cursor: pointer;
+    position: relative; /* Fixed: anchor badges */
 }
 
 .card-16-9 {
@@ -481,6 +483,7 @@ nav a:hover {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s ease;
     cursor: pointer;
+    position: relative; /* Fixed: anchor badges */
 }
 
 .card-1-1:hover,

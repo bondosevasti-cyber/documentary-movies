@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Watch: Kiss the Ground - Cineby</title>
+    <title>ყურება - Cineby</title>
+    <meta name="description" content="უყურეთ ფილმებს ქართული გახმოვანებით ონლაინ Cineby-ზე.">
     <meta property="og:title" content="Cineby - Watch Movies Online">
     <meta property="og:description" content="Watch your favorite movies and documentaries.">
     <meta property="og:image" content="images/kiss the ground.webp">
@@ -28,7 +29,7 @@
         </div>
 
         <div class="title-section">
-            <h2 class="movie-title" id="page-movie-title" style="margin-bottom: 0; font-size: 28px;">მოტვირთვა...</h2>
+            <h1 class="movie-title" id="page-movie-title" style="margin-bottom: 0; font-size: 28px;">მოტვირთვა...</h1>
         </div>
     </div>
 
@@ -58,8 +59,31 @@
             }
 
             // Update UI
-            document.getElementById('page-movie-title').innerText = movie.title;
-            document.title = `ყურება: ${movie.title} - Cineby`;
+            const movieTitle = movie.title;
+            document.getElementById('page-movie-title').innerText = movieTitle;
+            
+            // SEO: Dynamic Title
+            document.title = `${movieTitle} ქართულად (გახმოვანებული) - Cineby`;
+
+            // SEO: Dynamic Meta Description
+            const descriptionText = `უყურეთ ფილმს '${movieTitle}' ქართული გახმოვანებით ონლაინ, მაღალ ხარისხში. ექსკლუზიური გახმოვანება Cineby-სგან.`;
+            
+            let metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) {
+                metaDesc.setAttribute('content', descriptionText);
+            }
+
+            // SEO: Open Graph Updates
+            let ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle) ogTitle.setAttribute('content', `${movieTitle} - Cineby`);
+
+            let ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc) ogDesc.setAttribute('content', descriptionText);
+
+            if (movie.cover_url) {
+                let ogImage = document.querySelector('meta[property="og:image"]');
+                if (ogImage) ogImage.setAttribute('content', movie.cover_url);
+            }
 
             // 1. Build Rumble Embed URL intelligently
             let videoId = movie.video_id || '';
