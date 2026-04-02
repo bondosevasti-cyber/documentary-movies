@@ -17,6 +17,11 @@ body {
     scrollbar-color: auto;
 }
 
+img {
+    max-width: 100%;
+    height: auto;
+}
+
 /* Remove all custom scrollbars */
 ::-webkit-scrollbar {
     width: auto !important;
@@ -51,7 +56,9 @@ header {
     height: 80px;
     /* Reduced for a standard navbar fit */
     width: auto;
+    max-width: 100%;
     display: block;
+    object-fit: contain;
 }
 
 .logo span {
@@ -593,6 +600,7 @@ nav a:hover {
     line-height: 1.6;
     margin-top: 20px;
     max-width: 400px;
+    text-align: inherit;
 }
 
 .footer-links {
@@ -634,11 +642,23 @@ nav a:hover {
     font-size: 14px;
 }
 
-/* Responsive Footer */
 @media (max-width: 768px) {
     .footer-content {
         grid-template-columns: 1fr;
+    }
+
+    .site-footer {
+        padding: 40px 15px 20px;
+        margin-top: 30px;
         text-align: center;
+    }
+
+    .footer-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 30px;
     }
 
     .footer-section h4::after {
@@ -649,10 +669,229 @@ nav a:hover {
     .footer-disclaimer {
         margin-left: auto;
         margin-right: auto;
+        max-width: 100%;
+        font-size: 13px;
     }
 
-    .site-footer {
-        padding: 40px 20px 20px;
+    .footer-links {
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .footer-section .logo-img {
+        height: auto !important;
+        max-height: 60px;
+        width: auto;
+        margin-bottom: 10px;
+    }
+
+    /* Global Responsive Adjustments */
+    header {
+        padding: 15px 20px;
+        justify-content: center;
+    }
+
+    .logo-img {
+        height: auto !important;
+        max-height: 45px !important;
+        width: auto !important;
+        max-width: 85vw !important;
+    }
+
+    .hero {
+        height: 80vh;
+        padding: 0 20px;
+        align-items: flex-end;
+        justify-content: center;
+        text-align: center;
+        padding-bottom: 60px;
+    }
+
+    .hero::after {
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.4) 100%);
+    }
+
+    .hero-content {
+        margin-top: 0;
+        max-width: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero h1, .hero .hero-title {
+        font-size: 32px;
+        line-height: 1.1;
+        margin-bottom: 15px;
+    }
+
+    .hero-desc {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .hero-meta {
+        font-size: 14px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn-primary {
+        padding: 12px 24px;
+        font-size: 16px;
+    }
+
+    .section-header {
+        margin: 40px 20px 0 20px;
+        padding-right: 0;
+    }
+
+    .section-title {
+        font-size: 20px;
+    }
+
+    .top10-title {
+        margin: 40px 20px 20px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .top10-title h2 {
+        font-size: 50px;
+    }
+
+    .top10-title .sub-title {
+        font-size: 14px;
+        letter-spacing: 2px;
+    }
+
+    .cards-container {
+        padding: 0 20px;
+        gap: 20px;
+    }
+
+    .rank-card-wrapper {
+        min-width: 200px;
+        height: 240px;
+    }
+
+    .rank-number {
+        font-size: 150px;
+        left: -15px;
+        bottom: -15px;
+    }
+
+    .rank-poster-container {
+        width: 130px;
+        height: 195px;
+        margin-left: 55px;
+    }
+
+    .rank-card-title {
+        left: 55px;
+        width: 130px;
+        font-size: 12px;
+        bottom: -30px;
+    }
+
+    .card-16-9 {
+        min-width: 280px;
+        height: 157px;
+    }
+
+    .card-1-1 {
+        min-width: 160px;
+        height: 160px;
+    }
+
+    .section-ctrls {
+        display: none; /* Hide arrows on mobile as touch is preferred */
+    }
+
+    .see-all-btn {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1, .hero .hero-title {
+        font-size: 26px;
+    }
+
+    .hero {
+        height: 75vh;
+    }
+
+    .hero-meta {
+        font-size: 13px;
+    }
+
+    .hero-desc {
+        font-size: 13px;
+        line-clamp: 3;
+        -webkit-line-clamp: 3;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .rank-card-wrapper {
+        min-width: 170px;
+        height: 200px;
+    }
+
+    .rank-number {
+        font-size: 110px;
+    }
+
+    .rank-poster-container {
+        width: 100px;
+        height: 150px;
+        margin-left: 45px;
+    }
+
+    .rank-card-title {
+        left: 45px;
+        width: 100px;
+        font-size: 11px;
+    }
+
+    .card-16-9 {
+        min-width: calc(100vw - 60px);
+        height: auto;
+        aspect-ratio: 16 / 9;
+    }
+
+    .card-1-1 {
+        min-width: 140px;
+        height: 140px;
+    }
+
+    /* Watch Page Mobile */
+    .watch-container {
+        height: auto;
+        min-height: 100vh;
+        padding: 40px 15px;
+        gap: 30px;
+        overflow-y: auto;
+    }
+
+    .watch-container .logo-img {
+        height: 60px !important;
+    }
+
+    .player-container {
+        width: 100%;
+        max-height: none;
+    }
+
+    .movie-title {
+        font-size: 18px !important;
     }
 }
 
