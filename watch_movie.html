@@ -15,104 +15,82 @@
 
 <body>
 
-    <header>
-        <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="Cineby Logo" class="logo-img"></a>
-    </header>
-
     <div class="watch-container">
+        
+        <div class="logo-section">
+            <a href="index.html" class="logo">
+                <img src="images/logo/Logo.png" alt="Cineby Logo" class="logo-img" style="height: 100px;">
+            </a>
+        </div>
+
         <div class="player-container">
             <div id="rumble-player"></div>
-            
-            <!-- Pause Overlay -->
-            <div class="pause-overlay" id="pause-overlay">
-                <div class="movie-info-group">
-                    <h2 class="movie-info-title" id="overlay-title">Movie Title</h2>
-                    <div class="movie-info-meta">
-                        <span id="overlay-year">2026</span>
-                        <span>•</span>
-                        <span id="overlay-duration">1h 30m</span>
-                        <span>•</span>
-                        <span class="info-rating">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                            <span id="overlay-rating">8.5</span>
-                        </span>
-                    </div>
-                </div>
-                <p class="movie-info-desc" id="overlay-desc">Description goes here.</p>
-            </div>
         </div>
-        <h2 class="movie-title" id="page-movie-title">მოტვირთვა...</h2>
+
+        <div class="title-section">
+            <h2 class="movie-title" id="page-movie-title" style="margin-bottom: 0; font-size: 28px;">მოტვირთვა...</h2>
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <script>
-        // Parse URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const videoId = urlParams.get('id') || 'v753ui4';
-        const title = urlParams.get('title') || 'აკოცე მიწას';
-        const rating = urlParams.get('rating') || '8.1';
-        const year = urlParams.get('year') || '2020';
-        const genre = urlParams.get('genre') || 'დოკუმენტური';
-        const desc = urlParams.get('desc') || '';
-        const duration = urlParams.get('duration') || '1h 24m';
+        async function loadMovie() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const movieId = urlParams.get('id');
 
-        // Update UI
-        document.getElementById('page-movie-title').innerText = title;
-        document.getElementById('overlay-title').innerText = title;
-        document.getElementById('overlay-rating').innerText = rating;
-        document.getElementById('overlay-year').innerText = year;
-        document.getElementById('overlay-duration').innerText = duration;
-        document.getElementById('overlay-desc').innerText = desc;
-        document.title = `ყურება: ${title} - Cineby`;
-
-        // Create player
-        const playerContainer = document.getElementById('rumble-player');
-        const iframe = document.createElement('iframe');
-        iframe.className = 'rumble';
-        iframe.src = `https://rumble.com/embed/${videoId}/?pub=4p1avk&api=1`;
-        iframe.setAttribute('frameborder', '0');
-        iframe.setAttribute('allowfullscreen', '');
-        playerContainer.appendChild(iframe);
-
-        // API interaction to show overlay on pause
-        window.addEventListener('message', function(e) {
-            try {
-                const data = JSON.parse(e.data);
-                const overlay = document.getElementById('pause-overlay');
-                if (data.event === 'pause') {
-                    overlay.classList.add('visible');
-                } else if (data.event === 'play') {
-                    overlay.classList.remove('visible');
-                }
-            } catch (err) {
-                // Not a valid JSON or not from Rumble
+            if (!movieId) {
+                alert('ფილმი ვერ მოიძებნა!');
+                window.location.href = 'index.html';
+                return;
             }
-        });
+
+            const { data: movie, error } = await _supabase
+                .from('movies')
+                .select('*')
+                .eq('id', movieId)
+                .single();
+
+            if (error || !movie) {
+                console.error('Error fetching movie:', error);
+                document.getElementById('page-movie-title').innerText = 'ფილმი ვერ მოიძებნა';
+                return;
+            }
+
+            // Update UI
+            document.getElementById('page-movie-title').innerText = movie.title;
+            document.title = `ყურება: ${movie.title} - Cineby`;
+
+            // 1. Build Rumble Embed URL intelligently
+            let videoId = movie.video_id || '';
+            let embedUrl = '';
+
+            if (videoId.startsWith('http')) {
+                // If it's already a full URL, ensure it's an embed URL
+                if (videoId.includes('rumble.com/embed/')) {
+                    embedUrl = videoId;
+                } else {
+                    // Try to extract ID if it's a standard Rumble URL
+                    const parts = videoId.split('/');
+                    const id = parts[parts.length - 1] || parts[parts.length - 2];
+                    embedUrl = `https://rumble.com/embed/${id}/?pub=4p1avk&api=1`;
+                }
+            } else {
+                // If it's just an ID
+                embedUrl = `https://rumble.com/embed/${videoId}/?pub=4p1avk&api=1`;
+            }
+
+            // Create player
+            const playerContainer = document.getElementById('rumble-player');
+            const iframe = document.createElement('iframe');
+            iframe.className = 'rumble';
+            iframe.src = embedUrl;
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('allowfullscreen', '');
+            playerContainer.appendChild(iframe);
+        }
+
+        window.onload = loadMovie;
     </script>
 
-    <footer class="site-footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="Cineby Logo" class="logo-img" style="height: 200px; margin-bottom: 20px;"></a>
-                <p class="footer-disclaimer">ეს საიტი არ ინახავს არანაირ ფაილს ჩვენს სერვერზე. ჩვენ მხოლოდ ვაზიარებთ ბმულებს იმ მედიაზე, რომელიც განთავსებულია მესამე მხარის სერვისებზე.</p>
-            </div>
-            <div class="footer-section">
-                <h4>დახმარება</h4>
-                <ul class="footer-links">
-                    <li><a href="privacy.html">კონფიდენციალურობის პოლიტიკა</a></li>
-                    <li><a href="terms.html">სარგებლობის წესები</a></li>
-                    <li><a href="about.html">ჩვენ შესახებ</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>კონტაქტი</h4>
-                <p>Contact: <a href="mailto:contact@cyron.dev" class="contact-email">contact@cyron.dev</a></p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Cineby. ყველა უფლება დაცულია.</p>
-        </div>
-    </footer>
-
-</body>
-
-</html>
+</body></html>

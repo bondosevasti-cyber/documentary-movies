@@ -11,6 +11,19 @@
     <meta property="og:url" content="[Insert Your Website URL]">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Extra styles for empty states or layout */
+        .cards-container:empty::after {
+            content: 'ფილმები არ არის';
+            color: #444;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        .hero {
+            transition: background-image 1s ease-in-out;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,136 +32,238 @@
         <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="Cineby Logo" class="logo-img"></a>
     </header>
 
-    <section class="hero">
+    <section class="hero" id="hero-section">
         <div class="hero-content">
-            <h2 class="hero-title" id="hero-title">აკოცე მიწას</h2>
+            <h2 class="hero-title" id="hero-title">იტვირთება...</h2>
             <div class="hero-meta">
                 <span class="rating">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path
                             d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                     </svg>
-                    <span id="hero-rating">8.1</span>
+                    <span id="hero-rating">-</span>
                 </span>
-                <span id="hero-year">2020</span>
-                <span id="hero-genre">დოკუმენტური</span>
+                <span id="hero-year">-</span>
+                <span id="hero-genre">-</span>
             </div>
-            <p class="hero-desc">დოკუმენტური ფილმი, რომელიც იკვლევს დედამიწის ნიადაგის აღდგენის გზებს, როგორც კლიმატის
-                ცვლილების გადაჭრის საშუალებას.</p>
+            <p class="hero-desc">მოითმინეთ, მონაცემები იტვირთება ბაზიდან...</p>
             <div class="hero-buttons">
-                <a href="watch_movie.html?id=v753ui4&title=%E1%83%90%E1%83%90%E1%83%99%E1%83%9D%E1%83%AA%E1%83%94%20%E1%83%9B%E1%83%98%E1%83%AC%E1%83%90%E1%83%A1&rating=8.1&year=2020&genre=%E1%83%93%E1%83%9D%E1%83%99%E1%83%A3%E1%83%9B%E1%83%94%E1%83%9C%E1%83%A2%E1%83%A3%E1%83%A0%E1%83%98&desc=%E1%83%93%E1%83%9D%E1%83%99%E1%83%A3%E1%83%9B%E1%83%94%E1%83%9C%E1%83%A2%E1%83%A3%E1%83%A0%E1%83%98%20%E1%83%A4%E1%83%98%E1%83%9A%E1%83%9B%E1%83%98%2C%20%E1%83%A0%E1%83%9D%E1%83%9B%E1%83%94%E1%83%90%E1%83%9A%E1%83%98%E1%83%AA%20%E1%83%98%E1%83%99%E1%83%90%E1%83%95%E1%83%9A%E1%83%94%E1%83%95%E1%83%A1%20%E1%83%93%E1%83%94%E1%83%93%E1%83%90%E1%83%9B%E1%83%98%E1%83%AC%E1%83%98%E1%83%A1%20%E1%83%91%E1%83%98%E1%83%A1%20%E1%83%A0%E1%83%94%E1%83%A1%E1%83%A3%E1%83%A0%E1%83%A1%E1%83%94%E1%83%91%E1%83%98%E1%83%A1...&duration=1h%2024m" class="btn-primary">
+                <a href="#" class="btn-primary" id="hero-play-btn">
                     <svg class="play-icon" width="20" height="20" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z" />
                     </svg>
                     ყურება
                 </a>
-                <a href="#" class="btn-secondary">
-                    <svg style="margin-right: 5px" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z" />
-                    </svg>
-                    ვრცლად
-                </a>
             </div>
         </div>
     </section>
 
+    <!-- Top 5 Section -->
     <div class="top10-title">
-        <h2>TOP 10</h2>
-        <div class="sub-title">დღევანდელი<br>კონტენტი</div>
-    </div>
-
-    <div class="cards-container">
-        <!-- rank 1 -->
-        <div class="card-item"
-            onclick="updateHero('აკოცე მიწას', '8.1', '2020', 'დოკუმენტური', 'დოკუმენტური ფილმი, რომელიც იკვლევს დედამიწის ნიადაგის აღდგენის გზებს, როგორც კლიმატის ცვლილების გადაჭრის საშუალებას.', 'images/kiss the ground.webp', 'center', 'v753ui4', '1h 24m')">
-            <div class="card-with-number">
-                <div class="badge-genre">დოკუმენტური</div>
-                <div class="number-bg">1</div>
-                <div class="card-large" style="background-image: url('images/kiss the ground.webp')"></div>
-            </div>
-            <div class="card-title">აკოცე მიწას</div>
+        <div class="top10-left">
+            <h2>TOP 5</h2>
+            <div class="sub-title">დღევანდელი<br>კონტენტი</div>
         </div>
-        <!-- rank 2 -->
-        <div class="card-item"
-            onclick="updateHero('დრაკონების ფრენა', '7.2', '1982', 'ანიმაცია/ფენტეზი', 'ახალგაზრდა მამაკაცი გადადის სამყაროში, სადაც დრაკონები და ჯადოქრები რეალურია.', 'images/დრაკონების ფრენა.webp', 'center', 'v75dpax', '1h 32m')">
-            <div class="card-with-number">
-                <div class="badge-genre">ანიმაცია</div>
-                <div class="number-bg">2</div>
-                <div class="card-large" style="background-image: url('images/დრაკონების ფრენა.webp')"></div>
-            </div>
-            <div class="card-title">დრაკონების ფრენა</div>
+        <div class="section-ctrls">
+            <button class="ctrl-btn" onclick="scrollSection('top10-container', -1)">&#10094;</button>
+            <button class="ctrl-btn" onclick="scrollSection('top10-container', 1)">&#10095;</button>
         </div>
     </div>
+    <div class="cards-container" id="top10-container">
+        <!-- Top 5 Content -->
+    </div>
 
+    <!-- Coming Soon Section -->
     <div class="section-header">
         <h2 class="section-title">მალე დაემატება</h2>
-    </div>
-    <div class="cards-container">
-
-        <div class="card-item"
-            onclick="updateHero('ინტელექტის ძიება', '7.8', '2016', 'დოკუმენტური', 'საინტერესო მოგზაურობა ხელოვნური ინტელექტის განვითარებისა და მისი მომავლის შესახებ.', 'images/ინტელექტის ძიებ1.webp', 'center')">
-            <div class="card-small"
-                style="background-image: url('images/ინტელექტის ძიებ1.webp'); background-size: cover; height: 160px; width: 280px;">
-                <div class="badge-genre">დოკუმენტური</div>
-                <div class="badge-soon">მალე</div>
+        <div class="header-right">
+            <a href="#" class="see-all-btn">ყველას ნახვა</a>
+            <div class="section-ctrls">
+                <button class="ctrl-btn" onclick="scrollSection('soon-container', -1)">&#10094;</button>
+                <button class="ctrl-btn" onclick="scrollSection('soon-container', 1)">&#10095;</button>
             </div>
-            <div class="card-title">ინტელექტის ძიება</div>
-        </div>
-
-        <div class="card-item"
-            onclick="updateHero('ფანტასტიკური სოკოები', '7.4', '2019', 'დოკუმენტური', 'შთამბეჭდავი მოგზაურობა სოკოების ჯადოსნური, იდუმალი და სამკურნალო სამყაროს შესახებ.', 'images/ფანტასტიკური სოკოები.webp', 'top')">
-            <div class="card-small"
-                style="background-image: url('images/ფანტასტიკური სოკოები.webp'); background-size: cover; height: 160px; width: 280px;">
-                <div class="badge-genre">დოკუმენტური</div>
-                <div class="badge-soon">მალე</div>
-            </div>
-            <div class="card-title">ფანტასტიკური სოკოები</div>
-        </div>
-
-        <div class="card-item"
-            onclick="updateHero('ყველაზე დიდი პატარა ფერმა', '8.0', '2018', 'დოკუმენტური', 'ჯონ და მოლი ჩესტერების რვაწლიანი მოგზაურობა უნაყოფო მიწის აყვავებულ ფერმად ქცევის შესახებ.', 'images/first/ყველაზე დიდი პატარა ფერმა.webp', 'center')">
-            <div class="card-small"
-                style="background-image: url('images/ყველაზე დიდი პატარა ფერმა.webp'); background-size: cover; height: 160px; width: 280px;">
-                <div class="badge-genre">დოკუმენტური</div>
-                <div class="badge-soon">მალე</div>
-            </div>
-            <div class="card-title">ყველაზე დიდი პატარა ფერმა</div>
-        </div>
-
-        <div class="card-item"
-            onclick="updateHero('ჰობიტი', '7.8', '2012', 'ფენტეზი/თავგადასავალი', 'ბილბო ბეგინსის თავგადასავალი ცამეტი ჯუჯასა და ჯადოქარ განდალფის კომპანიაში.', 'images/first/ჰობიტი.webp', 'center')">
-            <div class="card-small"
-                style="background-image: url('images/ჰობიტი.webp'); background-size: cover; height: 160px; width: 280px;">
-                <div class="badge-genre">ანიმაცია</div>
-                <div class="badge-soon">მალე</div>
-            </div>
-            <div class="card-title">ჰობიტი</div>
         </div>
     </div>
+    <div class="cards-container" id="soon-container">
+        <!-- Coming Soon Content -->
+    </div>
 
+    <!-- All Movies Section -->
+    <div class="section-header">
+        <h2 class="section-title">ყველა ფილმი</h2>
+        <div class="header-right">
+            <a href="#" class="see-all-btn">ყველას ნახვა</a>
+            <div class="section-ctrls">
+                <button class="ctrl-btn" onclick="scrollSection('all-movies-container', -1)">&#10094;</button>
+                <button class="ctrl-btn" onclick="scrollSection('all-movies-container', 1)">&#10095;</button>
+            </div>
+        </div>
+    </div>
+    <div class="cards-container" id="all-movies-container">
+        <!-- All Movies Content -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <script>
-        function updateHero(title, rating, year, genre, desc, bg, pos = 'center', videoId = 'v753ui4', duration = '1h 30m') {
-            document.getElementById('hero-title').innerText = title;
-            document.getElementById('hero-rating').innerText = rating;
-            document.getElementById('hero-year').innerText = year;
-            document.getElementById('hero-genre').innerText = genre;
-            document.querySelector('.hero-desc').innerText = desc;
-            const hero = document.querySelector('.hero');
-            hero.style.backgroundImage = `url('${bg}')`;
-            hero.style.backgroundPosition = pos;
+        let top5Movies = [];
+        let currentRankIndex = 0;
+        let sliderInterval = null;
 
-            // Updated to pass URL parameters to watch_movie.html
-            const watchBtn = document.querySelector('.btn-primary');
-            const encodedTitle = encodeURIComponent(title);
-            const encodedDesc = encodeURIComponent(desc);
-            watchBtn.href = `watch_movie.html?id=${videoId}&title=${encodedTitle}&rating=${rating}&year=${year}&genre=${genre}&desc=${encodedDesc}&duration=${duration}`;
+        async function loadTop5() {
+            const { data: movies, error } = await _supabase
+                .from('movies')
+                .select('*')
+                .not('top_10_position', 'is', null)
+                .order('top_10_position', { ascending: true })
+                .limit(5);
 
-            window.scrollTo({
-                top: 0,
+            if (error) return console.error(error);
+            top5Movies = movies || [];
+
+            const container = document.getElementById('top10-container');
+            container.innerHTML = '';
+
+            top5Movies.forEach(movie => {
+                const badgeText = movie.genre || 'კინო';
+
+                const cardHtml = `
+                    <div class="rank-card-wrapper" onclick="manualHeroUpdate(${JSON.stringify(movie).replace(/"/g, '&quot;')})">
+                        <div class="rank-number">${movie.top_10_position}</div>
+                        <div class="rank-poster-container">
+                            <span class="badge-genre" style="background: rgba(0, 168, 89, 0.9);">${badgeText}</span>
+                            <img src="${movie.poster_url}" alt="${movie.title}">
+                        </div>
+                        <div class="rank-card-title">${movie.title}</div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+
+            return top5Movies;
+        }
+
+        function startHeroSlider() {
+            if (sliderInterval) clearInterval(sliderInterval);
+            sliderInterval = setInterval(() => {
+                if (top5Movies.length === 0) return;
+                currentRankIndex = (currentRankIndex + 1) % top5Movies.length;
+                updateHeroFromDB(top5Movies[currentRankIndex], false);
+            }, 5000);
+        }
+
+        function manualHeroUpdate(movie) {
+            if (sliderInterval) clearInterval(sliderInterval);
+            updateHeroFromDB(movie, true);
+
+            // Stay on manual choice for 15 seconds, then resume Top 5 cycle
+            setTimeout(() => {
+                startHeroSlider();
+            }, 15000);
+        }
+
+        function scrollSection(containerId, direction) {
+            const container = document.getElementById(containerId);
+            const scrollAmount = container.offsetWidth * 0.8;
+            container.scrollBy({
+                left: direction * scrollAmount,
                 behavior: 'smooth'
             });
         }
+
+        async function loadAllMovies() {
+            const { data: movies, error } = await _supabase
+                .from('movies')
+                .select('*')
+                .not('video_id', 'is', null)
+                .neq('video_id', '')
+                .eq('is_coming_soon', false)
+                .order('created_at', { ascending: false });
+
+            if (error) return console.error(error);
+            const container = document.getElementById('all-movies-container');
+            container.innerHTML = '';
+
+            movies.forEach(movie => {
+                const card = createCard(movie);
+                container.appendChild(card);
+            });
+        }
+
+        async function initHome() {
+            // 1. Initial Load Top 5
+            const movies = await loadTop5();
+            if (movies && movies.length > 0) {
+                updateHeroFromDB(movies[0], false);
+                startHeroSlider();
+            }
+
+            // 2. Sections
+            loadAllMovies();
+
+            // 3. Coming Soon Section
+            const { data: allMovies } = await _supabase.from('movies').select('*').order('created_at', { ascending: false });
+            const soonContainer = document.getElementById('soon-container');
+            const soonMovies = allMovies.filter(m => m.is_coming_soon);
+            soonMovies.forEach(movie => {
+                const card = createCard(movie, null, false, true);
+                soonContainer.appendChild(card);
+            });
+        }
+
+        function createCard(movie, rank = 0, isTop10 = false, isSoon = false) {
+            const card = document.createElement('div');
+            card.className = 'card-item';
+            card.onclick = () => manualHeroUpdate(movie);
+
+            let innerHTML = '';
+            if (isTop10) {
+                innerHTML = `
+                    <div class="card-with-number">
+                        <div class="badge-genre">${movie.genre}</div>
+                        <div class="number-bg">${rank}</div>
+                        <div class="card-large" style="background-image: url('${movie.poster_url}')"></div>
+                    </div>
+                    <div class="card-title">${movie.title}</div>
+                `;
+            } else {
+                const ratioClass = movie.display_ratio === '16:9' ? 'card-16-9' : 'card-1-1';
+                const bgUrl = movie.display_ratio === '16:9' ? (movie.cover_url || movie.poster_url) : (movie.poster_url || movie.cover_url);
+
+                innerHTML = `
+                    <div class="${ratioClass}" style="background-image: url('${bgUrl}');">
+                        <div class="badge-genre">${movie.genre}</div>
+                        ${isSoon ? '<div class="badge-soon">მალე</div>' : ''}
+                    </div>
+                    <div class="card-title">${movie.title}</div>
+                `;
+            }
+            card.innerHTML = innerHTML;
+            return card;
+        }
+
+        function updateHeroFromDB(movie, shouldScroll = true) {
+            document.getElementById('hero-title').innerText = movie.title;
+            document.getElementById('hero-rating').innerText = movie.rating;
+            document.getElementById('hero-year').innerText = movie.release_year;
+            document.getElementById('hero-genre').innerText = movie.genre;
+            document.querySelector('.hero-desc').innerText = movie.description;
+
+            const hero = document.getElementById('hero-section');
+            // Force 16:9 (Cover) for Hero background
+            const bgUrl = movie.cover_url || movie.poster_url;
+            hero.style.backgroundImage = `url('${bgUrl}')`;
+            hero.style.backgroundPosition = 'center';
+
+            document.getElementById('hero-play-btn').href = `watch_movie.html?id=${movie.id}`;
+
+            // Smooth scroll to top only if a card was manually clicked
+            if (shouldScroll) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        window.onload = initHome;
     </script>
 
     <footer class="site-footer">
