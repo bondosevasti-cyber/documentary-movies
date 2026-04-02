@@ -77,8 +77,9 @@
     <div class="section-header">
         <h2 class="section-title">მალე დაემატება</h2>
         <div class="header-right">
-            <a href="#" class="see-all-btn">ყველას ნახვა</a>
+            <a href="javascript:void(0)" class="see-all-btn" onclick="openSeeAll('soon')">ყველას ნახვა</a>
             <div class="section-ctrls">
+
                 <button class="ctrl-btn" onclick="scrollSection('soon-container', -1)">&#10094;</button>
                 <button class="ctrl-btn" onclick="scrollSection('soon-container', 1)">&#10095;</button>
             </div>
@@ -92,8 +93,9 @@
     <div class="section-header">
         <h2 class="section-title">ყველა ფილმი</h2>
         <div class="header-right">
-            <a href="#" class="see-all-btn">ყველას ნახვა</a>
+            <a href="javascript:void(0)" class="see-all-btn" onclick="openSeeAll('all')">ყველას ნახვა</a>
             <div class="section-ctrls">
+
                 <button class="ctrl-btn" onclick="scrollSection('all-movies-container', -1)">&#10094;</button>
                 <button class="ctrl-btn" onclick="scrollSection('all-movies-container', 1)">&#10095;</button>
             </div>
@@ -107,8 +109,11 @@
     <script src="supabase-config.js"></script>
     <script>
         let top5Movies = [];
+        let allMoviesGlobal = [];
+        let soonMoviesGlobal = [];
         let currentRankIndex = 0;
         let sliderInterval = null;
+
 
         async function loadTop5() {
             const { data: movies, error } = await _supabase
@@ -131,9 +136,9 @@
                     <div class="rank-card-wrapper" onclick="manualHeroUpdate(${JSON.stringify(movie).replace(/"/g, '&quot;')})">
                         <div class="rank-number">${movie.top_10_position}</div>
                         <div class="rank-poster-container">
-                            <span class="badge-genre" style="background: rgba(0, 168, 89, 0.9);">${badgeText}</span>
                             <img src="${movie.poster_url}" alt="${movie.title}">
                         </div>
+
                         <div class="rank-card-title">${movie.title}</div>
                     </div>
                 `;
@@ -164,7 +169,8 @@
 
         function scrollSection(containerId, direction) {
             const container = document.getElementById(containerId);
-            const scrollAmount = container.offsetWidth * 0.8;
+            // Move by roughly 1.5 elements to ensure snap picks the next one
+            const scrollAmount = container.offsetWidth * 0.7;
             container.scrollBy({
                 left: direction * scrollAmount,
                 behavior: 'smooth'
@@ -181,14 +187,16 @@
                 .order('created_at', { ascending: false });
 
             if (error) return console.error(error);
+            allMoviesGlobal = movies || [];
             const container = document.getElementById('all-movies-container');
             container.innerHTML = '';
 
-            movies.forEach(movie => {
+            allMoviesGlobal.forEach(movie => {
                 const card = createCard(movie);
                 container.appendChild(card);
             });
         }
+
 
         async function initHome() {
             // 1. Initial Load Top 5
@@ -199,17 +207,48 @@
             }
 
             // 2. Sections
-            loadAllMovies();
+            await loadAllMovies();
 
             // 3. Coming Soon Section
             const { data: allMovies } = await _supabase.from('movies').select('*').order('created_at', { ascending: false });
             const soonContainer = document.getElementById('soon-container');
-            const soonMovies = allMovies.filter(m => m.is_coming_soon);
-            soonMovies.forEach(movie => {
+            soonMoviesGlobal = (allMovies || []).filter(m => m.is_coming_soon);
+            soonMoviesGlobal.forEach(movie => {
                 const card = createCard(movie, null, false, true);
                 soonContainer.appendChild(card);
             });
         }
+
+        function openSeeAll(type) {
+            const modal = document.getElementById('see-all-modal');
+            const container = document.getElementById('modal-grid');
+            const title = document.getElementById('modal-title');
+            
+            container.innerHTML = '';
+            let movies = [];
+            
+            if (type === 'soon') {
+                title.innerText = 'მალე დაემატება';
+                movies = soonMoviesGlobal;
+            } else {
+                title.innerText = 'ყველა ფილმი';
+                movies = allMoviesGlobal;
+            }
+
+            movies.forEach(movie => {
+                const card = createCard(movie, null, false, type === 'soon');
+                container.appendChild(card);
+            });
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('see-all-modal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
 
         function createCard(movie, rank = 0, isTop10 = false, isSoon = false) {
             const card = document.createElement('div');
@@ -220,10 +259,10 @@
             if (isTop10) {
                 innerHTML = `
                     <div class="card-with-number">
-                        <div class="badge-genre">${movie.genre}</div>
                         <div class="number-bg">${rank}</div>
                         <div class="card-large" style="background-image: url('${movie.poster_url}')"></div>
                     </div>
+
                     <div class="card-title">${movie.title}</div>
                 `;
             } else {
@@ -232,9 +271,8 @@
 
                 innerHTML = `
                     <div class="${ratioClass}" style="background-image: url('${bgUrl}');">
-                        <div class="badge-genre">${movie.genre}</div>
-                        ${isSoon ? '<div class="badge-soon">მალე</div>' : ''}
                     </div>
+
                     <div class="card-title">${movie.title}</div>
                 `;
             }
@@ -266,7 +304,21 @@
         window.onload = initHome;
     </script>
 
+    <!-- Modal for See All -->
+    <div id="see-all-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">ყველა ფილმი</h2>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-grid" id="modal-grid">
+                <!-- Movies will be loaded here -->
+            </div>
+        </div>
+    </div>
+
     <footer class="site-footer">
+
         <div class="footer-content">
             <div class="footer-section">
                 <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="დოკუმენტური ფილმები"
