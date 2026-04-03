@@ -39,13 +39,13 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 50px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
-    position: absolute;
+    padding: 10px 50px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 100;
+    z-index: 1000;
 }
 
 .logo {
@@ -55,12 +55,15 @@ header {
 }
 
 .logo-img {
-    height: 80px;
-    /* Reduced for a standard navbar fit */
+    height: 50px;
     width: auto;
-    max-width: 100%;
     display: block;
     object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-img {
+    transform: scale(1.05);
 }
 
 .logo span {
@@ -85,8 +88,125 @@ nav a {
     transition: color 0.3s ease;
 }
 
-nav a:hover {
+nav a:hover, nav a.active {
     color: var(--accent-color);
+}
+
+/* Hamburger menu button */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    z-index: 1100;
+    padding: 10px;
+}
+
+.hamburger span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: var(--text-color);
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-support {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 10px 25px;
+    border-radius: 30px; /* Capsule shape */
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+}
+
+.btn-support:hover {
+    background-color: transparent;
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+/* Info Icon & Tooltip */
+.info-icon-wrapper {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+}
+
+.info-icon {
+    width: 22px;
+    height: 22px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.info-icon:hover {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.info-tooltip {
+    position: absolute;
+    top: 30px;
+    right: 0;
+    width: 280px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid var(--accent-color);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    pointer-events: none;
+    text-align: left;
+    backdrop-filter: blur(10px);
+}
+
+.info-icon-wrapper:hover .info-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(5px);
+}
+
+/* Video Grid */
+.videos-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 40px;
+    padding: 0 50px 50px;
+}
+
+.video-original-link {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--accent-color);
+    text-decoration: none;
+    border: 1px solid var(--accent-color);
+    padding: 4px 10px;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.video-original-link:hover {
+    background: var(--accent-color);
+    color: white;
 }
 
 .icons {
@@ -623,6 +743,28 @@ nav a:hover {
     text-decoration: underline;
 }
 
+/* Push Notification Button */
+.push-btn {
+    background: none;
+    border: none;
+    color: #a0a0a0;
+    font-size: 15px;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+    transition: color 0.3s;
+    font-family: inherit;
+}
+
+.push-btn:hover {
+    color: var(--accent-color);
+}
+
+.push-btn.subscribed {
+    color: #4CAF50;
+    cursor: default;
+}
+
 /* Modal Overlay */
 .modal-overlay {
     position: fixed;
@@ -768,36 +910,46 @@ nav a:hover {
     /* Global Responsive Adjustments */
     header {
         padding: 15px 20px;
-        justify-content: center;
+        justify-content: space-between;
     }
 
-    .logo-img {
-        height: auto !important;
-        max-height: 45px !important;
-        width: auto !important;
-        max-width: 85vw !important;
-    }
-
-    .hero {
-        height: 80vh;
-        padding: 0 20px;
-        align-items: flex-end;
-        justify-content: center;
-        text-align: center;
-        padding-bottom: 60px;
-    }
-
-    .hero::after {
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.4) 100%);
-    }
-
-    .hero-content {
-        margin-top: 0;
-        max-width: 100%;
-        width: 100%;
+    .hamburger {
         display: flex;
+    }
+
+    nav {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.98);
         flex-direction: column;
+        justify-content: center;
         align-items: center;
+        gap: 40px;
+        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+    }
+
+    nav.active {
+        right: 0;
+    }
+
+    nav a {
+        font-size: 24px;
+    }
+
+    /* burger to X animation */
+    .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(6px, 6px);
+    }
+    .hamburger.active span:nth-child(2) {
+        opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -7px);
     }
 
     .hero h1, .hero .hero-title {

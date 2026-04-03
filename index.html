@@ -30,79 +30,99 @@
 
     <header>
         <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="Cineby Logo" class="logo-img"></a>
+        <div class="hamburger" id="hamburger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <nav id="navbar">
+            <a href="javascript:void(0)" id="nav-movies-link" class="active" onclick="handleNavSelection('movies')">ფილმები</a>
+            <a href="javascript:void(0)" id="nav-videos-link" onclick="handleNavSelection('videos')">ვიდეოები</a>
+            <a href="https://www.buymeacoffee.com/placeholder" target="_blank" class="btn-support" onclick="closeMenuOnMobile()">მხარდაჭერა</a>
+        </nav>
     </header>
 
-    <section class="hero" id="hero-section">
-        <div class="hero-content">
-            <h2 class="hero-title" id="hero-title">იტვირთება...</h2>
-            <div class="hero-meta">
-                <span class="rating">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                    </svg>
-                    <span id="hero-rating">-</span>
-                </span>
-                <span id="hero-year">-</span>
-                <span id="hero-genre">-</span>
+    <div id="movies-content">
+        <section class="hero" id="hero-section">
+            <div class="hero-content">
+                <h2 class="hero-title" id="hero-title">იტვირთება...</h2>
+                <div class="hero-meta">
+                    <span class="rating">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <span id="hero-rating">-</span>
+                    </span>
+                    <span id="hero-year">-</span>
+                    <span id="hero-genre">-</span>
+                </div>
+                <p class="hero-desc">მოითმინეთ, მონაცემები იტვირთება ბაზიდან...</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn-primary" id="hero-play-btn">
+                        <svg class="play-icon" width="20" height="20" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                        ყურება
+                    </a>
+                </div>
             </div>
-            <p class="hero-desc">მოითმინეთ, მონაცემები იტვირთება ბაზიდან...</p>
-            <div class="hero-buttons">
-                <a href="#" class="btn-primary" id="hero-play-btn">
-                    <svg class="play-icon" width="20" height="20" viewBox="0 0 24 24">
-                        <path d="M8 5v14l11-7z" />
-                    </svg>
-                    ყურება
-                </a>
+        </section>
+
+        <!-- Top 5 Section -->
+        <div class="top10-title">
+            <div class="top10-left">
+                <h2>TOP 5</h2>
+                <div class="sub-title">დღევანდელი<br>კონტენტი</div>
             </div>
-        </div>
-    </section>
-
-    <!-- Top 5 Section -->
-    <div class="top10-title">
-        <div class="top10-left">
-            <h2>TOP 5</h2>
-            <div class="sub-title">დღევანდელი<br>კონტენტი</div>
-        </div>
-        <div class="section-ctrls">
-            <button class="ctrl-btn" onclick="scrollSection('top10-container', -1)">&#10094;</button>
-            <button class="ctrl-btn" onclick="scrollSection('top10-container', 1)">&#10095;</button>
-        </div>
-    </div>
-    <div class="cards-container" id="top10-container">
-        <!-- Top 5 Content -->
-    </div>
-
-    <!-- Coming Soon Section -->
-    <div class="section-header">
-        <h2 class="section-title">მალე დაემატება</h2>
-        <div class="header-right">
-            <a href="javascript:void(0)" class="see-all-btn" onclick="openSeeAll('soon')">ყველას ნახვა</a>
             <div class="section-ctrls">
-
-                <button class="ctrl-btn" onclick="scrollSection('soon-container', -1)">&#10094;</button>
-                <button class="ctrl-btn" onclick="scrollSection('soon-container', 1)">&#10095;</button>
+                <button class="ctrl-btn" onclick="scrollSection('top10-container', -1)">&#10094;</button>
+                <button class="ctrl-btn" onclick="scrollSection('top10-container', 1)">&#10095;</button>
             </div>
         </div>
-    </div>
-    <div class="cards-container" id="soon-container">
-        <!-- Coming Soon Content -->
-    </div>
+        <div class="cards-container" id="top10-container">
+            <!-- Top 5 Content -->
+        </div>
 
-    <!-- All Movies Section -->
-    <div class="section-header">
-        <h2 class="section-title">ყველა ფილმი</h2>
-        <div class="header-right">
-            <a href="javascript:void(0)" class="see-all-btn" onclick="openSeeAll('all')">ყველას ნახვა</a>
-            <div class="section-ctrls">
-
-                <button class="ctrl-btn" onclick="scrollSection('all-movies-container', -1)">&#10094;</button>
-                <button class="ctrl-btn" onclick="scrollSection('all-movies-container', 1)">&#10095;</button>
+        <!-- Coming Soon Section -->
+        <div class="section-header">
+            <h2 class="section-title">მალე დაემატება</h2>
+            <div class="header-right">
+                <a href="javascript:void(0)" class="see-all-btn" onclick="openSeeAll('soon')">ყველას ნახვა</a>
+                <div class="section-ctrls">
+                    <button class="ctrl-btn" onclick="scrollSection('soon-container', -1)">&#10094;</button>
+                    <button class="ctrl-btn" onclick="scrollSection('soon-container', 1)">&#10095;</button>
+                </div>
             </div>
         </div>
+        <div class="cards-container" id="soon-container">
+            <!-- Coming Soon Content -->
+        </div>
+
+        <!-- All Movies Section -->
+        <div class="section-header">
+            <h2 class="section-title">ყველა ფილმი</h2>
+            <div class="header-right">
+                <a href="javascript:void(0)" class="see-all-btn" onclick="openSeeAll('all')">ყველას ნახვა</a>
+                <div class="section-ctrls">
+                    <button class="ctrl-btn" onclick="scrollSection('all-movies-container', -1)">&#10094;</button>
+                    <button class="ctrl-btn" onclick="scrollSection('all-movies-container', 1)">&#10095;</button>
+                </div>
+            </div>
+        </div>
+        <div class="cards-container" id="all-movies-container">
+            <!-- All Movies Content -->
+        </div>
     </div>
-    <div class="cards-container" id="all-movies-container">
-        <!-- All Movies Content -->
+
+    <!-- VIDEOS CONTENT -->
+    <div id="videos-content" style="display: none; padding-top: 150px;">
+        <div class="section-header" style="margin-bottom: 40px;">
+            <h2 class="section-title">ვიდეოები</h2>
+        </div>
+        <div class="videos-grid-container" id="all-videos-grid">
+            <!-- Videos Content -->
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -111,8 +131,53 @@
         let top5Movies = [];
         let allMoviesGlobal = [];
         let soonMoviesGlobal = [];
+        let allVideosGlobal = [];
         let currentRankIndex = 0;
         let sliderInterval = null;
+
+        function switchContent(type) {
+            const moviesContent = document.getElementById('movies-content');
+            const videosContent = document.getElementById('videos-content');
+            const moviesLink = document.getElementById('nav-movies-link');
+            const videosLink = document.getElementById('nav-videos-link');
+
+            if (type === 'movies') {
+                moviesContent.style.display = 'block';
+                videosContent.style.display = 'none';
+                moviesLink.classList.add('active');
+                videosLink.classList.remove('active');
+            } else {
+                moviesContent.style.display = 'none';
+                videosContent.style.display = 'block';
+                moviesLink.classList.remove('active');
+                videosLink.classList.add('active');
+                loadAllVideos();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Mobile Menu Logic
+        const hamburger = document.getElementById('hamburger-menu');
+        const navbar = document.getElementById('navbar');
+
+        function toggleMenu() {
+            hamburger.classList.toggle('active');
+            navbar.classList.toggle('active');
+            document.body.style.overflow = navbar.classList.contains('active') ? 'hidden' : 'auto';
+        }
+
+        function handleNavSelection(type) {
+            switchContent(type);
+            closeMenuOnMobile();
+        }
+
+        function closeMenuOnMobile() {
+            if (window.innerWidth <= 768 && navbar.classList.contains('active')) {
+                toggleMenu();
+            }
+        }
+
+        hamburger.onclick = toggleMenu;
 
 
         async function loadTop5() {
@@ -130,13 +195,15 @@
             container.innerHTML = '';
 
             top5Movies.forEach(movie => {
-                const badgeText = movie.genre || 'კინო';
-
                 const cardHtml = `
                     <div class="rank-card-wrapper" onclick="manualHeroUpdate(${JSON.stringify(movie).replace(/"/g, '&quot;')})">
+                        <div class="info-icon-wrapper">
+                            <div class="info-icon">!</div>
+                            <div class="info-tooltip">გაფრთხილება: ჩვენ პატივს ვცემთ საავტორო უფლებებს. მზად ვართ ვითანამშრომლოთ ავტორებთან, თუმცა ჩვენს შეტყობინებებზე პასუხი ჯერ არ მიგვიღია.</div>
+                        </div>
                         <div class="rank-number">${movie.top_10_position}</div>
                         <div class="rank-poster-container">
-                            <img src="${movie.poster_url}" alt="${movie.title}">
+                            <img src="${movie.card_url || movie.poster_url}" alt="${movie.title}">
                         </div>
 
                         <div class="rank-card-title">${movie.title}</div>
@@ -209,7 +276,10 @@
             // 2. Sections
             await loadAllMovies();
 
-            // 3. Coming Soon Section
+            // 3. Videos (Preload)
+            loadAllVideos();
+
+            // 4. Coming Soon Section
             const { data: allMovies } = await _supabase.from('movies').select('*').order('created_at', { ascending: false });
             const soonContainer = document.getElementById('soon-container');
             soonMoviesGlobal = (allMovies || []).filter(m => m.is_coming_soon);
@@ -217,6 +287,39 @@
                 const card = createCard(movie, null, false, true);
                 soonContainer.appendChild(card);
             });
+        }
+
+        async function loadAllVideos() {
+            const { data: videos, error } = await _supabase.from('short_videos').select('*').order('created_at', { ascending: false });
+            if (error) return console.error(error);
+            
+            allVideosGlobal = videos || [];
+            const container = document.getElementById('all-videos-grid');
+            container.innerHTML = '';
+
+            allVideosGlobal.forEach(video => {
+                const card = createVideoCard(video);
+                container.appendChild(card);
+            });
+        }
+
+        function createVideoCard(video) {
+            const card = document.createElement('div');
+            card.className = 'card-item';
+            card.style.cursor = 'default';
+            
+            // Video cards use 1:1 format for short videos
+            card.innerHTML = `
+                <div class="card-1-1" style="background-image: url('${video.photo_url}'); cursor: pointer;" onclick="window.open('watch_video.html?id=${video.id}', '_blank')">
+                    <div class="info-icon-wrapper">
+                        <div class="info-icon">!</div>
+                        <div class="info-tooltip">გაფრთხილება: ჩვენ პატივს ვცემთ საავტორო უფლებებს. მზად ვართ ვითანამშრომლოთ ავტორებთან, თუმცა ჩვენს შეტყობინებებზე პასუხი ჯერ არ მიგვიღია.</div>
+                    </div>
+                </div>
+                <div class="card-title">${video.title}</div>
+                <a href="${video.original_link || '#'}" target="_blank" class="video-original-link">${video.original_link ? 'ნახე ორიგინალი' : 'ორიგინალი არ არის'}</a>
+            `;
+            return card;
         }
 
         function openSeeAll(type) {
@@ -255,9 +358,14 @@
             card.className = 'card-item';
             card.onclick = () => manualHeroUpdate(movie);
 
-            let innerHTML = '';
+            let innerHTML = `
+                <div class="info-icon-wrapper">
+                    <div class="info-icon">!</div>
+                    <div class="info-tooltip">გაფრთხილება: ჩვენ პატივს ვცემთ საავტორო უფლებებს. მზად ვართ ვითანამშრომლოთ ავტორებთან, თუმცა ჩვენს შეტყობინებებზე პასუხი ჯერ არ მიგვიღია.</div>
+                </div>
+            `;
             if (isTop10) {
-                innerHTML = `
+                innerHTML += `
                     <div class="card-with-number">
                         <div class="number-bg">${rank}</div>
                         <div class="card-large" style="background-image: url('${movie.poster_url}')"></div>
@@ -267,10 +375,12 @@
                 `;
             } else {
                 const ratioClass = movie.display_ratio === '16:9' ? 'card-16-9' : 'card-1-1';
-                const bgUrl = movie.display_ratio === '16:9' ? (movie.cover_url || movie.poster_url) : (movie.poster_url || movie.cover_url);
+                // Grids MUST use card_url with poster_url fallback
+                const bgUrl = movie.card_url || movie.poster_url;
+                const focalPos = 'center'; // Reset focal to center for standard grids
 
-                innerHTML = `
-                    <div class="${ratioClass}" style="background-image: url('${bgUrl}');">
+                innerHTML += `
+                    <div class="${ratioClass}" style="background-image: url('${bgUrl}'); background-position: ${focalPos};">
                     </div>
 
                     <div class="card-title">${movie.title}</div>
@@ -288,10 +398,15 @@
             document.querySelector('.hero-desc').innerText = movie.description;
 
             const hero = document.getElementById('hero-section');
-            // Force 16:9 (Cover) for Hero background
-            const bgUrl = movie.cover_url || movie.poster_url;
-            hero.style.backgroundImage = `url('${bgUrl}')`;
-            hero.style.backgroundPosition = 'center';
+            // Hero section MUST only use cover_url (Banner)
+            const bgUrl = movie.cover_url;
+            if (bgUrl) {
+                hero.style.backgroundImage = `url('${bgUrl}')`;
+                hero.style.backgroundPosition = `${movie.mobile_pos_x || 50}% ${movie.mobile_pos_y || 50}%`;
+            } else {
+                // Background fallback or empty if no banner
+                hero.style.backgroundImage = 'none';
+            }
 
             document.getElementById('hero-play-btn').href = `watch_movie.html?id=${movie.id}`;
 
@@ -301,7 +416,86 @@
             }
         }
 
-        window.onload = initHome;
+        // Push Notification Logic
+        const VAPID_PUBLIC_KEY = 'YOUR_VAPID_PUBLIC_KEY_PLACEHOLDER'; // REPLACEME
+
+        async function registerServiceWorker() {
+            if ('serviceWorker' in navigator && 'PushManager' in window) {
+                try {
+                    const registration = await navigator.serviceWorker.register('sw.js');
+                    console.log('SW Registered');
+                    checkSubscriptionStatus(registration);
+                } catch (error) {
+                    console.error('Service Worker registration failed:', error);
+                }
+            }
+        }
+
+        async function checkSubscriptionStatus(registration) {
+            const subscription = await registration.pushManager.getSubscription();
+            const btn = document.getElementById('push-notify-btn');
+            if (subscription) {
+                btn.innerText = 'ჩართულია';
+                btn.classList.add('subscribed');
+                btn.disabled = true;
+            } else {
+                btn.onclick = () => subscribeUser(registration);
+            }
+        }
+
+        async function subscribeUser(registration) {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                alert('შეტყობინებების ჩართვა აუცილებელია სიახლეების მისაღებად!');
+                return;
+            }
+
+            try {
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                });
+
+                // Send to Supabase
+                const { error } = await _supabase
+                    .from('push_subscriptions')
+                    .insert([{
+                        endpoint: subscription.endpoint,
+                        subscription_data: JSON.parse(JSON.stringify(subscription))
+                    }]);
+
+                if (error) throw error;
+
+                const btn = document.getElementById('push-notify-btn');
+                btn.innerText = 'ჩართულია';
+                btn.classList.add('subscribed');
+                btn.disabled = true;
+                
+                console.log('User Subscribed:', subscription);
+            } catch (err) {
+                console.error('Failed to subscribe the user: ', err);
+            }
+        }
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+
+        window.onload = () => {
+            initHome();
+            registerServiceWorker(); // Register SW on load
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('type') === 'videos') {
+                switchContent('videos');
+            }
+        };
     </script>
 
     <!-- Modal for See All -->
@@ -332,6 +526,7 @@
                     <li><a href="privacy.html">კონფიდენციალურობის პოლიტიკა</a></li>
                     <li><a href="terms.html">სარგებლობის წესები</a></li>
                     <li><a href="about.html">ჩვენ შესახებ</a></li>
+                    <li><button id="push-notify-btn" class="push-btn">შეტყობინებების ჩართვა</button></li>
                 </ul>
             </div>
             <div class="footer-section">

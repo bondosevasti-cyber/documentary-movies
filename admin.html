@@ -62,6 +62,69 @@
 
         #login-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: black; z-index: 1000; display: flex; align-items: center; justify-content: center; }
         #admin-content { display: none; }
+
+        /* Sub-navigation styles */
+        .admin-nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #222;
+        }
+        .nav-item {
+            padding: 12px 25px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #aaa;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+        .nav-item:hover {
+            border-color: #555;
+            color: white;
+        }
+        .nav-item.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(227, 27, 35, 0.3);
+        }
+        .admin-section {
+            display: none;
+            gap: 40px;
+        }
+        .admin-section.active {
+            display: grid;
+        }
+        .videos-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .video-card-item {
+            background: #111;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 1px solid #222;
+        }
+        .video-card-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .video-card-info {
+            flex: 1;
+        }
+        .video-card-info h4 { margin: 0 0 5px 0; color: white; }
+        .video-card-info p { margin: 0; font-size: 12px; color: #666; }
+        .video-card-actions { display: flex; gap: 10px; }
     </style>
 </head>
 <body>
@@ -87,85 +150,189 @@
         <button class="btn-logout" id="logout-btn" style="float: right; margin: 20px;" onclick="handleLogout()">გამოსვლა</button>
     </header>
 
-    <div class="admin-container" id="admin-content">
-        <div class="admin-form-container">
-            <h1 id="form-title">ფილმის დამატება</h1>
-            <form id="movie-form">
-                <input type="hidden" name="movie_id" id="movie-id">
-                <div class="form-group">
-                    <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-                        <span>პოსტერი (1:1)</span>
-                        <input type="radio" name="ratio_choice" value="1:1" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent-color);">
-                    </label>
-                    <div class="upload-wrapper poster-wrapper" id="poster-drop-zone">
-                        <button type="button" class="reset-upload" id="poster-reset">&times;</button>
-                        <div class="upload-placeholder" id="poster-placeholder" onclick="document.getElementById('poster-input').click()">
-                            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                            <p>პოსტერის ატვირთვა</p>
-                        </div>
-                        <div class="cropper-container-div" id="poster-cropper-container"><img id="poster-cropper-image"></div>
-                        <input type="file" id="poster-input" accept="image/*" style="display: none;">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-                        <span>ფონი (16:9)</span>
-                        <input type="radio" name="ratio_choice" value="16:9" style="width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent-color);">
-                    </label>
-                    <div class="upload-wrapper cover-wrapper" id="cover-drop-zone">
-                        <button type="button" class="reset-upload" id="cover-reset">&times;</button>
-                        <div class="upload-placeholder" id="cover-placeholder" onclick="document.getElementById('cover-input').click()">
-                            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                            <p>ფონის ატვირთვა</p>
-                        </div>
-                        <div class="cropper-container-div" id="cover-cropper-container"><img id="cover-cropper-image"></div>
-                        <input type="file" id="cover-input" accept="image/*" style="display: none;">
-                    </div>
-                </div>
-
-                <div class="form-group"><label>დასახელება</label><input type="text" name="title"></div>
-                <div class="form-group"><label>ჟანრი</label><input type="text" name="genre"></div>
-                <div class="form-group"><label>აღწერა</label><textarea name="description" rows="2"></textarea></div>
-                <div class="form-row" style="display: flex; gap: 10px;">
-                    <div class="form-group" style="flex: 1;"><label>წელი</label><input type="text" name="release_year"></div>
-                    <div class="form-group" style="flex: 1;"><label>რეიტინგი</label><input type="text" name="rating"></div>
-                </div>
-                <div class="form-group"><label>Rumble Video ID</label><input type="text" name="video_id"></div>
-                <div class="form-group">
-                    <label>ხანგრძლივობა</label>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <div style="flex: 1;"><input type="number" name="dur_h" min="0" placeholder="სთ"></div>
-                        <div style="color: #666;">სთ</div>
-                        <div style="flex: 1;"><input type="number" name="dur_m" min="0" max="59" placeholder="წთ"></div>
-                        <div style="color: #666;">წთ</div>
-                    </div>
-                </div>
-
-                <div class="checkbox-group">
-                    <label class="checkbox-item"><input type="checkbox" name="is_top_10"> Top 5</label>
-                    <label class="checkbox-item"><input type="checkbox" name="is_coming_soon"> მალე</label>
-                </div>
-
-                <button type="submit" class="btn-submit" id="submit-btn" disabled>მონაცემების ჩატვირთვა...</button>
-                <button type="button" class="btn-cancel" id="cancel-btn" onclick="resetForm()">გაუქმება</button>
-            </form>
+    <div class="admin-container" id="admin-content" style="display: none; grid-template-columns: 1fr;">
+        <div class="admin-nav">
+            <div class="nav-item active" id="nav-movies" onclick="switchSection('movies')">ფილმების მართვა</div>
+            <div class="nav-item" id="nav-videos" onclick="switchSection('videos')">ვიდეოების მართვა</div>
         </div>
 
-        <div class="admin-lists-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-            <div class="movie-list-container">
-                <h2>ფილმების სია</h2>
-                <table class="movie-table">
-                    <thead><tr><th>პოსტერი</th><th>დასახელება</th><th>სექცია</th><th>მოქმედება</th></tr></thead>
-                    <tbody id="movies-tbody"></tbody>
-                </table>
+        <!-- MOVIES SECTION -->
+        <div id="section-movies" class="admin-section active" style="grid-template-columns: 1fr 2fr;">
+            <div class="admin-form-container">
+                <h1 id="form-title">ფილმის დამატება</h1>
+                <form id="movie-form">
+                    <input type="hidden" name="movie_id" id="movie-id">
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                            <span>ბარათის ფოტო (სექციების სია)</span>
+                            <div style="display: flex; gap: 10px;">
+                                <label style="font-size: 11px; color: #888; display: flex; align-items: center; gap: 4px; cursor: pointer;"><input type="radio" name="ratio_choice" value="1:1" checked onchange="updateAllRatios()" style="width:14px; height:14px;"> 1:1</label>
+                                <label style="font-size: 11px; color: #888; display: flex; align-items: center; gap: 4px; cursor: pointer;"><input type="radio" name="ratio_choice" value="16:9" onchange="updateAllRatios()" style="width:14px; height:14px;"> 16:9</label>
+                            </div>
+                        </label>
+                        <div class="upload-wrapper poster-wrapper" id="card-drop-zone">
+                            <button type="button" class="reset-upload" id="card-reset">&times;</button>
+                            <div class="upload-placeholder" id="card-placeholder" onclick="document.getElementById('card-input').click()">
+                                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                <p>ბარათის ფოტოს ატვირთვა</p>
+                            </div>
+                            <div class="cropper-container-div" id="card-cropper-container"><img id="card-cropper-image"></div>
+                            <input type="file" id="card-input" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>პატარა ბარათი (Original Poster) (1:1)</label>
+                        <div class="upload-wrapper poster-wrapper" id="poster-drop-zone">
+                            <button type="button" class="reset-upload" id="poster-reset">&times;</button>
+                            <div class="upload-placeholder" id="poster-placeholder" onclick="document.getElementById('poster-input').click()">
+                                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                <p>პოსტერის ატვირთვა</p>
+                            </div>
+                            <div class="cropper-container-div" id="poster-cropper-container"><img id="poster-cropper-image"></div>
+                            <input type="file" id="poster-input" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>მთავარი ბანერი (ზედა Featured section) (16:9)</label>
+                        <div class="upload-wrapper cover-wrapper" id="cover-drop-zone">
+                            <button type="button" class="reset-upload" id="cover-reset">&times;</button>
+                            <div class="upload-placeholder" id="cover-placeholder" onclick="document.getElementById('cover-input').click()">
+                                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                <p>მთავარი ბანერის ატვირთვა</p>
+                            </div>
+                            <div class="cropper-container-div" id="cover-cropper-container"><img id="cover-cropper-image"></div>
+                            <input type="file" id="cover-input" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="form-group"><label>დასახელება</label><input type="text" name="title"></div>
+                    <div class="form-group"><label>ჟანრი</label><input type="text" name="genre"></div>
+                    <div class="form-group"><label>აღწერა</label><textarea name="description" rows="2"></textarea></div>
+                    <div class="form-row" style="display: flex; gap: 10px;">
+                        <div class="form-group" style="flex: 1;"><label>წელი</label><input type="text" name="release_year"></div>
+                        <div class="form-group" style="flex: 1;"><label>რეიტინგი</label><input type="text" name="rating"></div>
+                    </div>
+                    <div class="form-group"><label>Rumble Video ID</label><input type="text" name="video_id"></div>
+                    <div class="form-group">
+                        <label>ხანგრძლივობა</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div style="flex: 1;"><input type="number" name="dur_h" min="0" placeholder="სთ"></div>
+                            <div style="color: #666;">სთ</div>
+                            <div style="flex: 1;"><input type="number" name="dur_m" min="0" max="59" placeholder="წთ"></div>
+                            <div style="color: #666;">წთ</div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox" name="is_top_10"> Top 5</label>
+                        <label class="checkbox-item"><input type="checkbox" name="is_coming_soon"> მალე</label>
+                    </div>
+
+                    <!-- Focal Point Controls -->
+                    <div style="background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333;">
+                        <h4 style="margin-top: 0; color: #aaa; font-size: 14px;">Mobile Focal Point (მობილურის ფოკუსი)</h4>
+                        <div class="form-group">
+                            <label style="display: flex; justify-content: space-between;">
+                                <span>ფოკუსი X: <span id="val-x">50</span>%</span>
+                                <input type="range" name="mobile_pos_x" min="0" max="100" value="50" style="width: 150px;">
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; justify-content: space-between;">
+                                <span>ფოკუსი Y: <span id="val-y">50</span>%</span>
+                                <input type="range" name="mobile_pos_y" min="0" max="100" value="50" style="width: 150px;">
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submit-btn" disabled>მონაცემების ჩატვირთვა...</button>
+                    <button type="button" class="btn-cancel" id="cancel-btn" onclick="resetForm()">გაუქმება</button>
+                </form>
+
+                <!-- Live Preview Frames -->
+                <div style="margin-top: 30px; border-top: 1px solid #222; padding-top: 20px;">
+                    <h3 style="color: #666; font-size: 16px; margin-bottom: 20px;">ვიზუალური შემოწმება</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: end;">
+                        <!-- Desktop Frame -->
+                        <div style="text-align: center;">
+                            <p style="font-size: 11px; color: #444; margin-bottom: 5px;">Desktop View (16:9)</p>
+                            <div style="width: 100%; aspect-ratio: 16/9; background: #000; border: 4px solid #333; border-radius: 5px; overflow: hidden; position: relative;" id="preview-desktop-frame">
+                                <img id="preview-image-desktop" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        </div>
+                        <!-- Mobile Frame -->
+                        <div style="text-align: center;">
+                            <p style="font-size: 11px; color: #444; margin-bottom: 5px;">Mobile View (9:16)</p>
+                            <div style="width: 100px; height: 178px; margin: 0 auto; background: #000; border: 6px solid #222; border-radius: 12px; overflow: hidden; position: relative;" id="preview-mobile-frame">
+                                <img id="preview-image-mobile" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-                                        <!-- Top 5 Manager Section -->
+            <div class="admin-lists-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                <div class="movie-list-container">
+                    <h2>ფილმების სია</h2>
+                    <table class="movie-table">
+                        <thead><tr><th>პოსტერი</th><th>დასახელება</th><th>სექცია</th><th>მოქმედება</th></tr></thead>
+                        <tbody id="movies-tbody"></tbody>
+                    </table>
+                </div>
+
+                <div class="movie-list-container">
+                    <h2>Top 5 მენეჯერი (რეიტინგი 1-5)</h2>
+                    <div id="top5-manager-list" style="padding-top:10px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIDEOS SECTION -->
+        <div id="section-videos" class="admin-section" style="grid-template-columns: 1fr 1.5fr;">
+            <div class="admin-form-container">
+                <h1 id="video-form-title">ვიდეოს დამატება</h1>
+                <form id="video-form">
+                    <input type="hidden" name="video_id" id="video-db-id">
+                    
+                    <div class="form-group">
+                        <label>პოსტერი (1:1)</label>
+                        <div class="upload-wrapper poster-wrapper" id="v-poster-drop-zone">
+                            <button type="button" class="reset-upload" id="v-poster-reset">&times;</button>
+                            <div class="upload-placeholder" id="v-poster-placeholder" onclick="document.getElementById('v-poster-input').click()">
+                                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                <p>ფოტოს ატვირთვა</p>
+                            </div>
+                            <div class="cropper-container-div" id="v-poster-cropper-container"><img id="v-poster-cropper-image"></div>
+                            <input type="file" id="v-poster-input" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>დასახელება</label>
+                        <input type="text" name="title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Rumble-ის ლინკი</label>
+                        <input type="url" name="rumble_link" placeholder="https://rumble.com/embed/..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ორიგინალი ვიდეოს ლინკი</label>
+                        <input type="url" name="original_link" placeholder="TikTok, Facebook, ect. (Optional)">
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="video-submit-btn">ვიდეოს შენახვა</button>
+                    <button type="button" class="btn-cancel" id="video-cancel-btn" style="display:none;" onclick="resetVideoForm()">გაუქმება</button>
+                </form>
+            </div>
+
             <div class="movie-list-container">
-                <h2>Top 5 მენეჯერი (რეიტინგი 1-5)</h2>
-                <div id="top5-manager-list" style="padding-top:10px;">
-                    <!-- 1-5 Slots Rendered Here -->
+                <h2>ვიდეოების სია</h2>
+                <div id="videos-list" class="videos-grid">
+                    <!-- Videos rendered here -->
                 </div>
             </div>
         </div>
@@ -173,7 +340,12 @@
 
     <script src="supabase-config.js"></script>
     <script>
-        let posterCropper = null, coverCropper = null, isEditing = false, existingPosterUrl = '', existingCoverUrl = '';
+        let posterCropper = null, coverCropper = null, cardCropper = null, isEditing = false, existingPosterUrl = '', existingCoverUrl = '', existingCardUrl = '';
+        let vPosterCropper = null, isVideoEditing = false, existingVPosterUrl = '';
+        
+        // Focal Point State
+        let currentX = 50;
+        let currentY = 50;
 
         window.onload = async () => {
             const { data: { session } } = await _supabase.auth.getSession();
@@ -181,6 +353,22 @@
                 showAdminPanel();
             }
         };
+
+        function switchSection(section) {
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            if (section === 'movies') {
+                document.getElementById('section-movies').classList.add('active');
+                document.getElementById('nav-movies').classList.add('active');
+                loadMovies();
+                loadTop5Manager();
+            } else {
+                document.getElementById('section-videos').classList.add('active');
+                document.getElementById('nav-videos').classList.add('active');
+                loadVideos();
+            }
+        }
 
         async function handleLogin() {
             const email = document.getElementById('login-email').value;
@@ -270,11 +458,20 @@
                 if (file) initCropper(file, type, aspectRatio);
             });
             btnReset.onclick = () => {
-                const cropperVar = (type === 'poster') ? posterCropper : coverCropper;
+                let cropperVar = null;
+                if (type === 'poster') cropperVar = posterCropper;
+                else if (type === 'cover') cropperVar = coverCropper;
+                else cropperVar = cardCropper;
+
                 if (cropperVar) cropperVar.destroy();
-                if (type === 'poster') posterCropper = null; else coverCropper = null;
+                if (type === 'poster') posterCropper = null; 
+                else if (type === 'cover') coverCropper = null;
+                else cardCropper = null;
+
                 cropperImg.src = ''; cropperContainer.style.display = 'none'; placeholder.style.display = 'flex'; btnReset.style.display = 'none'; fileInput.value = '';
-                if (type === 'poster') existingPosterUrl = ''; else existingCoverUrl = '';
+                if (type === 'poster') existingPosterUrl = ''; 
+                else if (type === 'cover') existingCoverUrl = '';
+                else existingCardUrl = '';
             };
         }
 
@@ -283,15 +480,56 @@
             reader.onload = (e) => {
                 const cropperImg = document.getElementById(`${type}-cropper-image`), cropperContainer = document.getElementById(`${type}-cropper-container`), placeholder = document.getElementById(`${type}-placeholder`), btnReset = document.getElementById(`${type}-reset`);
                 cropperImg.src = e.target.result; placeholder.style.display = 'none'; cropperContainer.style.display = 'block'; btnReset.style.display = 'block';
-                let cropperVar = (type === 'poster') ? posterCropper : coverCropper;
+                let cropperVar = (type === 'poster') ? posterCropper : (type === 'cover' ? coverCropper : cardCropper);
                 if (cropperVar) cropperVar.destroy();
-                const newCropper = new Cropper(cropperImg, { aspectRatio, viewMode: 1, dragMode: 'move', guides: false, center: false, highlight: false, cropBoxMovable: false, cropBoxResizable: false, background: false });
-                if (type === 'poster') posterCropper = newCropper; else coverCropper = newCropper;
+                const newCropper = new Cropper(cropperImg, { aspectRatio, viewMode: 1, dragMode: 'move', guides: false, center: false, highlight: false, cropBoxMovable: false, cropBoxResizable: false, background: false, ready() { updateLivePreview(); }, cropend() { updateLivePreview(); } });
+                if (type === 'poster') posterCropper = newCropper; 
+                else if (type === 'cover') coverCropper = newCropper;
+                else cardCropper = newCropper;
             };
             reader.readAsDataURL(file);
         }
 
-        setupCropZone('poster', 1); setupCropZone('cover', 16 / 9);
+        setupCropZone('poster', 1); 
+        setupCropZone('cover', 16 / 9);
+        setupCropZone('card', 1);
+        
+        // Setup for video poster
+        const vDropZone = document.getElementById('v-poster-drop-zone'), 
+              vFileInput = document.getElementById('v-poster-input'), 
+              vCropperImg = document.getElementById('v-poster-cropper-image'), 
+              vCropperContainer = document.getElementById('v-poster-cropper-container'), 
+              vPlaceholder = document.getElementById('v-poster-placeholder'), 
+              vBtnReset = document.getElementById('v-poster-reset');
+
+        vDropZone.addEventListener('dragenter', (e) => { e.preventDefault(); vDropZone.classList.add('drag-active'); });
+        vDropZone.addEventListener('dragover', (e) => { e.preventDefault(); vDropZone.classList.add('drag-active'); });
+        vDropZone.addEventListener('dragleave', (e) => { e.preventDefault(); vDropZone.classList.remove('drag-active'); });
+        vDropZone.addEventListener('drop', (e) => {
+            e.preventDefault(); vDropZone.classList.remove('drag-active');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) initVideoCropper(file);
+        });
+        vFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) initVideoCropper(file);
+        });
+        vBtnReset.onclick = () => {
+            if (vPosterCropper) vPosterCropper.destroy();
+            vPosterCropper = null; vCropperImg.src = ''; vCropperContainer.style.display = 'none'; 
+            vPlaceholder.style.display = 'flex'; vBtnReset.style.display = 'none'; vFileInput.value = '';
+            existingVPosterUrl = '';
+        };
+
+        function initVideoCropper(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                vCropperImg.src = e.target.result; vPlaceholder.style.display = 'none'; vCropperContainer.style.display = 'block'; vBtnReset.style.display = 'block';
+                if (vPosterCropper) vPosterCropper.destroy();
+                vPosterCropper = new Cropper(vCropperImg, { aspectRatio: 1, viewMode: 1, dragMode: 'move', guides: false, center: false, highlight: false, cropBoxMovable: false, cropBoxResizable: false, background: false });
+            };
+            reader.readAsDataURL(file);
+        }
 
         async function loadMovies() {
             const { data: movies, error } = await _supabase.from('movies').select('*').order('created_at', { ascending: false });
@@ -330,9 +568,18 @@
             form['is_coming_soon'].checked = movie.is_coming_soon;
             const ratioVal = movie.display_ratio || '1:1';
             document.querySelector(`input[name="ratio_choice"][value="${ratioVal}"]`).checked = true;
-            existingPosterUrl = movie.poster_url; existingCoverUrl = movie.cover_url;
+            existingPosterUrl = movie.poster_url; existingCoverUrl = movie.cover_url; existingCardUrl = movie.card_url;
+            
+            // NEW: Set Focal Sliders
+            currentX = movie.mobile_pos_x || 50;
+            currentY = movie.mobile_pos_y || 50;
+            form['mobile_pos_x'].value = currentX;
+            form['mobile_pos_y'].value = currentY;
+            updateLivePreview();
+
             document.getElementById('poster-placeholder').innerHTML = `<img src="${movie.poster_url}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>`;
             document.getElementById('cover-placeholder').innerHTML = `<img src="${movie.cover_url}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>`;
+            document.getElementById('card-placeholder').innerHTML = movie.card_url ? `<img src="${movie.card_url}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>` : `<p>ცარიელია</p>`;
             isEditing = true; document.getElementById('form-title').innerText = 'განახლება'; document.getElementById('submit-btn').innerText = 'შენახვა'; document.getElementById('cancel-btn').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -342,10 +589,81 @@
         }
 
         function resetForm() {
-            document.getElementById('movie-form').reset(); document.getElementById('poster-reset').click(); document.getElementById('cover-reset').click();
+            document.getElementById('movie-form').reset(); 
+            document.getElementById('poster-reset').click(); 
+            document.getElementById('cover-reset').click(); 
+            document.getElementById('card-reset').click();
+            
             document.getElementById('poster-placeholder').innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><p>პოსტერის ატვირთვა</p>`;
-            document.getElementById('cover-placeholder').innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><p>ფონის ატვირთვა</p>`;
+            document.getElementById('cover-placeholder').innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><p>მთავარი ბანერის ატვირთვა</p>`;
+            document.getElementById('card-placeholder').innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><p>ბარათის ფოტოს ატვირთვა</p>`;
+            
+            document.getElementById('preview-image-desktop').src = '';
+            document.getElementById('preview-image-mobile').src = '';
+            currentX = 50; currentY = 50;
             isEditing = false; document.getElementById('form-title').innerText = 'ფილმის დამატება'; document.getElementById('submit-btn').innerText = 'ფილმის შენახვა'; document.getElementById('cancel-btn').style.display = 'none';
+        }
+
+        // Handle ratio switching globally
+        function updateAllRatios() {
+            const ratio = document.querySelector('input[name="ratio_choice"]:checked').value;
+            const targetRatio = (ratio === '1:1') ? 1 : 16 / 9;
+            
+            // Update Card Cropper if exists
+            if (cardCropper) {
+                cardCropper.setAspectRatio(targetRatio);
+            }
+            
+            updateLivePreview();
+        }
+
+        function updateLivePreview() {
+            const form = document.getElementById('movie-form');
+            document.getElementById('val-x').innerText = currentX;
+            document.getElementById('val-y').innerText = currentY;
+
+            const previewDesktop = document.getElementById('preview-image-desktop');
+            const previewMobile = document.getElementById('preview-image-mobile');
+
+            // Find current Banner (16:9) image for preview
+            let bannerImg = '';
+            if (coverCropper) {
+                bannerImg = coverCropper.getCroppedCanvas().toDataURL();
+            } else if (existingCoverUrl) {
+                bannerImg = existingCoverUrl;
+            }
+
+            if (bannerImg) {
+                previewDesktop.src = bannerImg;
+                previewMobile.src = bannerImg;
+                previewMobile.style.objectPosition = `${currentX}% ${currentY}%`;
+            } else {
+                // Background if no banner
+                previewDesktop.src = ''; previewMobile.src = '';
+            }
+        }
+
+        // Focal Point Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('movie-form');
+            form['mobile_pos_x'].addEventListener('input', (e) => {
+                currentX = e.target.value;
+                updateLivePreview();
+            });
+            form['mobile_pos_y'].addEventListener('input', (e) => {
+                currentY = e.target.value;
+                updateLivePreview();
+            });
+        });
+
+        // Hook into cropper events to update preview
+        function hookCropper(cropper, type) {
+            if (!cropper) return;
+            const canvas = cropper.canvas;
+            // Listen to some internal cropper event or just use a short delay
+            // Unfortunately cropperjs doesn't have a direct 'change' event that fires every millisecond during drag
+            // but we can update after drag ends or periodically
+            updateLivePreview();
         }
 
         document.getElementById('movie-form').onsubmit = async (e) => {
@@ -353,7 +671,7 @@
             const form = e.target;
             const btn = document.getElementById('submit-btn'); btn.disabled = true; btn.innerText = 'იტვირთება...';
             try {
-                let poster_url = existingPosterUrl, cover_url = existingCoverUrl;
+                let poster_url = existingPosterUrl, cover_url = existingCoverUrl, card_url = existingCardUrl;
                 if (posterCropper) {
                     const canvas = posterCropper.getCroppedCanvas({ width: 600, height: 600 });
                     const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', 0.8));
@@ -369,6 +687,14 @@
                     const { data, error } = await _supabase.storage.from('movie-images').upload(fileName, blob);
                     if (error) throw error;
                     cover_url = _supabase.storage.from('movie-images').getPublicUrl(fileName).data.publicUrl;
+                }
+                if (cardCropper) {
+                    const canvas = cardCropper.getCroppedCanvas({ width: 600, height: 600 });
+                    const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', 0.8));
+                    const fileName = `card_${Date.now()}.webp`;
+                    const { data, error } = await _supabase.storage.from('movie-images').upload(fileName, blob);
+                    if (error) throw error;
+                    card_url = _supabase.storage.from('movie-images').getPublicUrl(fileName).data.publicUrl;
                 }
                 const getVal = (name) => {
                     const el = form[name];
@@ -406,10 +732,13 @@
                     video_id: videoId,
                     poster_url: poster_url || null,
                     cover_url: cover_url || null,
+                    card_url: card_url || null,
                     duration: durationStr,
                     display_ratio: displayRatio,
                     is_top_10: Boolean(form['is_top_10'].checked),
-                    is_coming_soon: finalIsSoon
+                    is_coming_soon: finalIsSoon,
+                    mobile_pos_x: parseInt(currentX),
+                    mobile_pos_y: parseInt(currentY)
                 };
                 let result;
                 if (isEditing) {
@@ -429,6 +758,113 @@
             } finally {
                 btn.disabled = false;
                 btn.innerText = 'ფილმის შენახვა';
+            }
+        };
+
+        // --- VIDEOS LOGIC ---
+        async function loadVideos() {
+            const { data: videos, error } = await _supabase.from('short_videos').select('*').order('created_at', { ascending: false });
+            if (error) return console.error(error);
+            const container = document.getElementById('videos-list');
+            container.innerHTML = '';
+            videos.forEach(video => {
+                container.innerHTML += `
+                    <div class="video-card-item">
+                        <img src="${video.photo_url}" class="video-card-img">
+                        <div class="video-card-info">
+                            <h4>${video.title}</h4>
+                            <p><a href="${video.rumble_link}" target="_blank" style="color:red">Rumble</a> | <a href="${video.original_link || '#'}" target="_blank" style="color:#aaa">${video.original_link ? 'Original' : 'No link'}</a></p>
+                        </div>
+                        <div class="video-card-actions">
+                            <button class="btn-edit" onclick="editVideo('${video.id}')">E</button>
+                            <button class="btn-delete" onclick="deleteVideo('${video.id}')">D</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function editVideo(id) {
+            const { data: video } = await _supabase.from('short_videos').select('*').eq('id', id).single();
+            const form = document.getElementById('video-form');
+            form['video_id'].value = video.id;
+            form['title'].value = video.title;
+            form['rumble_link'].value = video.rumble_link;
+            form['original_link'].value = video.original_link || '';
+            
+            existingVPosterUrl = video.photo_url;
+            document.getElementById('v-poster-placeholder').innerHTML = `<img src="${video.photo_url}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>`;
+            
+            isVideoEditing = true;
+            document.getElementById('video-form-title').innerText = 'ვიდეოს განახლება';
+            document.getElementById('video-submit-btn').innerText = 'განახლება';
+            document.getElementById('video-cancel-btn').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function deleteVideo(id) {
+            if (confirm('დარწმუნებული ხართ რომ გსურთ ვიდეოს წაშლა?')) {
+                await _supabase.from('short_videos').delete().eq('id', id);
+                loadVideos();
+            }
+        }
+
+        function resetVideoForm() {
+            document.getElementById('video-form').reset();
+            document.getElementById('v-poster-reset').click();
+            document.getElementById('v-poster-placeholder').innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><p>ფოტოს ატვირთვა</p>`;
+            isVideoEditing = false;
+            document.getElementById('video-form-title').innerText = 'ვიდეოს დამატება';
+            document.getElementById('video-submit-btn').innerText = 'ვიდეოს შენახვა';
+            document.getElementById('video-cancel-btn').style.display = 'none';
+        }
+
+        document.getElementById('video-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('video-submit-btn');
+            btn.disabled = true;
+            btn.innerText = 'იტვირთება...';
+
+            try {
+                let photo_url = existingVPosterUrl;
+                if (vPosterCropper) {
+                    const canvas = vPosterCropper.getCroppedCanvas({ width: 600, height: 600 });
+                    const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', 0.8));
+                    const fileName = `video_${Date.now()}.webp`;
+                    const { data, error } = await _supabase.storage.from('movie-images').upload(fileName, blob);
+                    if (error) throw error;
+                    photo_url = _supabase.storage.from('movie-images').getPublicUrl(fileName).data.publicUrl;
+                }
+
+                if (!photo_url) {
+                    throw new Error('გთხოვთ ატვირთოთ ფოტო');
+                }
+
+                const videoData = {
+                    title: form['title'].value.trim(),
+                    rumble_link: form['rumble_link'].value.trim(),
+                    original_link: form['original_link'].value.trim() || null,
+                    photo_url: photo_url
+                };
+
+                let result;
+                if (isVideoEditing) {
+                    result = await _supabase.from('short_videos').update(videoData).eq('id', form['video_id'].value);
+                } else {
+                    result = await _supabase.from('short_videos').insert([videoData]);
+                }
+
+                if (result.error) throw result.error;
+
+                alert('ვიდეო წარმატებით შეინახა!');
+                resetVideoForm();
+                loadVideos();
+            } catch (err) {
+                alert('შეცდომა: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = isVideoEditing ? 'განახლება' : 'ვიდეოს შენახვა';
             }
         };
     </script>

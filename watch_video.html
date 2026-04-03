@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ka">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ყურება - Cineby</title>
+    <meta name="description" content="უყურეთ მოკლე ვიდეოებს ქართული გახმოვანებით ონლაინ Cineby-ზე.">
+    <meta property="og:title" content="Cineby - Watch Short Videos Online">
+    <meta property="og:description" content="Watch your favorite short videos and documentaries.">
+    <meta property="og:image" content="images/kiss the ground.webp">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="Cineby Logo" class="logo-img"></a>
+        <nav>
+            <a href="index.html">ფილმები</a>
+            <a href="index.html?type=videos">ვიდეოები</a>
+            <a href="https://www.buymeacoffee.com/placeholder" target="_blank" class="btn-support">მხარდაჭერა</a>
+        </nav>
+    </header>
+
+    <div class="watch-container">
+
+        <div class="player-container">
+            <div id="rumble-player"></div>
+        </div>
+
+        <div class="title-section">
+            <h1 class="movie-title" id="page-movie-title" style="margin-bottom: 0; font-size: 28px;">მოტვირთვა...</h1>
+            <a id="original-link-btn" href="#" target="_blank" class="video-original-link" style="margin-top: 20px; display: none;">ნახე ორიგინალი</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script>
+        async function loadVideo() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoId = urlParams.get('id');
+
+            if (!videoId) {
+                alert('ვიდეო ვერ მოიძებნა!');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const { data: video, error } = await _supabase
+                .from('short_videos')
+                .select('*')
+                .eq('id', videoId)
+                .single();
+
+            if (error || !video) {
+                console.error('Error fetching video:', error);
+                document.getElementById('page-movie-title').innerText = 'ვიდეო ვერ მოიძებნა';
+                return;
+            }
+
+            // Update UI
+            document.getElementById('page-movie-title').innerText = video.title;
+            document.title = `${video.title} - Cineby Shorts`;
+
+            if (video.original_link) {
+                const btn = document.getElementById('original-link-btn');
+                btn.href = video.original_link;
+                btn.style.display = 'inline-block';
+            }
+
+            // Rumble Embed Logic
+            let rumbleLink = video.rumble_link || '';
+            let embedUrl = '';
+
+            if (rumbleLink.includes('rumble.com/embed/')) {
+                embedUrl = rumbleLink;
+            } else {
+                // If it's just an ID or a standard link, try to format it
+                const parts = rumbleLink.split('/');
+                const id = parts[parts.length - 1] || parts[parts.length - 2];
+                embedUrl = `https://rumble.com/embed/${id}/?pub=4p1avk&api=1`;
+            }
+
+            // Create player
+            const playerContainer = document.getElementById('rumble-player');
+            const iframe = document.createElement('iframe');
+            iframe.className = 'rumble';
+            iframe.src = embedUrl;
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('allowfullscreen', '');
+            playerContainer.appendChild(iframe);
+        }
+
+        window.onload = loadVideo;
+    </script>
+
+</body></html>
