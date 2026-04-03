@@ -2,7 +2,9 @@
 <html lang="ka">
 
 <head>
+    <meta name="google-site-verification" content="2dZhy9aaeH9SuJoRYix3ESYsBAVZ_PfzJDnYqa_fcZo" />
     <meta charset="UTF-8">
+    <meta name="google-site-verification" content="wgZarI_zifHKJvi4l312gnmib5a_PDjpNmuc_EUTiUI" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>დოკუმენტური ფილმები</title>
     <meta property="og:title" content="დოკუმენტური ფილმები">
@@ -36,9 +38,11 @@
             <span></span>
         </div>
         <nav id="navbar">
-            <a href="javascript:void(0)" id="nav-movies-link" class="active" onclick="handleNavSelection('movies')">ფილმები</a>
+            <a href="javascript:void(0)" id="nav-movies-link" class="active"
+                onclick="handleNavSelection('movies')">ფილმები</a>
             <a href="javascript:void(0)" id="nav-videos-link" onclick="handleNavSelection('videos')">ვიდეოები</a>
-            <a href="https://www.buymeacoffee.com/placeholder" target="_blank" class="btn-support" onclick="closeMenuOnMobile()">მხარდაჭერა</a>
+            <a href="https://www.buymeacoffee.com/placeholder" target="_blank" class="btn-support"
+                onclick="closeMenuOnMobile()">მხარდაჭერა</a>
         </nav>
     </header>
 
@@ -292,7 +296,7 @@
         async function loadAllVideos() {
             const { data: videos, error } = await _supabase.from('short_videos').select('*').order('created_at', { ascending: false });
             if (error) return console.error(error);
-            
+
             allVideosGlobal = videos || [];
             const container = document.getElementById('all-videos-grid');
             container.innerHTML = '';
@@ -307,7 +311,7 @@
             const card = document.createElement('div');
             card.className = 'card-item';
             card.style.cursor = 'default';
-            
+
             // Video cards use 1:1 format for short videos
             card.innerHTML = `
                 <div class="card-1-1" style="background-image: url('${video.photo_url}'); cursor: pointer;" onclick="window.open('watch_video.html?id=${video.id}', '_blank')">
@@ -326,10 +330,10 @@
             const modal = document.getElementById('see-all-modal');
             const container = document.getElementById('modal-grid');
             const title = document.getElementById('modal-title');
-            
+
             container.innerHTML = '';
             let movies = [];
-            
+
             if (type === 'soon') {
                 title.innerText = 'მალე დაემატება';
                 movies = soonMoviesGlobal;
@@ -470,7 +474,7 @@
                 btn.innerText = 'ჩართულია';
                 btn.classList.add('subscribed');
                 btn.disabled = true;
-                
+
                 console.log('User Subscribed:', subscription);
             } catch (err) {
                 console.error('Failed to subscribe the user: ', err);

@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ყურება - Cineby</title>
-    <meta name="description" content="უყურეთ ფილმებს ქართული გახმოვანებით ონლაინ Cineby-ზე.">
-    <meta property="og:title" content="Cineby - Watch Movies Online">
-    <meta property="og:description" content="Watch your favorite movies and documentaries.">
+    <title>ყურება - დოკუმენტური ფილმები</title>
+    <meta name="description" content="უყურეთ ფილმებს ქართული გახმოვანებით ონლაინ საიტზე 'დოკუმენტური ფილმები'.">
+    <meta property="og:title" content="დოკუმენტური ფილმები - უყურეთ ონლაინ">
+    <meta property="og:description" content="უყურეთ საინტერესო დოკუმენტურ ფილმებსა და ვიდეოებს ქართული გახმოვანებით.">
     <meta property="og:image" content="images/kiss the ground.webp">
     <meta property="og:url" content="[Insert Your Website URL]">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -58,18 +58,20 @@
             if (error || !movie) {
                 console.error('Error fetching movie:', error);
                 document.getElementById('page-movie-title').innerText = 'ფილმი ვერ მოიძებნა';
+                document.title = 'ფილმი ვერ მოიძებნა - დოკუმენტური ფილმები';
                 return;
             }
 
             // Update UI
             const movieTitle = movie.title;
+            const movieYear = movie.release_year ? `(${movie.release_year})` : '';
             document.getElementById('page-movie-title').innerText = movieTitle;
             
             // SEO: Dynamic Title
-            document.title = `${movieTitle} ქართულად (გახმოვანებული) - Cineby`;
+            document.title = `${movieTitle} ქართულად ${movieYear} - დოკუმენტური ფილმები`;
 
             // SEO: Dynamic Meta Description
-            const descriptionText = `უყურეთ ფილმს '${movieTitle}' ქართული გახმოვანებით ონლაინ, მაღალ ხარისხში. ექსკლუზიური გახმოვანება Cineby-სგან.`;
+            const descriptionText = `უყურეთ ფილმს ${movieTitle} ქართული გახმოვანებით ონლაინ საიტზე 'დოკუმენტური ფილმები'. ექსკლუზიური თარგმანი.`;
             
             let metaDesc = document.querySelector('meta[name="description"]');
             if (metaDesc) {
@@ -78,7 +80,7 @@
 
             // SEO: Open Graph Updates
             let ogTitle = document.querySelector('meta[property="og:title"]');
-            if (ogTitle) ogTitle.setAttribute('content', `${movieTitle} - Cineby`);
+            if (ogTitle) ogTitle.setAttribute('content', `${movieTitle} ქართულად - დოკუმენტური ფილმები`);
 
             let ogDesc = document.querySelector('meta[property="og:description"]');
             if (ogDesc) ogDesc.setAttribute('content', descriptionText);
