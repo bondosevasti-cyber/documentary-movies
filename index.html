@@ -12,6 +12,7 @@
     <meta property="og:image" content="images/kiss the ground.webp">
     <meta property="og:url" content="[Insert Your Website URL]">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="style.css">
     <style>
         /* Extra styles for empty states or layout */
@@ -41,8 +42,8 @@
             <a href="javascript:void(0)" id="nav-movies-link" class="active"
                 onclick="handleNavSelection('movies')">ფილმები</a>
             <a href="javascript:void(0)" id="nav-videos-link" onclick="handleNavSelection('videos')">ვიდეოები</a>
-            <a href="https://www.buymeacoffee.com/placeholder" target="_blank" class="btn-support"
-                onclick="closeMenuOnMobile()">მხარდაჭერა</a>
+            <a href="javascript:void(0)" class="btn-support" id="support-btn-main"
+                onclick="openSupportModal(); closeMenuOnMobile()">მხარდაჭერა</a>
         </nav>
     </header>
 
@@ -539,6 +540,120 @@
             </div>
         </div>
     </footer>
+
+    <!-- Support Modal -->
+    <div id="support-modal" class="support-modal-overlay" onclick="closeSupportModal(event)">
+        <div class="support-modal-content" onclick="event.stopPropagation()">
+            <div class="support-modal-header">
+                <h2 class="support-modal-title">
+                    <span class="support-accent-bar"></span>
+                    მხარდაჭერა
+                </h2>
+                <button class="support-close-btn" onclick="closeSupportModal()"><i data-lucide="x"></i></button>
+            </div>
+            
+            <div class="support-modal-body">
+                <p class="support-modal-desc">აირჩიეთ სასურველი ბანკი მხარდაჭერისთვის</p>
+                
+                <!-- TBC Bank 1 -->
+                <div class="support-card tbc-card">
+                    <div class="support-card-header">
+                        <div class="support-card-icon"><i data-lucide="credit-card"></i></div>
+                        <div class="support-card-info">
+                            <h3>TBC Bank (1)</h3>
+                            <p class="support-account-holder">მათე ახალაია</p>
+                            <span>ანგარიშის ნომერი</span>
+                        </div>
+                    </div>
+                    <div class="support-copy-row">
+                        <code class="support-iban">GE33TB7777345068100035</code>
+                        <button class="support-copy-btn" onclick="copyIBAN('GE33TB7777345068100035', this)">
+                            <i data-lucide="copy"></i>
+                            <span>დააკოპირე</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TBC Bank 2 -->
+                <div class="support-card tbc-card">
+                    <div class="support-card-header">
+                        <div class="support-card-icon"><i data-lucide="credit-card"></i></div>
+                        <div class="support-card-info">
+                            <h3>TBC Bank (2)</h3>
+                            <p class="support-account-holder">მათე ახალაია</p>
+                            <span>ანგარიშის ნომერი</span>
+                        </div>
+                    </div>
+                    <div class="support-copy-row">
+                        <code class="support-iban">GE39TB7777345064300049</code>
+                        <button class="support-copy-btn" onclick="copyIBAN('GE39TB7777345064300049', this)">
+                            <i data-lucide="copy"></i>
+                            <span>დააკოპირე</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bank of Georgia -->
+                <div class="support-card bog-card">
+                    <div class="support-card-header">
+                        <div class="support-card-icon"><i data-lucide="credit-card"></i></div>
+                        <div class="support-card-info">
+                            <h3>Bank of Georgia</h3>
+                            <p class="support-account-holder">მათე ახალაია</p>
+                            <span>ანგარიშის ნომერი</span>
+                        </div>
+                    </div>
+                    <div class="support-copy-row">
+                        <code class="support-iban">GE03BG0000000611455194</code>
+                        <button class="support-copy-btn" onclick="copyIBAN('GE03BG0000000611455194', this)">
+                            <i data-lucide="copy"></i>
+                            <span>დააკოპირე</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="support-modal-footer">
+                <p>გმადლობთ მხარდაჭერისთვის!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        function openSupportModal() {
+            const modal = document.getElementById('support-modal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // Refresh icons in case they were hidden
+            lucide.createIcons();
+        }
+
+        function closeSupportModal(event) {
+            // Close if clicked on overlay or directly called
+            if (!event || event.target === document.getElementById('support-modal')) {
+                document.getElementById('support-modal').classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function copyIBAN(iban, btn) {
+            navigator.clipboard.writeText(iban).then(() => {
+                const originalContent = btn.innerHTML;
+                btn.classList.add('copied');
+                btn.innerHTML = `<i data-lucide="check" style="width: 14px; height: 14px;"></i><span>დაკოპირდა!</span>`;
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = originalContent;
+                    lucide.createIcons();
+                }, 2000);
+            });
+        }
+    </script>
 
 </body>
 

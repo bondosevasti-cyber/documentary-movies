@@ -1190,3 +1190,255 @@ nav a:hover, nav a.active {
         font-size: 32px;
     }
 }
+
+/* Support Modal Styles */
+.support-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.support-modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.support-modal-content {
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 95%;
+    max-width: 450px;
+    max-height: 90vh; /* Limit height */
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.support-modal-overlay.active .support-modal-content {
+    transform: scale(1);
+}
+
+.support-modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.support-modal-title {
+    margin: 0;
+    font-size: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.support-accent-bar {
+    width: 4px;
+    height: 24px;
+    background: #E31B23;
+    border-radius: 2px;
+}
+
+.support-close-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.support-close-btn:hover {
+    color: #fff;
+    transform: rotate(90deg);
+}
+
+.support-modal-body {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto; /* Enable scrolling */
+    flex: 1;
+}
+
+/* Custom Scrollbar for Modal Body */
+.support-modal-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+.support-modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.support-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.support-modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
+}
+
+.support-modal-desc {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.support-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 16px;
+    transition: all 0.3s;
+    border-left: 4px solid #444;
+}
+
+.support-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+}
+
+.tbc-card { border-left-color: #00ADEF; }
+.bog-card { border-left-color: #F36E21; }
+
+.support-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.support-card-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.tbc-card .support-card-icon { color: #00ADEF; }
+.bog-card .support-card-icon { color: #F36E21; }
+
+.support-card-info h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.support-account-holder {
+    margin: 2px 0;
+    font-size: 13px;
+    color: #fff;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.support-card-info span {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.support-copy-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.support-iban {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    word-break: break-all;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.support-copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 0 15px;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.support-copy-btn i {
+    width: 14px;
+    height: 14px;
+}
+
+.support-copy-btn:hover {
+    background: #e0e0e0;
+    transform: scale(1.02);
+}
+
+.support-copy-btn.copied {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.support-modal-footer {
+    padding: 15px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.support-modal-footer p {
+    margin: 0;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 480px) {
+    .support-modal-content {
+        width: 95%;
+    }
+    .support-copy-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .support-copy-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
