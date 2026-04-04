@@ -1,9 +1,16 @@
 self.addEventListener('push', function(event) {
-    let data = { title: 'Cineby', body: 'ახალი ფილმი დაემატა!' };
-    
+    let data = {
+        title: 'Cineby',
+        body: 'ახალი კონტენტი დაემატა!',
+        icon: 'images/logo/Logo.png',
+        image: 'images/logo/Logo.png',
+        url: 'https://documentary-movies.vercel.app/'
+    };
+
     if (event.data) {
         try {
-            data = event.data.json();
+            const parsed = event.data.json();
+            data = { ...data, ...parsed };
         } catch (e) {
             data.body = event.data.text();
         }
@@ -11,12 +18,18 @@ self.addEventListener('push', function(event) {
 
     const options = {
         body: data.body,
-        icon: 'images/logo/Logo.png', // Generic icon
+        icon: data.icon || 'images/logo/Logo.png',
         badge: 'images/logo/Logo.png',
-        vibrate: [100, 50, 100],
+        image: data.image || null,
+        vibrate: [200, 100, 200],
+        requireInteraction: false,
         data: {
-            url: data.url || 'index.html'
-        }
+            url: data.url || 'https://documentary-movies.vercel.app/'
+        },
+        actions: [
+            { action: 'open', title: 'გახსნა' },
+            { action: 'close', title: 'დახურვა' }
+        ]
     };
 
     event.waitUntil(
@@ -26,7 +39,22 @@ self.addEventListener('push', function(event) {
 
 self.addEventListener('notificationclick', function(event) {
     event.notification.close();
+
+    if (event.action === 'close') return;
+
     event.waitUntil(
-        clients.openWindow(event.notification.data.url)
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+            const url = event.notification.data.url;
+            // If tab is already open, focus it
+            for (let client of clientList) {
+                if (client.url === url && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            // Otherwise open new tab
+            if (clients.openWindow) {
+                return clients.openWindow(url);
+            }
+        })
     );
 });

@@ -9,7 +9,7 @@
     <title>დოკუმენტური ფილმები</title>
     <meta property="og:title" content="დოკუმენტური ფილმები">
     <meta property="og:description" content="Watch your favorite movies and documentaries.">
-    <meta property="og:image" content="images/kiss the ground.webp">
+    <meta property="og:image" content="images/logo/Logo.png">
     <meta property="og:url" content="[Insert Your Website URL]">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -25,6 +25,111 @@
 
         .hero {
             transition: background-image 1s ease-in-out;
+        }
+
+        /* ─── Soft Push Banner ─── */
+        #push-banner {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            width: 340px;
+            background: #000;
+            border: 1.5px solid #E31B23;
+            border-radius: 14px;
+            padding: 18px 20px;
+            box-shadow: 0 8px 32px rgba(227,27,35,0.25), 0 2px 8px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transform: translateY(120px);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+            pointer-events: none;
+        }
+        #push-banner.visible {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+        #push-banner .push-banner-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        #push-banner .push-banner-icon {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            background: rgba(227,27,35,0.12);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        #push-banner .push-banner-text {
+            font-size: 13px;
+            color: rgba(255,255,255,0.88);
+            line-height: 1.55;
+            flex: 1;
+        }
+        #push-banner .push-banner-close {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.35);
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.2s;
+            flex-shrink: 0;
+            margin-top: -2px;
+        }
+        #push-banner .push-banner-close:hover { color: #fff; }
+        #push-banner .push-banner-actions {
+            display: flex;
+            gap: 10px;
+        }
+        #push-banner .btn-enable-push {
+            flex: 1;
+            background: #E31B23;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            font-family: inherit;
+        }
+        #push-banner .btn-enable-push:hover {
+            background: #c2151d;
+            transform: scale(1.03);
+        }
+        #push-banner .btn-later-push {
+            background: transparent;
+            color: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        #push-banner .btn-later-push:hover {
+            color: rgba(255,255,255,0.7);
+            border-color: rgba(255,255,255,0.25);
+        }
+        @media (max-width: 480px) {
+            #push-banner {
+                width: calc(100vw - 32px);
+                left: 16px;
+                right: 16px;
+                bottom: 20px;
+            }
         }
     </style>
 </head>
@@ -442,17 +547,19 @@
         }
 
         // Push Notification Logic
-        const VAPID_PUBLIC_KEY = 'YOUR_VAPID_PUBLIC_KEY_PLACEHOLDER'; // REPLACEME
+        const VAPID_PUBLIC_KEY = 'BFuHOPaickaqQaElKEl1or8GPBEPY3VZsrvds1UnpUM_TgxeF-4HVvFCJkn2kckZQd33vXX4N_sI1T0GoI6i2zc';
 
         async function registerServiceWorker() {
-            if ('serviceWorker' in navigator && 'PushManager' in window) {
-                try {
-                    const registration = await navigator.serviceWorker.register('sw.js');
-                    console.log('SW Registered');
-                    checkSubscriptionStatus(registration);
-                } catch (error) {
-                    console.error('Service Worker registration failed:', error);
-                }
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                console.warn('[Push] Browser does not support Service Workers or PushManager.');
+                return;
+            }
+            try {
+                const registration = await navigator.serviceWorker.register('sw.js');
+                console.log('[Push] SW registered:', registration.scope);
+                checkSubscriptionStatus(registration);
+            } catch (error) {
+                console.error('[Push] SW registration failed:', error);
             }
         }
 
@@ -460,46 +567,91 @@
             const subscription = await registration.pushManager.getSubscription();
             const btn = document.getElementById('push-notify-btn');
             if (subscription) {
-                btn.innerText = 'ჩართულია';
-                btn.classList.add('subscribed');
-                btn.disabled = true;
+                console.log('[Push] Already subscribed.');
+                if (btn) { btn.innerText = 'ჩართულია'; btn.classList.add('subscribed'); btn.disabled = true; }
             } else {
-                btn.onclick = () => subscribeUser(registration);
+                console.log('[Push] No subscription yet. Permission:', Notification.permission);
+                if (btn) btn.onclick = () => enableNotifications(registration);
+                if (Notification.permission === 'default') {
+                    setTimeout(() => showPushBanner(registration), 4000);
+                }
             }
         }
 
-        async function subscribeUser(registration) {
+        // ─── Soft Push Banner Logic ───
+        function showPushBanner(registration) {
+            if (localStorage.getItem('hidePushPromptForever') === 'true') {
+                console.log('[Push] Banner permanently dismissed.');
+                return;
+            }
+            if (Notification.permission !== 'default') {
+                console.log('[Push] Permission already decided:', Notification.permission);
+                return;
+            }
+            const banner = document.getElementById('push-banner');
+            if (!banner) return;
+
+            document.getElementById('push-banner-enable').onclick = () => enableNotifications(registration);
+            document.getElementById('push-banner-later').onclick = () => dismissPushBanner();
+            document.getElementById('push-banner-close').onclick = () => dismissPushBanner();
+
+            console.log('[Push] Showing banner.');
+            requestAnimationFrame(() => banner.classList.add('visible'));
+        }
+
+        function dismissPushBanner() {
+            const banner = document.getElementById('push-banner');
+            if (banner) banner.classList.remove('visible');
+            localStorage.setItem('hidePushPromptForever', 'true');
+            console.log('[Push] Banner dismissed permanently.');
+        }
+
+        async function enableNotifications(registration) {
+            console.log('[Push] ჩართვა button clicked.');
+            // Hide banner first (this also sets the localStorage flag)
+            const banner = document.getElementById('push-banner');
+            if (banner) banner.classList.remove('visible');
+
+            console.log('[Push] Requesting Notification.permission...');
             const permission = await Notification.requestPermission();
+            console.log('[Push] Permission result:', permission);
+
             if (permission !== 'granted') {
-                alert('შეტყობინებების ჩართვა აუცილებელია სიახლეების მისაღებად!');
+                console.warn('[Push] Permission denied or dismissed.');
+                localStorage.setItem('hidePushPromptForever', 'true');
                 return;
             }
 
+            // Subscribe directly — do NOT call subscribeUser (it would ask permission again)
+            console.log('[Push] Subscribing to push manager...');
             try {
                 const subscription = await registration.pushManager.subscribe({
                     userVisibleOnly: true,
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
                 });
+                console.log('[Push] Got subscription:', subscription.endpoint);
 
-                // Send to Supabase
                 const { error } = await _supabase
                     .from('push_subscriptions')
-                    .insert([{
+                    .upsert([{
                         endpoint: subscription.endpoint,
                         subscription_data: JSON.parse(JSON.stringify(subscription))
-                    }]);
+                    }], { onConflict: 'endpoint' });
 
                 if (error) throw error;
 
+                console.log('[Push] Saved to Supabase ✓');
                 const btn = document.getElementById('push-notify-btn');
-                btn.innerText = 'ჩართულია';
-                btn.classList.add('subscribed');
-                btn.disabled = true;
-
-                console.log('User Subscribed:', subscription);
+                if (btn) { btn.innerText = 'ჩართულია'; btn.classList.add('subscribed'); btn.disabled = true; }
             } catch (err) {
-                console.error('Failed to subscribe the user: ', err);
+                console.error('[Push] Subscription failed:', err);
             }
+        }
+
+        // Kept for footer button compat — also avoids double permission request
+        async function subscribeUser(registration) {
+            console.log('[Push] subscribeUser called (footer button).');
+            await enableNotifications(registration);
         }
 
         function urlBase64ToUint8Array(base64String) {
@@ -522,6 +674,21 @@
             }
         };
     </script>
+
+    <!-- ─── Soft Push Notification Banner ─── -->
+    <div id="push-banner" role="dialog" aria-label="შეტყობინებების მოთხოვნა">
+        <div class="push-banner-top">
+            <div class="push-banner-icon">🔔</div>
+            <div class="push-banner-text">
+                გსურს მიიღო შეტყობინებები ახალი ფილმებისა და ვიდეოების შესახებ?
+            </div>
+            <button class="push-banner-close" id="push-banner-close" aria-label="დახურვა">&times;</button>
+        </div>
+        <div class="push-banner-actions">
+            <button class="btn-enable-push" id="push-banner-enable">ჩართვა</button>
+            <button class="btn-later-push" id="push-banner-later">მოგვიანებით</button>
+        </div>
+    </div>
 
     <!-- Modal for See All -->
     <div id="see-all-modal" class="modal-overlay">

@@ -125,6 +125,56 @@
         .video-card-info h4 { margin: 0 0 5px 0; color: white; }
         .video-card-info p { margin: 0; font-size: 12px; color: #666; }
         .video-card-actions { display: flex; gap: 10px; }
+        /* ==== Push Dropzone Styles ==== */
+        .push-dropzone {
+            border: 2px dashed #333;
+            border-radius: 12px;
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: border-color 0.2s, background 0.2s;
+            background: #0d0d0d;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .push-dropzone:hover { border-color: #E31B23; background: rgba(227,27,35,0.04); }
+        .push-dropzone.drag-over { border-color: #E31B23; background: rgba(227,27,35,0.08); }
+        .push-dropzone-sm { min-height: 70px; padding: 12px; }
+        .dz-inner { display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; }
+        .dz-icon { font-size: 24px; }
+        .push-dropzone-sm .dz-icon { font-size: 18px; }
+        .dz-text { font-size: 13px; color: #555; line-height: 1.5; }
+        .dz-text span { font-size: 11px; color: #3a3a3a; }
+        .dz-spinner {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: #E31B23;
+            animation: dz-spin 0.8s linear infinite;
+            background: rgba(0,0,0,0.6); border-radius: 12px;
+        }
+        @keyframes dz-spin { to { transform: rotate(360deg); } }
+        .dz-preview { position: absolute; inset: 0; border-radius: 10px; overflow: hidden; }
+        .dz-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .dz-preview-sm img { object-fit: contain; background:#111; }
+        .dz-clear-btn {
+            position: absolute; top: 6px; right: 8px;
+            background: rgba(0,0,0,0.75); border: none; color: #fff;
+            font-size: 16px; line-height: 1; border-radius: 50%;
+            width: 24px; height: 24px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .dz-clear-btn:hover { background: #E31B23; }
+        .dz-toggle-url {
+            background: none; border: none; color: #444; font-size: 12px;
+            cursor: pointer; padding: 0; font-family: inherit;
+            transition: color 0.2s; text-decoration: underline;
+        }
+        .dz-toggle-url:hover { color: #888; }
+        /* ==== End Dropzone ==== */
     </style>
 </head>
 <body>
@@ -154,6 +204,7 @@
         <div class="admin-nav">
             <div class="nav-item active" id="nav-movies" onclick="switchSection('movies')">ფილმების მართვა</div>
             <div class="nav-item" id="nav-videos" onclick="switchSection('videos')">ვიდეოების მართვა</div>
+            <div class="nav-item" id="nav-push" onclick="switchSection('push')">🔔 შეტყობინებები</div>
         </div>
 
         <!-- MOVIES SECTION -->
@@ -336,6 +387,109 @@
                 </div>
             </div>
         </div>
+
+        <!-- PUSH NOTIFICATIONS SECTION -->
+        <div id="section-push" class="admin-section" style="grid-template-columns: 1fr 1fr; align-items: start;">
+            <div class="admin-form-container">
+                <h1>&#x1F514; Push შეტყობინება</h1>
+                <p style="color: #666; font-size: 13px; margin-bottom: 20px;">გაგზავნი შეტყობინება ყველა გამომწერზე. Supabase Edge Function გამოიყენება.</p>
+
+                <div class="form-group">
+                    <label>სათაური</label>
+                    <input type="text" id="push-title" placeholder="მაგ: ახალი ვიდეო!" value="Cineby - ახალი კონტენტი" oninput="updatePushPreview()">
+                </div>
+                <div class="form-group">
+                    <label>შეტყობინების ტექსტი</label>
+                    <textarea id="push-body" rows="3" placeholder="შეიყვანეთ შეტყობინების ტექსტი..." oninput="updatePushPreview()"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>კონტენტის ტიპი</label>
+                    <select id="push-content-type" onchange="updatePushUrlHint()" style="background:#1a1a1a; color:#fff; border:1px solid #333; padding:10px; border-radius:8px; width:100%; font-size:13px; font-family:inherit;">
+                        <option value="video">🎥 მოკლე ვიდეო (short_videos)</option>
+                        <option value="movie">🎬 ფილმი (movies)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Content ID <span style="color:#555; font-size:11px;">(ბაზის ID)</span></label>
+                    <input type="text" id="push-content-id" placeholder="მაგ: 42d1f3a8-..." oninput="updatePushUrlHint()">
+                    <small id="push-url-hint" style="color:#555; font-size:12px; margin-top:4px; display:block;">ლინკი ავტომატურად აიგება</small>
+                </div>
+                <!-- ─── Image Dropzone ─── -->
+                <div class="form-group">
+                    <label>🖼️ ფოტო / Thumbnail <span style="color:#555;font-size:11px;">(Chrome Desktop)ზე გამოჩნდება)</span></label>
+                    <div class="push-dropzone" id="dz-image" ondragover="dzDragOver(event,'dz-image')" ondragleave="dzDragLeave('dz-image')" ondrop="dzDrop(event,'image')" onclick="document.getElementById('dz-image-input').click()">
+                        <div class="dz-inner" id="dz-image-inner">
+                            <div class="dz-icon">📤</div>
+                            <div class="dz-text">Ⴉარეკეთ ან დააწიეთ სურათი<br><span>მახ სიგანდი: JPG, PNG, WebP</span></div>
+                        </div>
+                        <div class="dz-spinner" id="dz-image-spinner" style="display:none;">&#9696;</div>
+                        <div class="dz-preview" id="dz-image-preview" style="display:none;">
+                            <img id="dz-image-preview-img" src="" alt="preview">
+                            <button class="dz-clear-btn" onclick="event.stopPropagation(); clearDropzone('image')">&times;</button>
+                        </div>
+                    </div>
+                    <input type="file" id="dz-image-input" accept="image/*" style="display:none;" onchange="dzFileSelected(event,'image')">
+                    <div style="margin-top:8px;">
+                        <button class="dz-toggle-url" onclick="toggleManualUrl('image')">&#128279; URL-ის ხელღწერა შეიყვანა</button>
+                        <input type="url" id="push-image" placeholder="https://..." oninput="updatePushPreview()" style="display:none; margin-top:6px;">
+                    </div>
+                </div>
+
+                <!-- ─── Icon Dropzone ─── -->
+                <div class="form-group">
+                    <label>🔔 ხატულა / Icon <span style="color:#555;font-size:11px;">(default: ლოგო)</span></label>
+                    <div class="push-dropzone push-dropzone-sm" id="dz-icon" ondragover="dzDragOver(event,'dz-icon')" ondragleave="dzDragLeave('dz-icon')" ondrop="dzDrop(event,'icon')" onclick="document.getElementById('dz-icon-input').click()">
+                        <div class="dz-inner" id="dz-icon-inner">
+                            <div class="dz-icon">📤</div>
+                            <div class="dz-text">ხატულა<br><span>64×64px, PNG</span></div>
+                        </div>
+                        <div class="dz-spinner" id="dz-icon-spinner" style="display:none;">&#9696;</div>
+                        <div class="dz-preview dz-preview-sm" id="dz-icon-preview" style="display:none;">
+                            <img id="dz-icon-preview-img" src="" alt="preview">
+                            <button class="dz-clear-btn" onclick="event.stopPropagation(); clearDropzone('icon')">&times;</button>
+                        </div>
+                    </div>
+                    <input type="file" id="dz-icon-input" accept="image/*" style="display:none;" onchange="dzFileSelected(event,'icon')">
+                    <div style="margin-top:8px;">
+                        <button class="dz-toggle-url" onclick="toggleManualUrl('icon')">&#128279; URL-ის ხელღწერა შეიყვანა</button>
+                        <input type="url" id="push-icon" placeholder="https://..." oninput="updatePushPreview()" style="display:none; margin-top:6px;">
+                    </div>
+                </div>
+
+                <div style="background:#1a1a1a; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #333;">
+                    <p style="margin:0 0 8px 0; color:#666; font-size:12px;">&#x26A1; Preview:</p>
+                    <div style="background:#222; padding:12px; border-radius:6px; display:flex; gap:12px; align-items:center;">
+                        <img id="push-preview-icon" src="images/logo/Logo.png" style="width:44px;height:44px;border-radius:8px;object-fit:cover;">
+                        <div style="flex:1;">
+                            <div id="push-preview-title" style="font-weight:bold; font-size:13px; color:white;">Cineby - ახალი კონტენტი</div>
+                            <div id="push-preview-body" style="font-size:12px; color:#aaa; margin-top:3px;">გამარჯობა!</div>
+                        </div>
+                    </div>
+                    <div id="push-preview-image-wrap" style="margin-top:10px; display:none;">
+                        <img id="push-preview-image" src="" style="width:100%; max-height:140px; object-fit:cover; border-radius:6px;">
+                    </div>
+                </div>
+
+                <button class="btn-submit" id="push-send-btn" onclick="sendPushNotification()">&#x1F514; გაგზავნა ყველასთვის</button>
+                <p id="push-status" style="margin-top:12px; font-size:13px; color:#aaa;"></p>
+            </div>
+
+            <div class="movie-list-container">
+                <h2>გამომწერები</h2>
+                <div id="push-subscribers-info" style="padding:10px 0; color:#666; font-size:14px;">იტვირთება...</div>
+
+                <div style="margin-top:30px; background:#0d0d0d; padding:20px; border-radius:10px; border:1px solid #1a1a1a;">
+                    <h3 style="color:#aaa; font-size:14px; margin-top:0;">&#x2699;&#xFE0F; Setup</h3>
+                    <ol style="color:#666; font-size:13px; line-height:2.2; padding-left:18px; margin:0;">
+                        <li>გაუშვი: <code style="color:#e31b23; background:#1a0000; padding:2px 6px; border-radius:4px;">npx web-push generate-vapid-keys</code></li>
+                        <li>Public Key &#x2192; <code style="color:#e31b23;">index.html</code> &#x2192; <code>VAPID_PUBLIC_KEY</code></li>
+                        <li>Supabase &#x2192; Edge Functions &#x2192; New: <code style="color:#e31b23;">send-push</code></li>
+                        <li>Private Key &#x2192; Edge Function secrets-ში</li>
+                        <li>Deploy &#x2192; Vercel</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="supabase-config.js"></script>
@@ -363,12 +517,221 @@
                 document.getElementById('nav-movies').classList.add('active');
                 loadMovies();
                 loadTop5Manager();
-            } else {
+            } else if (section === 'videos') {
                 document.getElementById('section-videos').classList.add('active');
                 document.getElementById('nav-videos').classList.add('active');
                 loadVideos();
+            } else if (section === 'push') {
+                document.getElementById('section-push').classList.add('active');
+                document.getElementById('nav-push').classList.add('active');
+                loadPushSubscribers();
             }
         }
+
+        // --- PUSH NOTIFICATION FUNCTIONS ---
+        function updatePushPreview() {
+            const title = document.getElementById('push-title').value || 'Cineby';
+            const body = document.getElementById('push-body').value || '';
+            const icon = document.getElementById('push-icon').value || 'images/logo/Logo.png';
+            const image = document.getElementById('push-image').value || '';
+
+            document.getElementById('push-preview-title').innerText = title;
+            document.getElementById('push-preview-body').innerText = body || 'გამარჯობა!';
+            document.getElementById('push-preview-icon').src = icon;
+
+            const imgWrap = document.getElementById('push-preview-image-wrap');
+            if (image) {
+                document.getElementById('push-preview-image').src = image;
+                imgWrap.style.display = 'block';
+            } else {
+                imgWrap.style.display = 'none';
+            }
+        }
+
+        async function loadPushSubscribers() {
+            const { data, error } = await _supabase.from('push_subscriptions').select('id, created_at');
+            const el = document.getElementById('push-subscribers-info');
+            if (error) { el.innerText = 'შეცდომა: ' + error.message; return; }
+            el.innerHTML = `
+                <div style="font-size:36px; font-weight:bold; color:white;">${data.length}</div>
+                <div style="color:#666; margin-top:5px;">გამომწერი</div>
+                <div style="color:#444; font-size:12px; margin-top:10px;">შეტყობინება ყველა ამ მოწყაბრე გაიგზავნება.</div>
+            `;
+        }
+
+        // ════════════════════════════════════════
+        // PUSH DROPZONE LOGIC
+        // ════════════════════════════════════════
+
+        // Stored URLs after upload
+        const dzUrls = { image: null, icon: null };
+
+        function dzDragOver(e, id) {
+            e.preventDefault();
+            document.getElementById(id).classList.add('drag-over');
+        }
+        function dzDragLeave(id) {
+            document.getElementById(id).classList.remove('drag-over');
+        }
+        function dzDrop(e, type) {
+            e.preventDefault();
+            document.getElementById(`dz-${type}`).classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) handleDropzoneFile(file, type);
+        }
+        function dzFileSelected(e, type) {
+            const file = e.target.files[0];
+            if (file) handleDropzoneFile(file, type);
+        }
+
+        async function handleDropzoneFile(file, type) {
+            const spinnerId = `dz-${type}-spinner`;
+            const previewId = `dz-${type}-preview`;
+            const previewImgId = `dz-${type}-preview-img`;
+            const innerId = `dz-${type}-inner`;
+
+            // Show spinner, hide inner prompt
+            document.getElementById(innerId).style.display = 'none';
+            document.getElementById(spinnerId).style.display = 'flex';
+            document.getElementById(previewId).style.display = 'none';
+
+            try {
+                // Upload to Supabase Storage → 'notifications' bucket
+                const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+                const { data, error } = await _supabase.storage
+                    .from('notifications')
+                    .upload(fileName, file, { upsert: true });
+
+                if (error) throw error;
+
+                const { data: urlData } = _supabase.storage
+                    .from('notifications')
+                    .getPublicUrl(fileName);
+
+                const publicUrl = urlData.publicUrl;
+                dzUrls[type] = publicUrl;
+
+                // Update the hidden text input too (for fallback / preview)
+                const input = document.getElementById(type === 'image' ? 'push-image' : 'push-icon');
+                if (input) input.value = publicUrl;
+
+                // Show preview
+                document.getElementById(previewImgId).src = publicUrl;
+                document.getElementById(previewId).style.display = 'block';
+                document.getElementById(spinnerId).style.display = 'none';
+
+                // Update notification preview card
+                updatePushPreview();
+
+            } catch (err) {
+                console.error('[Dropzone] Upload failed:', err);
+                alert(`ატვირთვის შეცდომა: ${err.message}\n\nდარწმუნდი რომ Supabase-ში 'notifications' bucket არსებობს.`);
+                // Reset to prompt
+                document.getElementById(spinnerId).style.display = 'none';
+                document.getElementById(innerId).style.display = '';
+            }
+        }
+
+        function clearDropzone(type) {
+            dzUrls[type] = null;
+            const input = document.getElementById(type === 'image' ? 'push-image' : 'push-icon');
+            if (input) input.value = '';
+            document.getElementById(`dz-${type}-preview`).style.display = 'none';
+            document.getElementById(`dz-${type}-preview-img`).src = '';
+            document.getElementById(`dz-${type}-inner`).style.display = '';
+            // Reset file input so same file can be re-selected
+            document.getElementById(`dz-${type}-input`).value = '';
+            updatePushPreview();
+        }
+
+        function toggleManualUrl(type) {
+            const input = document.getElementById(type === 'image' ? 'push-image' : 'push-icon');
+            if (!input) return;
+            const isHidden = input.style.display === 'none';
+            input.style.display = isHidden ? 'block' : 'none';
+            if (isHidden) input.focus();
+        }
+
+        // ════════════════════════════════════════
+
+        function updatePushUrlHint() {
+            const type = document.getElementById('push-content-type').value;
+            const id = document.getElementById('push-content-id').value.trim();
+            const base = 'https://documentary-movies.vercel.app';
+            let hint = 'ლინკი: ';
+            if (id) {
+                hint += type === 'movie'
+                    ? `${base}/watch_movie.html?id=${id}`
+                    : `${base}/watch_video.html?id=${id}`;
+            } else {
+                hint += type === 'movie' ? `${base}/watch_movie.html?id=...` : `${base}/watch_video.html?id=...`;
+            }
+            document.getElementById('push-url-hint').innerText = hint;
+        }
+
+        async function sendPushNotification() {
+            const EDGE_FUNCTION_URL = 'https://azrthnztbdenebqygcmp.supabase.co/functions/v1/send-push';
+            const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6cnRobnp0YmRlbmVicXlnY21wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNDYyNjksImV4cCI6MjA5MDcyMjI2OX0.OlY83Zi-9k3rFnlPQyzMiB27nnmgAgETK1jy3tDo0mA';
+
+            const btn = document.getElementById('push-send-btn');
+            const status = document.getElementById('push-status');
+            const title = document.getElementById('push-title').value.trim();
+            const body = document.getElementById('push-body').value.trim();
+            const image = document.getElementById('push-image').value.trim();
+            const icon = document.getElementById('push-icon').value.trim();
+
+            // Build URL from content type + ID
+            const contentType = document.getElementById('push-content-type').value;
+            const contentId = document.getElementById('push-content-id').value.trim();
+            const base = 'https://documentary-movies.vercel.app';
+            const url = contentId
+                ? (contentType === 'movie'
+                    ? `${base}/watch_movie.html?id=${contentId}`
+                    : `${base}/watch_video.html?id=${contentId}`)
+                : base;
+
+            if (!title || !body) {
+                status.style.color = '#f44336';
+                status.innerText = 'გთხოვთ შეიყვანოთ სათაური და ტექსტი.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'იგზავნება...';
+            status.style.color = '#aaa';
+            status.innerText = `Edge Function-ს უკავშირდება... (ლინკი: ${url})`;
+
+            try {
+                const response = await fetch(EDGE_FUNCTION_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${ANON_KEY}`
+                    },
+                    body: JSON.stringify({
+                        title,
+                        body,
+                        icon: icon || 'https://documentary-movies.vercel.app/images/logo/Logo.png',
+                        url,
+                        image: image || null
+                    })
+                });
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+
+                status.style.color = '#4CAF50';
+                status.innerText = `✓ გაიგზავნა ${result.count ?? '?'} გამომწერზე!`;
+            } catch (err) {
+                status.style.color = '#f44336';
+                status.innerText = 'შეცდომა: ' + err.message;
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '🔔 გაგზავნა ყველასთვის';
+            }
+        }
+
 
         async function handleLogin() {
             const email = document.getElementById('login-email').value;
