@@ -403,16 +403,9 @@
                     <textarea id="push-body" rows="3" placeholder="შეიყვანეთ შეტყობინების ტექსტი..." oninput="updatePushPreview()"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>კონტენტის ტიპი</label>
-                    <select id="push-content-type" onchange="updatePushUrlHint()" style="background:#1a1a1a; color:#fff; border:1px solid #333; padding:10px; border-radius:8px; width:100%; font-size:13px; font-family:inherit;">
-                        <option value="video">🎥 მოკლე ვიდეო (short_videos)</option>
-                        <option value="movie">🎬 ფილმი (movies)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Content ID <span style="color:#555; font-size:11px;">(ბაზის ID)</span></label>
-                    <input type="text" id="push-content-id" placeholder="მაგ: 42d1f3a8-..." oninput="updatePushUrlHint()">
-                    <small id="push-url-hint" style="color:#555; font-size:12px; margin-top:4px; display:block;">ლინკი ავტომატურად აიგება</small>
+                    <label>🔗 სრული ლინკი (Destination URL)</label>
+                    <input type="url" id="push-link" placeholder="https://documentary-movies.vercel.app/watch_video.html?id=..." style="font-size:12px;">
+                    <small style="color:#555; font-size:12px; margin-top:4px; display:block;">შეტყობინაზე დაწერა გაიხსნება ამ გვერდი. გარეშეან ხსნება: მთავარი გვერდი.</small>
                 </div>
                 <!-- ─── Image Dropzone ─── -->
                 <div class="form-group">
@@ -654,20 +647,6 @@
 
         // ════════════════════════════════════════
 
-        function updatePushUrlHint() {
-            const type = document.getElementById('push-content-type').value;
-            const id = document.getElementById('push-content-id').value.trim();
-            const base = 'https://documentary-movies.vercel.app';
-            let hint = 'ლინკი: ';
-            if (id) {
-                hint += type === 'movie'
-                    ? `${base}/watch_movie.html?id=${id}`
-                    : `${base}/watch_video.html?id=${id}`;
-            } else {
-                hint += type === 'movie' ? `${base}/watch_movie.html?id=...` : `${base}/watch_video.html?id=...`;
-            }
-            document.getElementById('push-url-hint').innerText = hint;
-        }
 
         async function sendPushNotification() {
             const EDGE_FUNCTION_URL = 'https://azrthnztbdenebqygcmp.supabase.co/functions/v1/send-push';
@@ -679,16 +658,8 @@
             const body = document.getElementById('push-body').value.trim();
             const image = document.getElementById('push-image').value.trim();
             const icon = document.getElementById('push-icon').value.trim();
-
-            // Build URL from content type + ID
-            const contentType = document.getElementById('push-content-type').value;
-            const contentId = document.getElementById('push-content-id').value.trim();
-            const base = 'https://documentary-movies.vercel.app';
-            const url = contentId
-                ? (contentType === 'movie'
-                    ? `${base}/watch_movie.html?id=${contentId}`
-                    : `${base}/watch_video.html?id=${contentId}`)
-                : base;
+            const url = document.getElementById('push-link').value.trim()
+                || 'https://documentary-movies.vercel.app/';
 
             if (!title || !body) {
                 status.style.color = '#f44336';
@@ -699,7 +670,7 @@
             btn.disabled = true;
             btn.innerText = 'იგზავნება...';
             status.style.color = '#aaa';
-            status.innerText = `Edge Function-ს უკავშირდება... (ლინკი: ${url})`;
+            status.innerText = `გაიგზავნება → ${url}`;
 
             try {
                 const response = await fetch(EDGE_FUNCTION_URL, {

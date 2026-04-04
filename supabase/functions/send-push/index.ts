@@ -2,65 +2,62 @@ import { serve } from "https://deno.land/std@0.131.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import webpush from "https://esm.sh/web-push"
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
+
 serve(async (req) => {
-  // CORS-ის მოგვარება (რომ ბრაუზერიდან გამოძახება შევძლოთ)
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*' } })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
     const { title, body, icon, url, image } = await req.json()
 
-    // VAPID keys are stored in Supabase Edge Function Secrets (never in source code)
+    // VAPID keys from Supabase Edge Function Secrets
     const VAPID_PUBLIC_KEY = Deno.env.get('VAPID_PUBLIC_KEY') ?? ''
     const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY') ?? ''
 
     if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
       return new Response(JSON.stringify({ error: 'VAPID keys not configured in Edge Function secrets.' }), {
         status: 500,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
-    webpush.setVapidDetails(
-      'mailto:contact@cyron.dev',
-      VAPID_PUBLIC_KEY,
-      VAPID_PRIVATE_KEY
-    )
+    webpush.setVapidDetails('mailto:contact@cyron.dev', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 
-    // 2. Supabase-თან დაკავშირება (ბაზიდან სუბსკრიფციების ამოსაღებად)
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // 3. ყველა გამომწერის წამოღება ბაზიდან
     const { data: subscriptions, error } = await supabase
       .from('push_subscriptions')
       .select('*')
 
     if (error) throw error
 
-    // 4. შეტყობინებების დაგზავნა ყველასთან
-    const notifications = subscriptions.map((sub) => {
-      const payload = JSON.stringify({ title, body, icon, url, image: image || null })
-      return webpush.sendNotification(sub.subscription_data, payload)
-        .catch((err) => console.error('Error sending push:', err))
-    })
+    const payload = JSON.stringify({ title, body, icon, url, image: image || null })
+
+    const notifications = subscriptions.map((sub) =>
+      webpush.sendNotification(sub.subscription_data, payload)
+        .catch((err: Error) => console.error('Error sending push to subscriber:', err.message))
+    )
 
     await Promise.all(notifications)
 
     return new Response(JSON.stringify({ success: true, count: subscriptions.length }), {
-      headers: { 
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*" 
-      },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
 })
