@@ -635,7 +635,7 @@
                     .from('push_subscriptions')
                     .upsert([{
                         endpoint: subscription.endpoint,
-                        subscription_data: JSON.parse(JSON.stringify(subscription))
+                        subscription_json: JSON.parse(JSON.stringify(subscription))
                     }], { onConflict: 'endpoint' });
 
                 if (error) throw error;

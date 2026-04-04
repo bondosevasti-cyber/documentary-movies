@@ -44,7 +44,7 @@ serve(async (req) => {
     const payload = JSON.stringify({ title, body, icon, url, image: image || null })
 
     const notifications = subscriptions.map((sub) =>
-      webpush.sendNotification(sub.subscription_data, payload)
+      webpush.sendNotification(sub.subscription_json, payload)
         .catch((err: Error) => console.error('Error sending push to subscriber:', err.message))
     )
 
