@@ -65,6 +65,21 @@
             document.getElementById('page-movie-title').innerText = video.title;
             document.title = `${video.title} - Cineby Shorts`;
 
+            // Increment Views
+            incrementShortViews(videoId);
+
+            // Display Views
+            const viewsDiv = document.createElement('div');
+            viewsDiv.className = 'card-meta';
+            viewsDiv.style.fontSize = '14px';
+            viewsDiv.style.marginTop = '8px';
+            
+            const viewsDisplay = video.views ? formatViews(video.views) : '0 ნახვა';
+            const dateDisplay = formatRelativeDate(video.created_at);
+            
+            viewsDiv.innerHTML = `<span>${viewsDisplay}</span><span class="dot">•</span><span>${dateDisplay}</span>`;
+            document.querySelector('.title-section').appendChild(viewsDiv);
+
             if (video.original_link) {
                 const btn = document.getElementById('original-link-btn');
                 btn.href = video.original_link;
@@ -92,6 +107,29 @@
             iframe.setAttribute('frameborder', '0');
             iframe.setAttribute('allowfullscreen', '');
             playerContainer.appendChild(iframe);
+        }
+
+        async function incrementShortViews(videoId) {
+            const { error } = await _supabase.rpc('increment_short_views', { video_id: videoId });
+            if (error) console.error('Error incrementing views:', error);
+        }
+
+        function formatViews(count) {
+            return `${count} ნახვა`;
+        }
+
+        function formatRelativeDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffInSeconds < 60) return 'ახლახანს';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} წუთის წინ`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} საათის წინ`;
+            if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} დღის წინ`;
+            
+            return date.toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' });
         }
 
         window.onload = loadVideo;

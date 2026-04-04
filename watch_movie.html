@@ -70,6 +70,22 @@
             // SEO: Dynamic Title
             document.title = `${movieTitle} ქართულად ${movieYear} - დოკუმენტური ფილმები`;
 
+            // Increment Views
+            incrementViews('movies', movieId);
+            
+            // Display Views
+            const viewsDiv = document.createElement('div');
+            viewsDiv.className = 'card-meta';
+            viewsDiv.style.fontSize = '14px';
+            viewsDiv.style.marginTop = '8px';
+            
+            // Format number to K/M
+            const viewsDisplay = movie.views ? formatViews(movie.views) : '0 ნახვა';
+            const dateDisplay = formatRelativeDate(movie.created_at);
+            
+            viewsDiv.innerHTML = `<span>${viewsDisplay}</span><span class="dot">•</span><span>${dateDisplay}</span>`;
+            document.querySelector('.title-section').appendChild(viewsDiv);
+
             // SEO: Dynamic Meta Description
             const descriptionText = `უყურეთ ფილმს ${movieTitle} ქართული გახმოვანებით ონლაინ საიტზე 'დოკუმენტური ფილმები'. ექსკლუზიური თარგმანი.`;
             

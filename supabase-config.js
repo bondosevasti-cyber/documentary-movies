@@ -31,6 +31,34 @@ async function uploadFile(file) {
 }
 
 /**
+ * Format view count to K/M
+ */
+function formatViews(count) {
+    if (!count) return '0 ნახვა';
+    const num = parseInt(count);
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M ნახვა';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K ნახვა';
+    return num + ' ნახვა';
+}
+
+/**
+ * Format date to relative string
+ */
+function formatRelativeDate(dateString) {
+    if (!dateString) return 'ახალი';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    
+    if (diffInSeconds < 60) return 'ახლახანს';
+    if (diffInSeconds < 3600) return Math.floor(diffInSeconds / 60) + ' წუთის წინ';
+    if (diffInSeconds < 86400) return Math.floor(diffInSeconds / 3600) + ' საათის წინ';
+    if (diffInSeconds < 2592000) return Math.floor(diffInSeconds / 86400) + ' დღის წინ';
+    if (diffInSeconds < 31536000) return Math.floor(diffInSeconds / 2592000) + ' თვის წინ';
+    return Math.floor(diffInSeconds / 31536000) + ' წლის წინ';
+}
+
+/**
  * Fetch all movies from database
  */
 async function fetchMovies() {
@@ -45,5 +73,17 @@ async function fetchMovies() {
     } catch (err) {
         console.error("Database Error:", err.message);
         return [];
+    }
+}
+
+/**
+ * Increment view count for short videos using RPC
+ */
+async function incrementShortViews(id) {
+    try {
+        const { error } = await _supabase.rpc('increment_short_views', { video_id: id });
+        if (error) throw error;
+    } catch (err) {
+        console.error('RPC Short View Increment Error:', err.message);
     }
 }

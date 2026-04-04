@@ -34,7 +34,7 @@ async function generateSitemap() {
         });
 
         // Fetch Videos
-        const videosResponse = await fetch(`${SUPABASE_URL}/rest/v1/short_videos?select=id,created_at`, {
+        const videosResponse = await fetch(`${SUPABASE_URL}/rest/v1/videos?select=id,created_at`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const videos = await videosResponse.json();

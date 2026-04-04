@@ -313,15 +313,23 @@
             card.className = 'card-item';
             card.style.cursor = 'default';
 
-            // Video cards use 1:1 format for short videos
+            // Robust photo URL selection
+            const bgUrl = video.photo_url || video.poster_url || video.card_url || 'images/placeholder.webp';
+            const date = video.created_at ? new Date(video.created_at).toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' }) : '';
+
             card.innerHTML = `
-                <div class="card-1-1" style="background-image: url('${video.photo_url}'); cursor: pointer;" onclick="window.open('watch_video.html?id=${video.id}', '_blank')">
+                <div class="card-16-9" style="background-image: url('${bgUrl}'); cursor: pointer;" onclick="window.open('watch_video.html?id=${video.id}', '_blank')">
                     <div class="info-icon-wrapper">
                         <div class="info-icon">!</div>
                         <div class="info-tooltip">გაფრთხილება: ჩვენ პატივს ვცემთ საავტორო უფლებებს. მზად ვართ ვითანამშრომლოთ ავტორებთან, თუმცა ჩვენს შეტყობინებებზე პასუხი ჯერ არ მიგვიღია.</div>
                     </div>
                 </div>
-                <div class="card-title">${video.title}</div>
+                <div class="card-title" style="cursor: pointer;" onclick="window.open('watch_video.html?id=${video.id}', '_blank')">${video.title}</div>
+                <div class="card-meta" style="opacity: 1 !important; visibility: visible !important;">
+                    <span>${date}</span>
+                    <span class="dot">•</span>
+                    <span>${video.views || 0} ნახვა</span>
+                </div>
                 <a href="${video.original_link || '#'}" target="_blank" class="video-original-link">${video.original_link ? 'ნახე ორიგინალი' : 'ორიგინალი არ არის'}</a>
             `;
             return card;
@@ -363,6 +371,8 @@
             card.className = 'card-item';
             card.onclick = () => manualHeroUpdate(movie);
 
+            const date = movie.created_at ? new Date(movie.created_at).toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' }) : '';
+
             let innerHTML = `
                 <div class="info-icon-wrapper">
                     <div class="info-icon">!</div>
@@ -377,6 +387,11 @@
                     </div>
 
                     <div class="card-title">${movie.title}</div>
+                    <div class="card-meta">
+                        <span>${date}</span>
+                        <span class="dot">•</span>
+                        <span>${movie.views || 0} ნახვა</span>
+                    </div>
                 `;
             } else {
                 const ratioClass = movie.display_ratio === '16:9' ? 'card-16-9' : 'card-1-1';
@@ -389,6 +404,11 @@
                     </div>
 
                     <div class="card-title">${movie.title}</div>
+                    <div class="card-meta">
+                        <span>${date}</span>
+                        <span class="dot">•</span>
+                        <span>${movie.views || 0} ნახვა</span>
+                    </div>
                 `;
             }
             card.innerHTML = innerHTML;

@@ -114,8 +114,8 @@
             border: 1px solid #222;
         }
         .video-card-img {
-            width: 100px;
-            height: 100px;
+            width: 160px;
+            aspect-ratio: 16 / 9;
             border-radius: 8px;
             object-fit: cover;
         }
@@ -182,7 +182,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>პატარა ბარათი (Original Poster) (1:1)</label>
+                        <label>პატარა ბარათი (Original Poster) (16:9)</label>
                         <div class="upload-wrapper poster-wrapper" id="poster-drop-zone">
                             <button type="button" class="reset-upload" id="poster-reset">&times;</button>
                             <div class="upload-placeholder" id="poster-placeholder" onclick="document.getElementById('poster-input').click()">
@@ -297,7 +297,7 @@
                     <input type="hidden" name="video_id" id="video-db-id">
                     
                     <div class="form-group">
-                        <label>პოსტერი (1:1)</label>
+                        <label>პოსტერი (16:9)</label>
                         <div class="upload-wrapper poster-wrapper" id="v-poster-drop-zone">
                             <button type="button" class="reset-upload" id="v-poster-reset">&times;</button>
                             <div class="upload-placeholder" id="v-poster-placeholder" onclick="document.getElementById('v-poster-input').click()">
@@ -526,7 +526,7 @@
             reader.onload = (e) => {
                 vCropperImg.src = e.target.result; vPlaceholder.style.display = 'none'; vCropperContainer.style.display = 'block'; vBtnReset.style.display = 'block';
                 if (vPosterCropper) vPosterCropper.destroy();
-                vPosterCropper = new Cropper(vCropperImg, { aspectRatio: 1, viewMode: 1, dragMode: 'move', guides: false, center: false, highlight: false, cropBoxMovable: false, cropBoxResizable: false, background: false });
+                vPosterCropper = new Cropper(vCropperImg, { aspectRatio: 16 / 9, viewMode: 1, dragMode: 'move', guides: false, center: false, highlight: false, cropBoxMovable: false, cropBoxResizable: false, background: false });
             };
             reader.readAsDataURL(file);
         }
@@ -768,11 +768,13 @@
             const container = document.getElementById('videos-list');
             container.innerHTML = '';
             videos.forEach(video => {
+                const imgUrl = video.photo_url || video.poster_url || 'images/placeholder.webp';
                 container.innerHTML += `
                     <div class="video-card-item">
-                        <img src="${video.photo_url}" class="video-card-img">
+                        <img src="${imgUrl}" class="video-card-img">
                         <div class="video-card-info">
                             <h4>${video.title}</h4>
+                            <p style="margin-bottom: 5px; color: #aaa;">${video.views || 0} ნახვა</p>
                             <p><a href="${video.rumble_link}" target="_blank" style="color:red">Rumble</a> | <a href="${video.original_link || '#'}" target="_blank" style="color:#aaa">${video.original_link ? 'Original' : 'No link'}</a></p>
                         </div>
                         <div class="video-card-actions">
@@ -792,8 +794,9 @@
             form['rumble_link'].value = video.rumble_link;
             form['original_link'].value = video.original_link || '';
             
-            existingVPosterUrl = video.photo_url;
-            document.getElementById('v-poster-placeholder').innerHTML = `<img src="${video.photo_url}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>`;
+            existingVPosterUrl = video.photo_url || video.poster_url || '';
+            const imgUrl = video.photo_url || video.poster_url || '';
+            document.getElementById('v-poster-placeholder').innerHTML = imgUrl ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>` : `<p>ფოტოს ატვირთვა</p>`;
             
             isVideoEditing = true;
             document.getElementById('video-form-title').innerText = 'ვიდეოს განახლება';
@@ -829,7 +832,7 @@
             try {
                 let photo_url = existingVPosterUrl;
                 if (vPosterCropper) {
-                    const canvas = vPosterCropper.getCroppedCanvas({ width: 600, height: 600 });
+                    const canvas = vPosterCropper.getCroppedCanvas({ width: 1280, height: 720 });
                     const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', 0.8));
                     const fileName = `video_${Date.now()}.webp`;
                     const { data, error } = await _supabase.storage.from('movie-images').upload(fileName, blob);

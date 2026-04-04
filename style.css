@@ -187,9 +187,17 @@ nav a:hover, nav a.active {
 /* Video Grid */
 .videos-grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 40px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
     padding: 0 50px 50px;
+}
+
+@media (max-width: 768px) {
+    .videos-grid-container {
+        grid-template-columns: 1fr;
+        padding: 0;
+        gap: 0;
+    }
 }
 
 .video-original-link {
@@ -327,24 +335,63 @@ nav a:hover, nav a.active {
 
 .card-title {
     margin-top: 12px;
-    font-size: 15px;
+    font-size: 16px;
     color: var(--text-color);
-    text-align: center;
-    max-width: 100%;
-    font-weight: 500;
+    text-align: left;
+    width: 100%;
+    font-weight: 600;
     line-height: 1.4;
+    padding: 0 16px; /* Added padding to text but not the image */
     transition: color 0.3s ease;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-meta {
+    width: 100%;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 4px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 16px; /* Indent meta text for better hierarchy */
+}
+
+.card-meta .dot {
+    opacity: 0.5;
 }
 
 .card-item {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     cursor: pointer;
-    position: relative; /* Fixed: anchor badges to card */
+    position: relative;
     scroll-snap-align: center;
+    background: transparent;
+    transition: transform 0.3s ease;
+    padding: 10px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5); /* subtle shadow-sm */
 }
 
+.card-item:hover {
+    transform: translateY(-5px);
+}
+
+@media (max-width: 768px) {
+    .card-item {
+        padding: 0 0 24px 0;
+        border-radius: 0;
+        box-shadow: none;
+        border-bottom: 0px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+    }
+}
 
 .card-item:hover .card-title {
     color: var(--accent-color);
@@ -612,7 +659,17 @@ nav a:hover, nav a.active {
 
 .card-1-1:hover,
 .card-16-9:hover {
-    transform: scale(1.05);
+    /* Reduced scale for cleaner look */
+    transform: scale(1.02);
+}
+
+@media (max-width: 768px) {
+    .card-1-1, .card-16-9 {
+        border-radius: 0;
+        box-shadow: none;
+        width: 100%;
+        min-width: 100%;
+    }
 }
 
 /* Watch Page */
