@@ -106,11 +106,19 @@
                 if (ogImage) ogImage.setAttribute('content', movie.cover_url);
             }
 
-            // Rumble Embed Logic
+            // Rumble ID/URL Parser (Supports raw ID, full URL, or entire IFRAME tag)
             function prepareRumbleUrl(input) {
                 if (!input) return '';
                 input = input.trim();
                 
+                // Check if it's an iframe tag (extract src)
+                if (input.includes('<iframe')) {
+                    const srcMatch = input.match(/src=["'](.*?)["']/i);
+                    if (srcMatch && srcMatch[1]) {
+                        input = srcMatch[1];
+                    }
+                }
+
                 // 1. If it's already an embed URL, use it as is
                 if (input.includes('rumble.com/embed/')) {
                     if (!input.startsWith('http')) {

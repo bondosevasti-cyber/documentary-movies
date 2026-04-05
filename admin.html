@@ -265,7 +265,7 @@
                         <div class="form-group" style="flex: 1;"><label>წელი</label><input type="text" name="release_year"></div>
                         <div class="form-group" style="flex: 1;"><label>რეიტინგი</label><input type="text" name="rating"></div>
                     </div>
-                    <div class="form-group"><label>Rumble Video ID</label><input type="text" name="video_id"></div>
+                    <div class="form-group"><label>Embed IFRAME URL</label><input type="text" name="video_id" placeholder="https://rumble.com/embed/..."></div>
                     <div class="form-group">
                         <label>ხანგრძლივობა</label>
                         <div style="display: flex; gap: 10px; align-items: center;">
@@ -366,7 +366,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>Rumble-ის ლინკი</label>
+                        <label>Embed IFRAME URL</label>
                         <input type="url" name="rumble_link" placeholder="https://rumble.com/embed/..." required>
                     </div>
 
@@ -490,26 +490,32 @@
         let posterCropper = null, coverCropper = null, cardCropper = null, isEditing = false, existingPosterUrl = '', existingCoverUrl = '', existingCardUrl = '';
         let vPosterCropper = null, isVideoEditing = false, existingVPosterUrl = '';
         
-        // Rumble ID/URL Parser
+        // Rumble ID/URL Parser (Supports raw ID, full URL, or entire IFRAME tag)
         function prepareRumbleUrl(input) {
             if (!input) return '';
             input = input.trim();
             
+            // Check if it's an iframe tag (extract src)
+            if (input.includes('<iframe')) {
+                const srcMatch = input.match(/src=["'](.*?)["']/i);
+                if (srcMatch && srcMatch[1]) {
+                    input = srcMatch[1];
+                }
+            }
+
             // 1. If it's already an embed URL, use it as is
             if (input.includes('rumble.com/embed/')) {
-                // Ensure correct protocol
                 if (!input.startsWith('http')) {
                     input = 'https://' + input.replace(/^[\/:]+/, '');
                 }
                 return input;
             }
             
-            // 2. Extract ID from various formats (https://rumble.com/v..., /v..., or just v...)
+            // 2. Extract ID from various formats
             const idRegex = /(?:rumble\.com\/v|(?:\/|^)v)([a-zA-Z0-9]+)/i;
             const match = input.match(idRegex);
             let rId = (match && match[1]) ? match[1] : null;
             
-            // Fallback for simple ID strings or paths
             if (!rId) {
                 if (!input.includes('://') && !input.includes('.')) {
                     rId = input.split('/').filter(Boolean).pop();
@@ -522,8 +528,7 @@
             if (rId) {
                 return `https://rumble.com/embed/${rId}/?pub=4p1avk&api=1`;
             }
-            
-            return input; // Fallback
+            return input;
         }
 
         // Focal Point State
