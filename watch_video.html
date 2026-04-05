@@ -76,7 +76,8 @@
             viewsDiv.style.fontSize = '14px';
             viewsDiv.style.marginTop = '8px';
 
-            const viewsDisplay = video.views ? formatViews(video.views) : '0 ნახვა';
+            const currentViews = (video.views || 0) + 1;
+            const viewsDisplay = formatViews(currentViews);
             const dateDisplay = formatRelativeDate(video.created_at);
 
             viewsDiv.innerHTML = `<span>${viewsDisplay}</span><span class="dot">•</span><span>${dateDisplay}</span>`;

@@ -80,7 +80,8 @@
             viewsDiv.style.marginTop = '8px';
 
             // Format number to K/M
-            const viewsDisplay = movie.views ? formatViews(movie.views) : '0 ნახვა';
+            const currentViews = (movie.views || 0) + 1;
+            const viewsDisplay = formatViews(currentViews);
             const dateDisplay = formatRelativeDate(movie.created_at);
 
             viewsDiv.innerHTML = `<span>${viewsDisplay}</span><span class="dot">•</span><span>${dateDisplay}</span>`;
