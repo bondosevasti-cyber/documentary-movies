@@ -87,3 +87,36 @@ async function incrementShortViews(id) {
         console.error('RPC Short View Increment Error:', err.message);
     }
 }
+
+/**
+ * Global function to check and apply site settings
+ * (Currently only handles the Support Button)
+ */
+async function applySiteSettings() {
+    try {
+        const { data, error } = await _supabase
+            .from('site_settings')
+            .select('show_support_button')
+            .eq('id', 1)
+            .single();
+
+        if (error) {
+            console.error('Error fetching site settings:', error);
+            // If the table doesn't exist yet, we don't want to break the site
+            return;
+        }
+
+        if (data) {
+            const supportBtns = document.querySelectorAll('.btn-support');
+            supportBtns.forEach(btn => {
+                if (data.show_support_button === false) {
+                    btn.style.setProperty('display', 'none', 'important');
+                } else {
+                    btn.style.display = '';
+                }
+            });
+        }
+    } catch (err) {
+        console.error('applySiteSettings Error:', err);
+    }
+}

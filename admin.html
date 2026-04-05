@@ -205,6 +205,7 @@
             <div class="nav-item active" id="nav-movies" onclick="switchSection('movies')">ფილმების მართვა</div>
             <div class="nav-item" id="nav-videos" onclick="switchSection('videos')">ვიდეოების მართვა</div>
             <div class="nav-item" id="nav-push" onclick="switchSection('push')">🔔 შეტყობინებები</div>
+            <div class="nav-item" id="nav-settings" onclick="switchSection('settings')">⚙️ პარამეტრები</div>
         </div>
 
         <!-- MOVIES SECTION -->
@@ -483,6 +484,20 @@
                 </div>
             </div>
         </div>
+
+        <!-- SETTINGS SECTION -->
+        <div id="section-settings" class="admin-section" style="grid-template-columns: 1fr;">
+            <div class="admin-form-container" style="max-width: 600px;">
+                <h1>⚙️ საიტის პარამეტრები</h1>
+                <div class="checkbox-group" style="flex-direction: column; align-items: flex-start; gap: 15px;">
+                    <label class="checkbox-item" style="font-size: 16px;">
+                        <input type="checkbox" id="show-support-toggle" onchange="updateSupportButtonSetting(this.checked)"> მხარდაჭერის ღილაკის ჩვენება
+                    </label>
+                    <p style="color: #666; font-size: 13px; margin: 0;">თუ გამორთულია, "მხარდაჭერა" ღილაკი გაქრება ნავიგაციის ზოლიდან ყველა გვერდზე.</p>
+                </div>
+                <div id="settings-status" style="margin-top:20px; font-size:14px; color:#aaa; font-weight: 500;"></div>
+            </div>
+        </div>
     </div>
 
     <script src="supabase-config.js"></script>
@@ -559,6 +574,61 @@
                 document.getElementById('section-push').classList.add('active');
                 document.getElementById('nav-push').classList.add('active');
                 loadPushSubscribers();
+            } else if (section === 'settings') {
+                document.getElementById('section-settings').classList.add('active');
+                document.getElementById('nav-settings').classList.add('active');
+                loadSiteSettings();
+            }
+        }
+
+        async function loadSiteSettings() {
+            const status = document.getElementById('settings-status');
+            status.innerText = 'იტვირთება...';
+            try {
+                const { data, error } = await _supabase
+                    .from('site_settings')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+                
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        // Not found, maybe create it? But user says they created it.
+                        status.innerText = 'პარამეტრები ბაზაში არ მოიძებნა (id=1)';
+                    } else {
+                        throw error;
+                    }
+                    return;
+                }
+                
+                document.getElementById('show-support-toggle').checked = data.show_support_button;
+                status.innerText = 'მონაცემები ჩაიტვირთა.';
+                setTimeout(() => status.innerText = '', 2000);
+            } catch (err) {
+                status.style.color = '#f44336';
+                status.innerText = 'შეცდომა: ' + err.message;
+            }
+        }
+
+        async function updateSupportButtonSetting(isVisible) {
+            const status = document.getElementById('settings-status');
+            status.style.color = '#aaa';
+            status.innerText = 'ბაზა განახლდება...';
+            
+            try {
+                const { error } = await _supabase
+                    .from('site_settings')
+                    .update({ show_support_button: isVisible })
+                    .eq('id', 1);
+                
+                if (error) throw error;
+                
+                status.style.color = '#4CAF50';
+                status.innerText = '✓ პარამეტრი წარმატებით შეინახა!';
+                setTimeout(() => status.innerText = '', 3000);
+            } catch (err) {
+                status.style.color = '#f44336';
+                status.innerText = 'შეცდომა შენახვისას: ' + err.message;
             }
         }
 

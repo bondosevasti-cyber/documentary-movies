@@ -591,6 +591,7 @@
         window.onload = () => {
             initHome();
             registerServiceWorker(); // Register SW on load
+            applySiteSettings(); // Apply site-wide settings
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('type') === 'videos') {
                 switchContent('videos');

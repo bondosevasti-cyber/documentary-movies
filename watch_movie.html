@@ -191,7 +191,10 @@
             return date.toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' });
         }
 
-        window.onload = loadMovie;
+        window.onload = () => {
+            loadMovie();
+            applySiteSettings();
+        };
     </script>
 
 </body>
