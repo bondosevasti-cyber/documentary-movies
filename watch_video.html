@@ -87,26 +87,34 @@
             }
 
             // Rumble Embed Logic
-            let rumbleLink = video.rumble_link || '';
-            let embedUrl = '';
-
-            if (rumbleLink.includes('rumble.com/embed/')) {
-                embedUrl = rumbleLink;
-            } else {
-                // If it's just an ID or a standard link, try to format it
-                const parts = rumbleLink.split('/');
-                const id = parts[parts.length - 1] || parts[parts.length - 2];
-                embedUrl = `https://rumble.com/embed/${id}/?pub=4p1avk&api=1`;
+            function extractRumbleId(input) {
+                if (!input) return '';
+                input = input.trim();
+                const regex = /(?:rumble\.com\/(?:embed\/|v))([a-zA-Z0-9]+)/i;
+                const match = input.match(regex);
+                if (match && match[1]) return match[1];
+                if (input.includes('://')) {
+                    const embedRegex = /\/embed\/([a-zA-Z0-9]+)/i;
+                    const embedMatch = input.match(embedRegex);
+                    if (embedMatch && embedMatch[1]) return embedMatch[1];
+                    return input; // Fallback if it's already a full weird URL
+                }
+                return input.split('/').filter(Boolean).pop().split('-')[0]; // Final fallback
             }
 
-            // Create player
-            const playerContainer = document.getElementById('rumble-player');
-            const iframe = document.createElement('iframe');
-            iframe.className = 'rumble';
-            iframe.src = embedUrl;
-            iframe.setAttribute('frameborder', '0');
-            iframe.setAttribute('allowfullscreen', '');
-            playerContainer.appendChild(iframe);
+            const rId = extractRumbleId(video.rumble_link || '');
+            const embedUrl = rId ? `https://rumble.com/embed/${rId}/?pub=4p1avk&api=1` : '';
+
+            if (embedUrl) {
+                // Create player
+                const playerContainer = document.getElementById('rumble-player');
+                const iframe = document.createElement('iframe');
+                iframe.className = 'rumble';
+                iframe.src = embedUrl;
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allowfullscreen', '');
+                playerContainer.appendChild(iframe);
+            }
         }
 
         async function incrementShortViews(videoId) {

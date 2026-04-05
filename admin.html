@@ -490,6 +490,21 @@
         let posterCropper = null, coverCropper = null, cardCropper = null, isEditing = false, existingPosterUrl = '', existingCoverUrl = '', existingCardUrl = '';
         let vPosterCropper = null, isVideoEditing = false, existingVPosterUrl = '';
         
+        // Rumble ID Parser
+        function extractRumbleId(input) {
+            if (!input) return '';
+            input = input.trim();
+            const regex = /(?:rumble\.com\/(?:embed\/|v))([a-zA-Z0-9]+)/i;
+            const match = input.match(regex);
+            if (match && match[1]) return match[1];
+            if (input.includes('://')) {
+                const embedRegex = /\/embed\/([a-zA-Z0-9]+)/i;
+                const embedMatch = input.match(embedRegex);
+                if (embedMatch && embedMatch[1]) return embedMatch[1];
+            }
+            return input.split('/').filter(Boolean).pop().split('-')[0]; // Fallback for simple paths
+        }
+
         // Focal Point State
         let currentX = 50;
         let currentY = 50;
@@ -1038,7 +1053,7 @@
                 };
 
                 // Smart 'Coming Soon' Logic
-                const videoId = getVal('video_id');
+                const videoId = extractRumbleId(getVal('video_id'));
                 const manualSoon = form['is_coming_soon'].checked;
                 let finalIsSoon = manualSoon;
                 if (!videoId) {
@@ -1180,7 +1195,7 @@
 
                 const videoData = {
                     title: form['title'].value.trim(),
-                    rumble_link: form['rumble_link'].value.trim(),
+                    rumble_link: extractRumbleId(form['rumble_link'].value.trim()),
                     original_link: form['original_link'].value.trim() || null,
                     photo_url: photo_url
                 };
