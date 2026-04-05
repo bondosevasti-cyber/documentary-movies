@@ -87,26 +87,41 @@
             }
 
             // Rumble Embed Logic
-            function extractRumbleId(input) {
+            function prepareRumbleUrl(input) {
                 if (!input) return '';
                 input = input.trim();
-                const regex = /(?:rumble\.com\/(?:embed\/|v))([a-zA-Z0-9]+)/i;
-                const match = input.match(regex);
-                if (match && match[1]) return match[1];
-                if (input.includes('://')) {
-                    const embedRegex = /\/embed\/([a-zA-Z0-9]+)/i;
-                    const embedMatch = input.match(embedRegex);
-                    if (embedMatch && embedMatch[1]) return embedMatch[1];
-                    return input; // Fallback if it's already a full weird URL
+                
+                // 1. If it's already an embed URL, use it as is
+                if (input.includes('rumble.com/embed/')) {
+                    if (!input.startsWith('http')) {
+                        input = 'https://' + input.replace(/^[\/:]+/, '');
+                    }
+                    return input;
                 }
-                return input.split('/').filter(Boolean).pop().split('-')[0]; // Final fallback
+                
+                // 2. Extract ID from various formats
+                const idRegex = /(?:rumble\.com\/v|(?:\/|^)v)([a-zA-Z0-9]+)/i;
+                const match = input.match(idRegex);
+                let rId = (match && match[1]) ? match[1] : null;
+                
+                if (!rId) {
+                    if (!input.includes('://') && !input.includes('.')) {
+                        rId = input.split('/').filter(Boolean).pop();
+                    } else {
+                        const fallbackMatch = input.match(/\/v([a-zA-Z0-9]+)/i);
+                        if (fallbackMatch) rId = fallbackMatch[1];
+                    }
+                }
+                
+                if (rId) {
+                    return `https://rumble.com/embed/${rId}/?pub=4p1avk&api=1`;
+                }
+                return input;
             }
 
-            const rId = extractRumbleId(video.rumble_link || '');
-            const embedUrl = rId ? `https://rumble.com/embed/${rId}/?pub=4p1avk&api=1` : '';
+            const embedUrl = prepareRumbleUrl(video.rumble_link || '');
 
             if (embedUrl) {
-                // Create player
                 const playerContainer = document.getElementById('rumble-player');
                 const iframe = document.createElement('iframe');
                 iframe.className = 'rumble';
