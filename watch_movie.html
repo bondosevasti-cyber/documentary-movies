@@ -9,7 +9,7 @@
     <meta property="og:title" content="დოკუმენტური ფილმები - უყურეთ ონლაინ">
     <meta property="og:description" content="უყურეთ საინტერესო დოკუმენტურ ფილმებსა და ვიდეოებს ქართული გახმოვანებით.">
     <meta property="og:image" content="images/logo/Logo.png">
-    <meta property="og:url" content="[Insert Your Website URL]">
+    <meta property="og:url" content="https://documentary-movies.vercel.app">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -66,29 +66,29 @@
             const movieTitle = movie.title;
             const movieYear = movie.release_year ? `(${movie.release_year})` : '';
             document.getElementById('page-movie-title').innerText = movieTitle;
-            
+
             // SEO: Dynamic Title
             document.title = `${movieTitle} ქართულად ${movieYear} - დოკუმენტური ფილმები`;
 
             // Increment Views
             incrementViews('movies', movieId);
-            
+
             // Display Views
             const viewsDiv = document.createElement('div');
             viewsDiv.className = 'card-meta';
             viewsDiv.style.fontSize = '14px';
             viewsDiv.style.marginTop = '8px';
-            
+
             // Format number to K/M
             const viewsDisplay = movie.views ? formatViews(movie.views) : '0 ნახვა';
             const dateDisplay = formatRelativeDate(movie.created_at);
-            
+
             viewsDiv.innerHTML = `<span>${viewsDisplay}</span><span class="dot">•</span><span>${dateDisplay}</span>`;
             document.querySelector('.title-section').appendChild(viewsDiv);
 
             // SEO: Dynamic Meta Description
             const descriptionText = `უყურეთ ფილმს ${movieTitle} ქართული გახმოვანებით ონლაინ საიტზე 'დოკუმენტური ფილმები'. ექსკლუზიური თარგმანი.`;
-            
+
             let metaDesc = document.querySelector('meta[name="description"]');
             if (metaDesc) {
                 metaDesc.setAttribute('content', descriptionText);
@@ -110,7 +110,7 @@
             function prepareRumbleUrl(input) {
                 if (!input) return '';
                 input = input.trim();
-                
+
                 // Check if it's an iframe tag (extract src)
                 if (input.includes('<iframe')) {
                     const srcMatch = input.match(/src=["'](.*?)["']/i);
@@ -126,12 +126,12 @@
                     }
                     return input;
                 }
-                
+
                 // 2. Extract ID from various formats
                 const idRegex = /(?:rumble\.com\/v|(?:\/|^)v)([a-zA-Z0-9]+)/i;
                 const match = input.match(idRegex);
                 let rId = (match && match[1]) ? match[1] : null;
-                
+
                 if (!rId) {
                     if (!input.includes('://') && !input.includes('.')) {
                         rId = input.split('/').filter(Boolean).pop();
@@ -140,7 +140,7 @@
                         if (fallbackMatch) rId = fallbackMatch[1];
                     }
                 }
-                
+
                 if (rId) {
                     return `https://rumble.com/embed/${rId}/?pub=4p1avk&api=1`;
                 }
@@ -160,7 +160,39 @@
             }
         }
 
+        async function incrementViews(table, movieId) {
+            try {
+                const { error } = await _supabase.rpc('increment_movie_views', { movie_id: movieId });
+                if (error) console.error('Error incrementing views:', error);
+            } catch (err) {
+                console.error('RPC failed, views may not increment', err);
+            }
+        }
+
+        function formatViews(count) {
+            if (!count) return '0 ნახვა';
+            if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M ნახვა';
+            if (count >= 1000) return (count / 1000).toFixed(1) + 'K ნახვა';
+            return `${count} ნახვა`;
+        }
+
+        function formatRelativeDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffInSeconds < 60) return 'ახლახანს';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} წუთის წინ`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} საათის წინ`;
+            if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} დღის წინ`;
+            
+            return date.toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' });
+        }
+
         window.onload = loadMovie;
     </script>
 
-</body></html>
+</body>
+
+</html>
