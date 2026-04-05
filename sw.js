@@ -1,6 +1,6 @@
 self.addEventListener('push', function(event) {
     let data = {
-        title: 'Cineby',
+        title: 'სტუდია სენაკი',
         body: 'ახალი კონტენტი დაემატა!',
         icon: 'images/logo/Logo.png',
         image: 'images/logo/Logo.png',

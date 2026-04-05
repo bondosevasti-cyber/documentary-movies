@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ყურება - Cineby</title>
-    <meta name="description" content="უყურეთ მოკლე ვიდეოებს ქართული გახმოვანებით ონლაინ Cineby-ზე.">
-    <meta property="og:title" content="დოკუმენტური ფილმები">
-    <meta property="og:description"
-        content="უყურეთ საუკეთესო დოკუმენტურ ფილმებს ქართული გახმოვანებით ონლაინ Cineby-ზე.">
-    <meta property="og:image" content="images/logo/social.jpeg">
+    <title>ყურება - სტუდია სენაკი</title>
+    <meta name="description" content="უყურეთ მოკლე ვიდეოებსა და დოკუმენტურებს სტუდია სენაკი-ში.">
+    <meta property="og:title" content="სტუდია სენაკი">
+    <meta property="og:description" content="უყურეთ საუკეთესო დოკუმენტურ ფილმებსა და ვიდეოებს სტუდია სენაკი-ში.">
+    <meta property="og:image" content="https://documentary-movies.vercel.app/images/logo/social.jpeg">
+    <meta property="og:url" content="https://documentary-movies.vercel.app/">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -17,7 +17,7 @@
 <body>
 
     <header>
-        <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="Cineby Logo" class="logo-img"></a>
+        <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="სტუდია სენაკი" class="logo-img"></a>
         <nav>
             <a href="index.html">ფილმები</a>
             <a href="index.html?type=videos">ვიდეოები</a>
@@ -65,7 +65,7 @@
 
             // Update UI
             document.getElementById('page-movie-title').innerText = video.title;
-            document.title = `${video.title} - Cineby Shorts`;
+            document.title = `${video.title} - სტუდია სენაკი`;
 
             // Increment Views
             incrementShortViews(videoId);
@@ -93,7 +93,7 @@
             function prepareRumbleUrl(input) {
                 if (!input) return '';
                 input = input.trim();
-                
+
                 // Check if it's an iframe tag (extract src)
                 if (input.includes('<iframe')) {
                     const srcMatch = input.match(/src=["'](.*?)["']/i);
@@ -109,12 +109,12 @@
                     }
                     return input;
                 }
-                
+
                 // 2. Extract ID from various formats
                 const idRegex = /(?:rumble\.com\/v|(?:\/|^)v)([a-zA-Z0-9]+)/i;
                 const match = input.match(idRegex);
                 let rId = (match && match[1]) ? match[1] : null;
-                
+
                 if (!rId) {
                     if (!input.includes('://') && !input.includes('.')) {
                         rId = input.split('/').filter(Boolean).pop();
@@ -123,7 +123,7 @@
                         if (fallbackMatch) rId = fallbackMatch[1];
                     }
                 }
-                
+
                 if (rId) {
                     return `https://rumble.com/embed/${rId}/?pub=4p1avk&api=1`;
                 }
