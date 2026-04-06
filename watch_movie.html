@@ -11,6 +11,7 @@
     <meta property="og:image" content="https://documentary-movies.vercel.app/images/logo/social.jpeg">
     <meta property="og:url" content="https://documentary-movies.vercel.app/">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/logo/Logo.png">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -73,7 +74,8 @@
             // Increment Views
             incrementViews('movies', movieId);
 
-            // Display Views
+            // Display Views (Removed for movies as requested)
+            /*
             const viewsDiv = document.createElement('div');
             viewsDiv.className = 'card-meta';
             viewsDiv.style.fontSize = '14px';
@@ -86,6 +88,7 @@
 
             viewsDiv.innerHTML = `<span>${viewsDisplay}</span><span class="dot">•</span><span>${dateDisplay}</span>`;
             document.querySelector('.title-section').appendChild(viewsDiv);
+            */
 
             // SEO: Dynamic Meta Description
             const descriptionText = `უყურეთ ფილმს ${movieTitle} ქართული გახმოვანებით სტუდია სენაკში. ექსკლუზიური თარგმანი.`;

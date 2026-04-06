@@ -13,6 +13,7 @@
     <meta property="og:url" content="https://documentary-movies.vercel.app/">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="icon" type="image/png" href="images/logo/Logo.png">
     <link rel="stylesheet" href="style.css">
     <style>
         /* Extra styles for empty states or layout */
@@ -434,11 +435,7 @@
                     </div>
 
                     <div class="card-title">${movie.title}</div>
-                    <div class="card-meta">
-                        <span>${date}</span>
-                        <span class="dot">•</span>
-                        <span>${movie.views || 0} ნახვა</span>
-                    </div>
+                    <!-- Views/Date removed as requested -->
                 `;
             } else {
                 const ratioClass = movie.display_ratio === '16:9' ? 'card-16-9' : 'card-1-1';
@@ -451,11 +448,7 @@
                     </div>
 
                     <div class="card-title">${movie.title}</div>
-                    <div class="card-meta">
-                        <span>${date}</span>
-                        <span class="dot">•</span>
-                        <span>${movie.views || 0} ნახვა</span>
-                    </div>
+                    <!-- Views/Date removed as requested -->
                 `;
             }
             card.innerHTML = innerHTML;
