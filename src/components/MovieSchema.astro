@@ -1,0 +1,33 @@
+---
+interface Props {
+  title_ge: string;
+  title_en: string;
+  description: string;
+  image: string;
+  director: string;
+  id: string;
+  datePublished?: string;
+}
+
+const { title_ge, title_en, description, image, director, id, datePublished } = Astro.props;
+
+const siteUrl = "https://documentary-movies.vercel.app";
+const movieUrl = `${siteUrl}/watch_movie.html?id=${id}`;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Movie",
+  "name": title_ge,
+  "alternateName": title_en,
+  "description": description,
+  "image": image,
+  "url": movieUrl,
+  "director": {
+    "@type": "Person",
+    "name": director
+  },
+  ...(datePublished && { "datePublished": datePublished })
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

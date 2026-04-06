@@ -5,6 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ყურება - სტუდია სენაკი</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2TFBP7GM8T"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-2TFBP7GM8T');
+    </script>
     <meta name="description" content="უყურეთ ფილმებსა და დოკუმენტურებს სტუდია სენაკში.">
     <meta property="og:title" content="სტუდია სენაკი">
     <meta property="og:description" content="უყურეთ საინტერესო დოკუმენტურ ფილმებსა და ვიდეოებს სტუდია სენაკი-ში.">
@@ -91,24 +100,36 @@
             */
 
             // SEO: Dynamic Meta Description
-            const descriptionText = `უყურეთ ფილმს ${movieTitle} ქართული გახმოვანებით სტუდია სენაკში. ექსკლუზიური თარგმანი.`;
+            const descriptionText = movie.description || `უყურეთ ფილმს ${movieTitle} ქართული გახმოვანებით სტუდია სენაკში. ექსკლუზიური თარგმანი.`;
 
-            let metaDesc = document.querySelector('meta[name="description"]');
-            if (metaDesc) {
-                metaDesc.setAttribute('content', descriptionText);
-            }
+            document.querySelector('meta[name="description"]')?.setAttribute('content', descriptionText);
 
             // SEO: Open Graph Updates
-            let ogTitle = document.querySelector('meta[property="og:title"]');
-            if (ogTitle) ogTitle.setAttribute('content', `${movieTitle} ქართულად - სტუდია სენაკი`);
-
-            let ogDesc = document.querySelector('meta[property="og:description"]');
-            if (ogDesc) ogDesc.setAttribute('content', descriptionText);
+            document.querySelector('meta[property="og:title"]')?.setAttribute('content', `${movieTitle} ქართულად - სტუდია სენაკი`);
+            document.querySelector('meta[property="og:description"]')?.setAttribute('content', descriptionText);
 
             if (movie.cover_url) {
-                let ogImage = document.querySelector('meta[property="og:image"]');
-                if (ogImage) ogImage.setAttribute('content', movie.cover_url);
+                document.querySelector('meta[property="og:image"]')?.setAttribute('content', movie.cover_url);
             }
+
+            // SEO: JSON-LD Structured Data (Schema.org/Movie)
+            const jsonLd = {
+                "@context": "https://schema.org",
+                "@type": "Movie",
+                "name": movieTitle,
+                "description": descriptionText,
+                "image": movie.cover_url || movie.poster_url,
+                "director": {
+                    "@type": "Person",
+                    "name": movie.director || "სტუდია სენაკი"
+                },
+                "datePublished": movie.created_at
+            };
+
+            const script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.text = JSON.stringify(jsonLd);
+            document.head.appendChild(script);
 
             // Rumble ID/URL Parser (Supports raw ID, full URL, or entire IFRAME tag)
             function prepareRumbleUrl(input) {
@@ -200,6 +221,37 @@
         };
     </script>
 
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="სტუდია სენაკი" class="logo-img"></a>
+                <p class="footer-disclaimer">ეს საიტი არ ინახავს არანაირ ფაილს ჩვენს სერვერზე. ჩვენ მხოლოდ ვაზიარებთ
+                    ბმულებს იმ მედიაზე, რომელიც განთავსებულია მესამე მხარის სერვისებზე.</p>
+            </div>
+            <div class="footer-section">
+                <h4>დახმარება</h4>
+                <ul class="footer-links">
+                    <li><a href="privacy.html">კონფიდენციალურობის პოლიტიკა</a></li>
+                    <li><a href="terms.html">სარგებლობის წესები</a></li>
+                    <li><a href="about.html">ჩვენ შესახებ</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>კონტაქტი</h4>
+                <p>Contact: <a href="mailto:contact@cyron.dev" class="contact-email">contact@cyron.dev</a></p>
+                <div class="footer-socials">
+                    <a href="https://www.facebook.com/profile.php?id=61574358185958" target="_blank" class="social-link" aria-label="Facebook">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.99 3.65 9.12 8.44 9.88v-6.99H7.9v-2.89h2.54V9.41c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.23.19 2.23.19v2.45h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.77l-.44 2.89h-2.33v6.99C18.35 21.12 22 16.99 22 12z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 სტუდია სენაკი. ყველა უფლება დაცულია.</p>
+        </div>
+    </footer>
 </body>
 
 </html>

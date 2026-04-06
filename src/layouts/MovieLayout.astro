@@ -1,0 +1,63 @@
+---
+import MovieSchema from '../components/MovieSchema.astro';
+
+interface Props {
+  title_ge: string;
+  title_en: string;
+  description: string;
+  image: string;
+  director: string;
+  id: string;
+}
+
+const { title_ge, title_en, description, image, director, id } = Astro.props;
+
+const siteName = "სტუდია სენაკი";
+const pageTitle = `${title_ge} ქართულად - ${siteName}`;
+const metaDescription = description || `უყურეთ ფილმს ${title_ge} ქართული გახმოვანებით სტუდია სენაკში. ექსკლუზიური თარგმანი.`;
+const siteUrl = "https://documentary-movies.vercel.app";
+const movieUrl = `${siteUrl}/watch_movie.html?id=${id}`;
+---
+
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Dynamic Meta Tags -->
+  <title>{pageTitle}</title>
+  <meta name="description" content={metaDescription} />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={metaDescription} />
+  <meta property="og:image" content={image} />
+  <meta property="og:url" content={movieUrl} />
+  <meta property="og:type" content="video.movie" />
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={metaDescription} />
+  <meta name="twitter:image" content={image} />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/images/logo/Logo.png" />
+
+  <!-- Structured Data -->
+  <MovieSchema 
+    title_ge={title_ge}
+    title_en={title_en}
+    description={metaDescription}
+    image={image}
+    director={director}
+    id={id}
+  />
+  
+  <slot name="head" />
+</head>
+<body>
+  <slot />
+</body>
+</html>

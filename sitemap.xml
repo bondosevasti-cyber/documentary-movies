@@ -1,65 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://documentary-movies.vercel.app</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://documentary-movies.vercel.app/about.html</loc>
+    <loc>https://documentary-movies.vercel.app/about</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://documentary-movies.vercel.app/privacy.html</loc>
+    <loc>https://documentary-movies.vercel.app/privacy</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://documentary-movies.vercel.app/terms.html</loc>
+    <loc>https://documentary-movies.vercel.app/terms</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://documentary-movies.vercel.app/watch_movie.html?id=9f824ed7-39f0-4e59-8e15-c92aad5da013</loc>
+    <loc>https://documentary-movies.vercel.app/watch_movie?id=9f824ed7-39f0-4e59-8e15-c92aad5da013</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+    <video:video>
+      <video:thumbnail_loc>https://azrthnztbdenebqygcmp.supabase.co/storage/v1/object/public/movie-images/cover_1775158765516.webp</video:thumbnail_loc>
+      <video:title>დრაკონთა ფრენა | The Flight of Dragons</video:title>
+      <video:description>ახალგაზრდა ბოსტონელი მწერალი დროში უკან ბრუნდება იმ ეპოქაში, სადაც ჯადოქრები და დრაკონები მეფობენ, მეცნიერება კი თითქმის უცნობია.</video:description>
+      <video:publication_date>2026-04-02T19:39:26.251169+00:00</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
   </url>
   <url>
-    <loc>https://documentary-movies.vercel.app/watch_movie.html?id=71cdd198-e71c-4de2-81c8-c15398c3518d</loc>
+    <loc>https://documentary-movies.vercel.app/watch_movie?id=426b63c1-e6b6-42d0-8087-361366733d65</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+    <video:video>
+      <video:thumbnail_loc>https://azrthnztbdenebqygcmp.supabase.co/storage/v1/object/public/movie-images/cover_1775161786893.webp</video:thumbnail_loc>
+      <video:title>ჰობიტი | The Hobbit</video:title>
+      <video:description>ჯადოქარი განდალფი ჰობიტ ბილბო ბეგინსს და ცამეტ ჯუჯას დაარწმუნებს, რომ მარტოხელა მთისკენ სახიფათო მოგზაურობაში გაჰყვნენ. მათ უნდა დაიბრუნონ ჯუჯების საგანძური, რო</video:description>
+      <video:publication_date>2026-04-02T20:16:47.990567+00:00</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
   </url>
   <url>
-    <loc>https://documentary-movies.vercel.app/watch_movie.html?id=b96de420-7896-44a9-8d98-5c51ee34ef6d</loc>
+    <loc>https://documentary-movies.vercel.app/watch_movie?id=61f2cd05-1cf2-4eeb-ae12-50fe021be8a7</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+    <video:video>
+      <video:thumbnail_loc>https://azrthnztbdenebqygcmp.supabase.co/storage/v1/object/public/movie-images/cover_1775160479695.webp</video:thumbnail_loc>
+      <video:title>ინტელექტის ძიება</video:title>
+      <video:description>ფილმი იკვლევს ხელოვნური ინტელექტის განვითარების გზას — წარსულიდან დღემდე და მის პოტენციურ გავლენას კაცობრიობის მომავალზე. არის თუ არა AI ჩვენი ევოლუციის შემდეგი</video:description>
+      <video:publication_date>2026-04-02T20:07:18.960718+00:00</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
   </url>
   <url>
-    <loc>https://documentary-movies.vercel.app/watch_movie.html?id=426b63c1-e6b6-42d0-8087-361366733d65</loc>
+    <loc>https://documentary-movies.vercel.app/watch_movie?id=71cdd198-e71c-4de2-81c8-c15398c3518d</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+    <video:video>
+      <video:thumbnail_loc>https://azrthnztbdenebqygcmp.supabase.co/storage/v1/object/public/movie-images/cover_1775160323620.webp</video:thumbnail_loc>
+      <video:title>აკოცე მიწას | Kiss the Ground</video:title>
+      <video:description>აქტივისტების, მეცნიერების, ფერმერებისა და პოლიტიკოსების რევოლუციური ჯგუფი ერთიანდება „რეგენერაციული სოფლის მეურნეობის“ გლობალურ მოძრაობაში, რომელსაც შეუძლია ჩვე</video:description>
+      <video:publication_date>2026-04-02T19:46:31.415021+00:00</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
   </url>
   <url>
-    <loc>https://documentary-movies.vercel.app/watch_movie.html?id=61f2cd05-1cf2-4eeb-ae12-50fe021be8a7</loc>
+    <loc>https://documentary-movies.vercel.app/watch_movie?id=df452286-98ab-4598-b3af-4e0e27f9621f</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+    <video:video>
+      <video:thumbnail_loc>https://azrthnztbdenebqygcmp.supabase.co/storage/v1/object/public/movie-images/cover_1775221246177.webp</video:thumbnail_loc>
+      <video:title>ყველაზე დიდი პატარა ფერმა | The Biggest Little Farm</video:title>
+      <video:description>რეალური ისტორია წყვილზე, რომლებიც ქალაქიდან გარბიან და გადაწყვეტენ შექმნან უტოპიური ფერმა. ფილმი 8 წლის განმავლობაში ასახავს მათ ბრძოლას ბუნებასთან, რათა მკვდარ</video:description>
+      <video:publication_date>2026-04-02T20:18:15.108754+00:00</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
   </url>
   <url>
-    <loc>https://documentary-movies.vercel.app/watch_movie.html?id=df452286-98ab-4598-b3af-4e0e27f9621f</loc>
+    <loc>https://documentary-movies.vercel.app/watch_movie?id=b96de420-7896-44a9-8d98-5c51ee34ef6d</loc>
     <lastmod>2026-04-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://documentary-movies.vercel.app/watch_video.html?id=cf38bb12-ecef-45a7-8ac9-f547fbf61f12</loc>
-    <lastmod>2026-04-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <video:video>
+      <video:thumbnail_loc>https://azrthnztbdenebqygcmp.supabase.co/storage/v1/object/public/movie-images/cover_1775222035691.webp</video:thumbnail_loc>
+      <video:title>ფანტასტიკური სოკოები | Fantastic Fungi</video:title>
+      <video:description>მოგზაურობა სოკოების ჯადოსნურ სამყაროში — ნიადაგის ქვეშ არსებული მიცელიუმის ქსელებიდან, რომლებიც ტყეში ხეებს შორის ინფორმაციის გადამცემი "ბუნებრივი ინტერნეტია", </video:description>
+      <video:publication_date>2026-04-02T20:21:04.657467+00:00</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
   </url>
 </urlset>

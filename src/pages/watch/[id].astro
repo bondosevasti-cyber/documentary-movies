@@ -1,0 +1,63 @@
+---
+import MovieLayout from '../../layouts/MovieLayout.astro';
+
+// In an Astro dynamic route, we'd fetch the data here.
+// For demonstration, we assume data comes through props or fetch.
+// If using getStaticPaths (SSG):
+/*
+export async function getStaticPaths() {
+  const { data: movies } = await _supabase.from('movies').select('*');
+  return movies.map(movie => ({
+    params: { id: movie.id.toString() },
+    props: { movie }
+  }));
+}
+*/
+
+// If using SSR (output: 'server'):
+// const { id } = Astro.params;
+// const { data: movie } = await _supabase.from('movies').select('*').eq('id', id).single();
+
+const { movie } = Astro.props; 
+
+// Mock data for documentation/example if props are missing
+const movieData = movie || {
+  id: "test-id",
+  title: "მოკვდავი დედამიწა",
+  name_en: "Mortal Earth",
+  description: "საინტერესო დოკუმენტური ფილმი ბუნების შესახებ.",
+  cover_url: "https://documentary-movies.vercel.app/images/posters/mortal-earth.jpg",
+  director: "რეზო ჩხეიძე"
+};
+---
+
+<MovieLayout 
+  title_ge={movieData.title}
+  title_en={movieData.name_en}
+  description={movieData.description}
+  image={movieData.cover_url}
+  director={movieData.director}
+  id={movieData.id}
+>
+  <main class="watch-container">
+    <div class="player-container">
+      <!-- Player would go here -->
+         <h1 class="movie-title">{movieData.title}</h1>
+         <p>{movieData.description}</p>
+         <p><strong>რეჟისორი:</strong> {movieData.director}</p>
+    </div>
+  </main>
+</MovieLayout>
+
+<style>
+ .watch-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    color: white;
+  }
+  .movie-title {
+    font-size: 2.5rem;
+    margin-top: 1rem;
+  }
+</style>

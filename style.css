@@ -808,6 +808,36 @@ nav a:hover, nav a.active {
     text-decoration: underline;
 }
 
+.footer-socials {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    color: #a0a0a0;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-link:hover {
+    background: var(--accent-color);
+    color: #fff;
+    transform: translateY(-3px);
+}
+
+.social-link svg {
+    width: 20px;
+    height: 20px;
+}
+
 /* Push Notification Button */
 .push-btn {
     background: none;
