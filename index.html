@@ -257,16 +257,17 @@
             container.innerHTML = '';
 
             top5Movies.forEach(movie => {
-                const officialBadge = movie.is_official ? '<div class="official-badge">Authorized</div>' : '';
+                const officialBadge = movie.is_official ? '<div class="official-badge" title="Officially Authorized Screening"></div>' : '';
+                const infoClass = movie.is_official ? 'info-icon-wrapper has-badge' : 'info-icon-wrapper';
                 const cardHtml = `
                     <div class="rank-card-wrapper" onclick="manualHeroUpdate(${JSON.stringify(movie).replace(/"/g, '&quot;')})">
-                        <div class="info-icon-wrapper">
-                            ${officialBadge}
+                        <div class="${infoClass}">
                             <div class="info-icon">!</div>
                             <div class="info-tooltip">გაფრთხილება: ჩვენ პატივს ვცემთ საავტორო უფლებებს. მზად ვართ ვითანამშრომლოთ ავტორებთან, თუმცა ჩვენს შეტყობინებებზე პასუხი ჯერ არ მიგვიღია.</div>
                         </div>
                         <div class="rank-number">${movie.top_10_position}</div>
                         <div class="rank-poster-container">
+                            ${officialBadge}
                             <img src="${movie.card_url || movie.poster_url}" alt="${movie.title}">
                         </div>
 
@@ -431,12 +432,11 @@
             card.onclick = () => manualHeroUpdate(movie);
 
             const date = movie.created_at ? new Date(movie.created_at).toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' }) : '';
-
-            const officialBadge = movie.is_official ? '<div class="official-badge">Authorized</div>' : '';
+            const officialBadge = movie.is_official ? '<div class="official-badge" title="Officially Authorized Screening"></div>' : '';
+            const infoClass = movie.is_official ? 'info-icon-wrapper has-badge' : 'info-icon-wrapper';
 
             let innerHTML = `
-                <div class="info-icon-wrapper">
-                    ${officialBadge}
+                <div class="${infoClass}">
                     <div class="info-icon">!</div>
                     <div class="info-tooltip">გაფრთხილება: ჩვენ პატივს ვცემთ საავტორო უფლებებს. მზად ვართ ვითანამშრომლოთ ავტორებთან, თუმცა ჩვენს შეტყობინებებზე პასუხი ჯერ არ მიგვიღია.</div>
                 </div>
@@ -445,7 +445,9 @@
                 innerHTML += `
                     <div class="card-with-number">
                         <div class="number-bg">${rank}</div>
-                        <div class="card-large" style="background-image: url('${movie.poster_url}')"></div>
+                        <div class="card-large" style="background-image: url('${movie.poster_url}')">
+                            ${officialBadge}
+                        </div>
                     </div>
 
                     <div class="card-title">${movie.title}</div>
@@ -459,6 +461,7 @@
 
                 innerHTML += `
                     <div class="${ratioClass}" style="background-image: url('${bgUrl}'); background-position: ${focalPos};">
+                        ${officialBadge}
                     </div>
 
                     <div class="card-title">${movie.title}</div>
