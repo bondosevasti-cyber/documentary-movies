@@ -77,27 +77,39 @@
             const movieYear = movie.release_year ? `(${movie.release_year})` : '';
             document.getElementById('page-movie-title').innerText = movieTitle;
 
+            // Step 3: UI Implementation (Official Status)
+            if (movie.is_official) {
+                const titleSection = document.querySelector('.title-section');
+                
+                // Authorization Text
+                const authText = document.createElement('div');
+                authText.className = 'official-auth-text';
+                authText.innerText = 'Official authorization for screening received from the creators';
+                titleSection.appendChild(authText);
+
+                // Creator Link
+                if (movie.creator_url) {
+                    const creatorBtn = document.createElement('a');
+                    creatorBtn.className = 'creator-link-btn';
+                    creatorBtn.href = movie.creator_url;
+                    creatorBtn.target = '_blank';
+                    
+                    // Extracts the domain name for the label
+                    let domain = 'Official Creator';
+                    try {
+                        domain = new URL(movie.creator_url).hostname.replace('www.', '');
+                    } catch(e) {}
+                    
+                    creatorBtn.innerHTML = `Visit Official Creator: ${domain}`;
+                    titleSection.appendChild(creatorBtn);
+                }
+            }
+
             // SEO: Dynamic Title
             document.title = `${movieTitle} ქართულად ${movieYear} - სტუდია სენაკი`;
 
             // Increment Views
             incrementViews('movies', movieId);
-
-            // Display Views (Removed for movies as requested)
-            /*
-            const viewsDiv = document.createElement('div');
-            viewsDiv.className = 'card-meta';
-            viewsDiv.style.fontSize = '14px';
-            viewsDiv.style.marginTop = '8px';
-
-            // Format number to K/M
-            const currentViews = (movie.views || 0) + 1;
-            const viewsDisplay = formatViews(currentViews);
-            const dateDisplay = formatRelativeDate(movie.created_at);
-
-            viewsDiv.innerHTML = `<span>${viewsDisplay}</span><span class="dot">•</span><span>${dateDisplay}</span>`;
-            document.querySelector('.title-section').appendChild(viewsDiv);
-            */
 
             // SEO: Dynamic Meta Description
             const descriptionText = movie.description || `უყურეთ ფილმს ${movieTitle} ქართული გახმოვანებით სტუდია სენაკში. ექსკლუზიური თარგმანი.`;

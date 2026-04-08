@@ -281,6 +281,12 @@
                     <div class="checkbox-group">
                         <label class="checkbox-item"><input type="checkbox" name="is_top_10"> Top 5</label>
                         <label class="checkbox-item"><input type="checkbox" name="is_coming_soon"> მალე</label>
+                        <label class="checkbox-item"><input type="checkbox" name="is_official" onchange="document.getElementById('creator-url-group').style.display = this.checked ? 'block' : 'none'"> Official Status</label>
+                    </div>
+
+                    <div class="form-group" id="creator-url-group" style="display: none;">
+                        <label>ავტორის საიტი (Creator URL)</label>
+                        <input type="url" name="creator_url" placeholder="https://movingart.com">
                     </div>
 
                     <!-- Focal Point Controls -->
@@ -1011,6 +1017,10 @@
 
             form['is_top_10'].checked = movie.is_top_10; 
             form['is_coming_soon'].checked = movie.is_coming_soon;
+            form['is_official'].checked = movie.is_official || false;
+            form['creator_url'].value = movie.creator_url || '';
+            document.getElementById('creator-url-group').style.display = movie.is_official ? 'block' : 'none';
+
             const ratioVal = movie.display_ratio || '1:1';
             document.querySelector(`input[name="ratio_choice"][value="${ratioVal}"]`).checked = true;
             existingPosterUrl = movie.poster_url; existingCoverUrl = movie.cover_url; existingCardUrl = movie.card_url;
@@ -1047,6 +1057,7 @@
             document.getElementById('preview-image-mobile').src = '';
             currentX = 50; currentY = 50;
             isEditing = false; document.getElementById('form-title').innerText = 'ფილმის დამატება'; document.getElementById('submit-btn').innerText = 'ფილმის შენახვა'; document.getElementById('cancel-btn').style.display = 'none';
+            document.getElementById('creator-url-group').style.display = 'none';
         }
 
         // Handle ratio switching globally
@@ -1182,6 +1193,8 @@
                     display_ratio: displayRatio,
                     is_top_10: Boolean(form['is_top_10'].checked),
                     is_coming_soon: finalIsSoon,
+                    is_official: Boolean(form['is_official'].checked),
+                    creator_url: form['is_official'].checked ? getVal('creator_url') : null,
                     mobile_pos_x: parseInt(currentX),
                     mobile_pos_y: parseInt(currentY)
                 };

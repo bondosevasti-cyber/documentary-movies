@@ -257,9 +257,11 @@
             container.innerHTML = '';
 
             top5Movies.forEach(movie => {
+                const officialBadge = movie.is_official ? '<div class="official-badge">Authorized</div>' : '';
                 const cardHtml = `
                     <div class="rank-card-wrapper" onclick="manualHeroUpdate(${JSON.stringify(movie).replace(/"/g, '&quot;')})">
                         <div class="info-icon-wrapper">
+                            ${officialBadge}
                             <div class="info-icon">!</div>
                             <div class="info-tooltip">გაფრთხილება: ჩვენ პატივს ვცემთ საავტორო უფლებებს. მზად ვართ ვითანამშრომლოთ ავტორებთან, თუმცა ჩვენს შეტყობინებებზე პასუხი ჯერ არ მიგვიღია.</div>
                         </div>
@@ -430,8 +432,11 @@
 
             const date = movie.created_at ? new Date(movie.created_at).toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' }) : '';
 
+            const officialBadge = movie.is_official ? '<div class="official-badge">Authorized</div>' : '';
+
             let innerHTML = `
                 <div class="info-icon-wrapper">
+                    ${officialBadge}
                     <div class="info-icon">!</div>
                     <div class="info-tooltip">გაფრთხილება: ჩვენ პატივს ვცემთ საავტორო უფლებებს. მზად ვართ ვითანამშრომლოთ ავტორებთან, თუმცა ჩვენს შეტყობინებებზე პასუხი ჯერ არ მიგვიღია.</div>
                 </div>
