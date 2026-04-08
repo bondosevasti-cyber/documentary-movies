@@ -181,12 +181,41 @@ nav a:hover, nav a.active {
     pointer-events: none;
     text-align: left;
     backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+/* Fix for icons on the left side of the card */
+.info-icon-wrapper.has-badge .info-tooltip {
+    right: auto;
+    left: 0;
 }
 
 .info-icon-wrapper:hover .info-tooltip {
     opacity: 1;
     visibility: visible;
     transform: translateY(5px);
+}
+
+@media (max-width: 768px) {
+    .info-tooltip {
+        position: fixed;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translate(-50%, -50%) scale(0.9) !important;
+        width: 85vw !important;
+        max-width: 320px !important;
+        height: auto !important;
+        z-index: 10001;
+        pointer-events: auto; /* Allow interaction if needed */
+        box-sizing: border-box;
+    }
+
+    .info-icon-wrapper:hover .info-tooltip {
+        transform: translate(-50%, -50%) scale(1) !important;
+        opacity: 1;
+        visibility: visible;
+    }
 }
 
 /* Official Badge Elite Aesthetic */
@@ -202,7 +231,13 @@ nav a:hover, nav a.active {
     pointer-events: auto; /* Enable for tooltip */
     filter: drop-shadow(0 4px 15px rgba(212, 175, 55, 0.4));
     animation: badge-glow-pulse 4s infinite ease-in-out;
-    cursor: help;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.official-badge:hover {
+    transform: scale(1.2) rotate(10deg);
+    filter: drop-shadow(0 8px 30px rgba(212, 175, 55, 0.9));
 }
 
 @keyframes badge-glow-pulse {
