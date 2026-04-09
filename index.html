@@ -277,7 +277,7 @@
             container.innerHTML = '';
 
             top5Movies.forEach(movie => {
-                const officialBadge = movie.is_official ? `<div class="official-badge" title="ოფიციალური ავტორიზაცია" onclick="event.stopPropagation(); openOfficialModal()"></div>` : '';
+                const officialBadge = movie.is_official ? `<div class="official-badge" title="ოფიციალური დასტური ავტორისგან" onclick="event.stopPropagation(); openOfficialModal()"></div>` : '';
                 const infoIcon = movie.is_official ? '' : `
                     <div class="info-icon-wrapper">
                         <div class="info-icon">!</div>
@@ -457,7 +457,7 @@
             card.onclick = () => manualHeroUpdate(movie);
 
             const date = movie.created_at ? new Date(movie.created_at).toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' }) : '';
-            const officialBadge = movie.is_official ? `<div class="official-badge" title="ოფიციალური ავტორიზაცია" onclick="event.stopPropagation(); openOfficialModal()"></div>` : '';
+            const officialBadge = movie.is_official ? `<div class="official-badge" title="ოფიციალური დასტური ავტორისგან" onclick="event.stopPropagation(); openOfficialModal()"></div>` : '';
             const infoIcon = movie.is_official ? '' : `
                 <div class="info-icon-wrapper">
                     <div class="info-icon">!</div>
