@@ -932,7 +932,7 @@ nav a:hover, nav a.active {
 .social-link:hover {
     background: var(--accent-color);
     color: #fff;
-    transform: translateY(-3px);
+    transform: translateY(-3px) scale(1.1);
 }
 
 .social-link svg {
