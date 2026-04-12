@@ -11,6 +11,7 @@
     <meta property="og:url" content="https://documentary-movies.vercel.app/">
     <link rel="icon" type="image/png" href="images/logo/Logo.png">
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
 </head>
@@ -41,7 +42,10 @@
             document.body.style.overflow = navbar.classList.contains('active') ? 'hidden' : 'auto';
         };
 
-        window.onload = applySiteSettings;
+        window.onload = () => {
+            applySiteSettings();
+            lucide.createIcons();
+        };
     </script>
 
     <div class="content-page">
@@ -74,9 +78,7 @@
                 <p>Contact: <a href="mailto:contact@cyron.dev" class="contact-email">contact@cyron.dev</a></p>
                 <div class="footer-socials">
                     <a href="https://www.facebook.com/StudiaSenakiOfficial" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow Studio Senaki on Facebook">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.99 3.65 9.12 8.44 9.88v-6.99H7.9v-2.89h2.54V9.41c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.23.19 2.23.19v2.45h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.77l-.44 2.89h-2.33v6.99C18.35 21.12 22 16.99 22 12z"/>
-                        </svg>
+                        <span class="social-text-icon">F</span>
                     </a>
                 </div>
             </div>

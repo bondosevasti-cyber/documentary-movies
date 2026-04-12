@@ -639,9 +639,9 @@ nav a:hover, nav a.active {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 260px; /* Increased to avoid horizontal squeeze */
-    height: 400px;
-    margin-right: -20px;
+    min-width: 260px;
+    height: 320px;
+    margin-right: 10px;
     z-index: 1;
     scroll-snap-align: center;
 }
@@ -701,19 +701,7 @@ nav a:hover, nav a.active {
 }
 
 
-.rank-card-title {
-    position: relative;
-    margin-top: 15px;
-    margin-left: 60px; /* Match poster offset */
-    width: calc(var(--card-height) * 0.68);
-    text-align: center;
-    font-size: 14px;
-    color: #fff;
-    white-space: nowrap;
-    
-    text-overflow: ellipsis;
-    z-index: 3;
-}
+/* .rank-card-title removed */
 
 .card-large {
     min-width: 250px;
@@ -920,24 +908,37 @@ nav a:hover, nav a.active {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.05);
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
-    color: #a0a0a0;
-    transition: all 0.3s ease;
+    color: #ffffff;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .social-link:hover {
-    background: var(--accent-color);
+    background: #1877F2; /* Facebook Blue on hover */
+    border-color: #1877F2;
     color: #fff;
-    transform: translateY(-3px) scale(1.1);
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 10px 20px rgba(24, 119, 242, 0.4);
 }
 
 .social-link svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
+    stroke-width: 2.5px; /* Thicker lines for better icon definition */
+}
+
+.social-text-icon {
+    font-size: 22px;
+    font-weight: 800;
+    font-family: 'Open Sans', sans-serif;
+    line-height: 1;
+    margin-top: 0;
 }
 
 /* Push Notification Button */
@@ -1400,6 +1401,65 @@ nav a:hover, nav a.active {
 
     .content-page h1 {
         font-size: 32px;
+    }
+
+    /* Top 5 Mobile Optimization */
+    .rank-card-wrapper {
+        min-width: 140px; /* More compact width */
+        height: 200px;
+        margin-right: 25px; /* Added spacing to prevent overlap */
+        z-index: 1 !important; /* Reset z-index stacking */
+    }
+
+    /* Remove specific z-index stacking on mobile to avoid title overlap */
+    .rank-card-wrapper:nth-child(n) { z-index: 1; }
+
+    .rank-number {
+        font-size: 110px;
+        left: -15px;
+        bottom: 0;
+        -webkit-text-stroke: 1px var(--accent-color);
+    }
+
+    .rank-poster-container {
+        width: 110px;
+        height: 165px;
+        margin-left: 30px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.5); /* Simpler shadow for mobile */
+    }
+
+    .rank-card-title {
+        margin-left: 30px;
+        width: 110px;
+        font-size: 11px;
+        margin-top: 8px;
+        line-height: 1.2;
+        overflow: visible; /* Show full title if it wraps */
+        -webkit-line-clamp: 3; /* Allow up to 3 lines on mobile */
+    }
+}
+
+@media (max-width: 480px) {
+    .rank-card-wrapper {
+        min-width: 130px;
+        margin-right: 20px;
+    }
+
+    .rank-number {
+        font-size: 100px;
+        left: -12px;
+    }
+
+    .rank-poster-container {
+        width: 95px;
+        height: 145px;
+        margin-left: 25px;
+    }
+
+    .rank-card-title {
+        margin-left: 25px;
+        width: 95px;
+        font-size: 10px;
     }
 }
 

@@ -292,8 +292,6 @@
                             ${officialBadge}
                             <img src="${movie.card_url || movie.poster_url}" alt="${movie.title}">
                         </div>
-
-                        <div class="rank-card-title">${movie.title}</div>
                     </div>
                 `;
                 container.innerHTML += cardHtml;
@@ -701,7 +699,7 @@
                 <div class="footer-socials">
                     <a href="https://www.facebook.com/StudiaSenakiOfficial" target="_blank" rel="noopener noreferrer" class="social-link"
                         aria-label="Follow Studio Senaki on Facebook">
-                        <i data-lucide="facebook"></i>
+                        <span class="social-text-icon">F</span>
                     </a>
                 </div>
             </div>
