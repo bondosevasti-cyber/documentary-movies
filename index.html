@@ -428,12 +428,31 @@
             dynamicContainer.appendChild(gridWrapper);
 
             // Helper to render grid
-            function renderGrid(vids) {
-                gridWrapper.innerHTML = '';
-                vids.forEach(v => {
-                    gridWrapper.appendChild(createVideoCard(v));
-                });
-                if (window.lucide) lucide.createIcons();
+            async function renderGrid(vids) {
+                // 1. Animate existing cards out
+                const existingCards = gridWrapper.querySelectorAll('.card-item');
+                existingCards.forEach(c => c.classList.add('card-hidden'));
+                
+                // 2. Wait for exit animation to complete
+                setTimeout(() => {
+                    gridWrapper.innerHTML = '';
+                    
+                    // 3. Create new cards and stagger their entrance
+                    vids.forEach((v, index) => {
+                        const card = createVideoCard(v);
+                        card.classList.add('card-hidden'); // Ensure it starts hidden
+                        gridWrapper.appendChild(card);
+                        
+                        // Small delay for each card to create the cascade effect
+                        // We cap the index to avoid very long animations for many items
+                        const delay = Math.min(index * 40, 800); 
+                        setTimeout(() => {
+                            card.classList.remove('card-hidden');
+                        }, 50 + delay);
+                    });
+                    
+                    if (window.lucide) lucide.createIcons();
+                }, 300);
             }
 
             // 3. Initial Load (Prefer 'აგრო')

@@ -289,6 +289,15 @@ nav a:hover, nav a.active {
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 30px;
     padding: 0 50px 50px;
+    transition: opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    opacity: 1;
+    transform: translateY(0);
+    will-change: opacity, transform;
+}
+
+.videos-grid-container.grid-hidden {
+    opacity: 0;
+    transform: translateY(20px);
 }
 
 @media (max-width: 768px) {
@@ -476,6 +485,11 @@ nav a:hover, nav a.active {
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     padding: 10px;
     border-radius: 12px;
+}
+
+.card-item.card-hidden {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
 }
 
 .videos-grid-container .card-item {
