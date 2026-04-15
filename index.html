@@ -381,16 +381,14 @@
             allVideosGlobal = videos || [];
             const container = document.getElementById('videos-content');
             
-            // Clear everything EXCEPT the initial header if you want, 
-            // but easier to just clear and rebuild or use a sub-container.
-            // Let's use a sub-container for the dynamic sections.
-            let dynamicSections = document.getElementById('dynamic-video-sections');
-            if (!dynamicSections) {
-                dynamicSections = document.createElement('div');
-                dynamicSections.id = 'dynamic-video-sections';
-                container.appendChild(dynamicSections);
+            // Container for Navbar and Grid
+            let dynamicContainer = document.getElementById('dynamic-video-sections');
+            if (!dynamicContainer) {
+                dynamicContainer = document.createElement('div');
+                dynamicContainer.id = 'dynamic-video-sections';
+                container.appendChild(dynamicContainer);
             }
-            dynamicSections.innerHTML = '';
+            dynamicContainer.innerHTML = '';
 
             // Grouping logic
             const groups = {};
@@ -400,30 +398,58 @@
                 groups[cat].push(video);
             });
 
-            // Render each group
-            for (const [category, vids] of Object.entries(groups)) {
-                const sectionHeader = `
-                    <div class="section-header" style="margin-top: 60px; margin-bottom: 30px;">
-                        <h2 class="section-title">${category}</h2>
-                    </div>
-                `;
-                const gridContainer = document.createElement('div');
-                gridContainer.className = 'videos-grid-container';
-                gridContainer.style.paddingTop = '10px';
-                
+            const categories = Object.keys(groups);
+            if (categories.length === 0) return;
+
+            // 1. Create Sub-Navbar
+            const navbar = document.createElement('div');
+            navbar.className = 'category-navbar';
+            navbar.style = "margin-bottom: 40px; display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px;";
+            
+            categories.forEach((cat, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'category-nav-item';
+                btn.innerText = cat;
+                btn.onclick = () => {
+                    // Update active state
+                    navbar.querySelectorAll('.category-nav-item').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    // Render category
+                    renderGrid(groups[cat]);
+                };
+                navbar.appendChild(btn);
+            });
+            dynamicContainer.appendChild(navbar);
+
+            // 2. Create Grid Wrapper
+            const gridWrapper = document.createElement('div');
+            gridWrapper.className = 'videos-grid-container';
+            gridWrapper.style.padding = '0'; // Use full width in dynamic container
+            dynamicContainer.appendChild(gridWrapper);
+
+            // Helper to render grid
+            function renderGrid(vids) {
+                gridWrapper.innerHTML = '';
                 vids.forEach(v => {
-                    gridContainer.appendChild(createVideoCard(v));
+                    gridWrapper.appendChild(createVideoCard(v));
                 });
-
-                dynamicSections.innerHTML += sectionHeader;
-                dynamicSections.appendChild(gridContainer);
+                if (window.lucide) lucide.createIcons();
             }
 
-            // Hide the original static title if we have dynamic sections
+            // 3. Initial Load (Prefer 'აგრო')
+            const defaultCat = groups['აგრო'] ? 'აგრო' : categories[0];
+            
+            // Find the button for defaultCat and mark it active
+            navbar.querySelectorAll('.category-nav-item').forEach(b => {
+                if (b.innerText === defaultCat) b.classList.add('active');
+                else b.classList.remove('active');
+            });
+
+            renderGrid(groups[defaultCat]);
+
+            // Hide the original static title
             const staticHeader = container.querySelector('.section-header');
-            if (staticHeader && Object.keys(groups).length > 0) {
-                staticHeader.style.display = 'none';
-            }
+            if (staticHeader) staticHeader.style.display = 'none';
         }
 
         function createVideoCard(video) {

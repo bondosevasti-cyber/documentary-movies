@@ -1718,3 +1718,46 @@ nav a:hover, nav a.active {
         justify-content: center;
     }
 }
+
+/* Category Sub-Navbar Styling */
+.category-navbar {
+    padding: 0 50px;
+}
+
+@media (max-width: 768px) {
+    .category-navbar {
+        padding: 0 20px;
+    }
+}
+
+.category-nav-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    font-family: inherit;
+}
+
+.category-nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.category-nav-item.active {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    box-shadow: 0 10px 20px rgba(227, 27, 35, 0.3);
+}
+
+.category-navbar::-webkit-scrollbar {
+    display: none;
+}
