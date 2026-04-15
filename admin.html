@@ -369,8 +369,20 @@
                     </div>
 
                     <div class="form-group">
-                        <label>დასახელება</label>
-                        <input type="text" name="title" required>
+                        <label>სათაური (მხოლოდ ადმინისთვის)</label>
+                        <input type="text" name="title" value="აგრო" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>სექცია (აირჩიეთ ან დაამატეთ ახალი)</label>
+                        <div id="category-selector-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                            <!-- Category buttons will be injected here -->
+                        </div>
+                        <div id="new-category-input-wrap" style="display: none; display: flex; gap: 8px;">
+                            <input type="text" id="new-category-input" placeholder="ახალი სექციის სახელი..." style="flex: 1;">
+                            <button type="button" class="btn-edit" onclick="confirmNewCategory()" style="padding: 10px 15px;">OK</button>
+                        </div>
+                        <input type="hidden" name="category" id="video-category-hidden" value="აგრო">
                     </div>
                     
                     <div class="form-group">
@@ -1225,13 +1237,19 @@
             if (error) return console.error(error);
             const container = document.getElementById('videos-list');
             container.innerHTML = '';
+            // Grouping logic for Admin List
+            const categories = new Set();
             videos.forEach(video => {
                 const imgUrl = video.photo_url || video.poster_url || 'images/placeholder.webp';
+                const cat = video.category || 'აგრო';
+                categories.add(cat);
+
                 container.innerHTML += `
                     <div class="video-card-item">
                         <img src="${imgUrl}" class="video-card-img">
                         <div class="video-card-info">
                             <h4>${video.title}</h4>
+                            <p style="margin: 0; font-size: 11px; color: var(--accent-color); font-weight: bold;">სექცია: ${cat}</p>
                             <p style="margin-bottom: 5px; color: #aaa;">${video.views || 0} ნახვა</p>
                             <p><a href="${video.rumble_link}" target="_blank" style="color:red">Rumble</a> | <a href="${video.original_link || '#'}" target="_blank" style="color:#aaa">${video.original_link ? 'Original' : 'No link'}</a></p>
                         </div>
@@ -1242,6 +1260,53 @@
                     </div>
                 `;
             });
+            renderCategoryButtons(Array.from(categories));
+        }
+
+        let availableCategories = ['აგრო'];
+        function renderCategoryButtons(categories) {
+            // Ensure "აგრო" is always there
+            if (!categories.includes('აგრო')) categories.unshift('აგრო');
+            availableCategories = categories;
+
+            const container = document.getElementById('category-selector-container');
+            const currentVal = document.getElementById('video-category-hidden').value;
+            
+            container.innerHTML = categories.map(cat => `
+                <button type="button" class="nav-item ${cat === currentVal ? 'active' : ''}" 
+                    style="padding: 6px 15px; font-size: 13px; text-transform: none; border-radius: 20px;" 
+                    onclick="selectCategory('${cat}')">${cat}</button>
+            `).join('');
+
+            // Add the "+" button
+            container.innerHTML += `
+                <button type="button" class="nav-item" 
+                    style="padding: 6px 15px; font-size: 13px; border-radius: 20px; border-style: dashed; border-color: #444;" 
+                    onclick="toggleNewCategoryInput()">+ ახალი</button>
+            `;
+        }
+
+        function selectCategory(cat) {
+            document.getElementById('video-category-hidden').value = cat;
+            document.getElementById('new-category-input-wrap').style.display = 'none';
+            renderCategoryButtons(availableCategories);
+        }
+
+        function toggleNewCategoryInput() {
+            const wrap = document.getElementById('new-category-input-wrap');
+            wrap.style.display = wrap.style.display === 'none' ? 'flex' : 'none';
+            if (wrap.style.display === 'flex') document.getElementById('new-category-input').focus();
+        }
+
+        function confirmNewCategory() {
+            const val = document.getElementById('new-category-input').value.trim();
+            if (val) {
+                if (!availableCategories.includes(val)) {
+                    availableCategories.push(val);
+                }
+                selectCategory(val);
+                document.getElementById('new-category-input').value = '';
+            }
         }
 
         async function editVideo(id) {
@@ -1249,6 +1314,9 @@
             const form = document.getElementById('video-form');
             form['video_id'].value = video.id;
             form['title'].value = video.title;
+            const cat = video.category || 'აგრო';
+            document.getElementById('video-category-hidden').value = cat;
+            renderCategoryButtons(availableCategories);
             form['rumble_link'].value = video.rumble_link;
             form['original_link'].value = video.original_link || '';
             
@@ -1304,6 +1372,7 @@
 
                 const videoData = {
                     title: form['title'].value.trim(),
+                    category: document.getElementById('video-category-hidden').value,
                     rumble_link: prepareRumbleUrl(form['rumble_link'].value.trim()),
                     original_link: form['original_link'].value.trim() || null,
                     photo_url: photo_url

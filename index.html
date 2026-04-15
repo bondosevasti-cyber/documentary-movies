@@ -379,13 +379,51 @@
             if (error) return console.error(error);
 
             allVideosGlobal = videos || [];
-            const container = document.getElementById('all-videos-grid');
-            container.innerHTML = '';
+            const container = document.getElementById('videos-content');
+            
+            // Clear everything EXCEPT the initial header if you want, 
+            // but easier to just clear and rebuild or use a sub-container.
+            // Let's use a sub-container for the dynamic sections.
+            let dynamicSections = document.getElementById('dynamic-video-sections');
+            if (!dynamicSections) {
+                dynamicSections = document.createElement('div');
+                dynamicSections.id = 'dynamic-video-sections';
+                container.appendChild(dynamicSections);
+            }
+            dynamicSections.innerHTML = '';
 
+            // Grouping logic
+            const groups = {};
             allVideosGlobal.forEach(video => {
-                const card = createVideoCard(video);
-                container.appendChild(card);
+                const cat = video.category || 'აგრო';
+                if (!groups[cat]) groups[cat] = [];
+                groups[cat].push(video);
             });
+
+            // Render each group
+            for (const [category, vids] of Object.entries(groups)) {
+                const sectionHeader = `
+                    <div class="section-header" style="margin-top: 60px; margin-bottom: 30px;">
+                        <h2 class="section-title">${category}</h2>
+                    </div>
+                `;
+                const gridContainer = document.createElement('div');
+                gridContainer.className = 'videos-grid-container';
+                gridContainer.style.paddingTop = '10px';
+                
+                vids.forEach(v => {
+                    gridContainer.appendChild(createVideoCard(v));
+                });
+
+                dynamicSections.innerHTML += sectionHeader;
+                dynamicSections.appendChild(gridContainer);
+            }
+
+            // Hide the original static title if we have dynamic sections
+            const staticHeader = container.querySelector('.section-header');
+            if (staticHeader && Object.keys(groups).length > 0) {
+                staticHeader.style.display = 'none';
+            }
         }
 
         function createVideoCard(video) {
@@ -395,7 +433,6 @@
 
             // Robust photo URL selection
             const bgUrl = video.photo_url || video.poster_url || video.card_url || 'images/placeholder.webp';
-            const date = video.created_at ? new Date(video.created_at).toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' }) : '';
 
             const infoIcon = video.is_official ? '' : `
                 <div class="info-icon-wrapper">
@@ -407,13 +444,6 @@
                 <div class="card-16-9" style="background-image: url('${bgUrl}'); cursor: pointer;" onclick="window.open('watch_video.html?id=${video.id}', '_blank')">
                     ${infoIcon}
                 </div>
-                <div class="card-title" style="cursor: pointer;" onclick="window.open('watch_video.html?id=${video.id}', '_blank')">${video.title}</div>
-                <div class="card-meta" style="opacity: 1 !important; visibility: visible !important;">
-                    <span>${date}</span>
-                    <span class="dot">•</span>
-                    <span>${video.views || 0} ნახვა</span>
-                </div>
-                <a href="${video.original_link || '#'}" target="_blank" class="video-original-link">${video.original_link ? 'ნახე ორიგინალი' : 'ორიგინალი არ არის'}</a>
             `;
             return card;
         }
