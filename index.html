@@ -474,7 +474,8 @@
         function createVideoCard(video) {
             const card = document.createElement('div');
             card.className = 'card-item';
-            card.style.cursor = 'default';
+            card.style.cursor = 'pointer';
+            card.onclick = () => window.open(`watch_video.html?id=${video.id}`, '_blank');
 
             // Robust photo URL selection
             const bgUrl = video.photo_url || video.poster_url || video.card_url || 'images/placeholder.webp';
@@ -486,9 +487,10 @@
                 </div>`;
 
             card.innerHTML = `
-                <div class="card-16-9" style="background-image: url('${bgUrl}'); cursor: pointer;" onclick="window.open('watch_video.html?id=${video.id}', '_blank')">
+                <div class="card-16-9" style="background-image: url('${bgUrl}');">
                     ${infoIcon}
                 </div>
+                <div class="card-title">${video.title}</div>
             `;
             return card;
         }
