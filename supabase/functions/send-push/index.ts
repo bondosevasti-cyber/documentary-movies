@@ -28,7 +28,7 @@ serve(async (req) => {
       })
     }
 
-    webpush.setVapidDetails('mailto:contact@cyron.dev', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
+    webpush.setVapidDetails('mailto:studiasenaki@proton.me', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',

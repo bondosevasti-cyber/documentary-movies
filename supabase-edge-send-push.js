@@ -6,14 +6,14 @@
 // 3. Secrets-ში დაამატე:
 //    VAPID_PRIVATE_KEY = (npx web-push generate-vapid-keys-ის private key)
 //    VAPID_PUBLIC_KEY  = (npx web-push generate-vapid-keys-ის public key)
-//    VAPID_EMAIL       = mailto:contact@cyron.dev
+//    VAPID_EMAIL       = mailto:studiasenaki@proton.me
 // ============================================================
 
 import webpush from 'npm:web-push@3.6.7';
 
 const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY')!;
 const VAPID_PUBLIC_KEY = Deno.env.get('VAPID_PUBLIC_KEY')!;
-const VAPID_EMAIL = Deno.env.get('VAPID_EMAIL') ?? 'mailto:contact@cyron.dev';
+const VAPID_EMAIL = Deno.env.get('VAPID_EMAIL') ?? 'mailto:studiasenaki@proton.me';
 
 webpush.setVapidDetails(VAPID_EMAIL, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
