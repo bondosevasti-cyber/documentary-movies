@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Save, X, Image as ImageIcon } from 'lucide-react';
+import { Save, X, Image as ImageIcon, Upload } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 import { RichTextEditor } from './RichTextEditor';
 
@@ -23,6 +24,33 @@ export const ArticleForm = ({ initialData, onSubmit }: ArticleFormProps) => {
     isPublished: initialData?.isPublished ?? true,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileName = `${Date.now()}_${file.name}`;
+      const { data, error } = await supabase.storage
+        .from('movie-images')
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      const { data: publicData } = supabase.storage
+        .from('movie-images')
+        .getPublicUrl(fileName);
+
+      setFormData(prev => ({ ...prev, thumbnailUrl: publicData.publicUrl }));
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('ატვირთვა ვერ მოხერხდა');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const generateSlug = (text: string) => {
     return text
@@ -144,23 +172,49 @@ export const ArticleForm = ({ initialData, onSubmit }: ArticleFormProps) => {
           
           <div className="space-y-6">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2 uppercase">გარეკანი (Thumbnail URL)</label>
-              <div className="relative group">
-                <div className="aspect-video bg-[#0a0a0a] rounded-lg overflow-hidden border border-[#333] flex items-center justify-center mb-2">
+              <label className="block text-xs font-medium text-gray-500 mb-2 uppercase">გარეკანი (Thumbnail)</label>
+              <div className="space-y-3">
+                <div className="aspect-video bg-[#0a0a0a] rounded-lg overflow-hidden border border-[#333] flex items-center justify-center relative">
                   {formData.thumbnailUrl ? (
                     <img src={formData.thumbnailUrl} alt="Preview" className="w-full h-full object-cover" />
                   ) : (
                     <ImageIcon className="text-gray-700" size={32} />
                   )}
+                  {isUploading && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                      <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    </div>
+                  )}
                 </div>
-                <input
-                  type="url"
-                  name="thumbnailUrl"
-                  value={formData.thumbnailUrl}
-                  onChange={handleChange}
-                  className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-accent outline-none"
-                  placeholder="https://images.unsplash.com/..."
-                />
+                
+                <div className="grid grid-cols-1 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('thumbnail-file')?.click()}
+                    disabled={isUploading}
+                    className="flex items-center justify-center gap-2 bg-[#222] hover:bg-[#333] text-xs py-2 rounded-lg border border-[#333] transition-all disabled:opacity-50"
+                  >
+                    <Upload size={14} />
+                    ფაილის ატვირთვა
+                  </button>
+                  <input
+                    type="file"
+                    id="thumbnail-file"
+                    onChange={handleFileUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <div className="relative">
+                    <input
+                      type="url"
+                      name="thumbnailUrl"
+                      value={formData.thumbnailUrl}
+                      onChange={handleChange}
+                      className="w-full bg-[#1a1a1a] border border-[#333] rounded-lg px-3 py-2 text-xs focus:ring-1 focus:ring-accent outline-none"
+                      placeholder="ან ჩაწერეთ URL..."
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 

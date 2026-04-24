@@ -6,20 +6,21 @@ export const metadata: Metadata = {
   description: "დოკუმენტური ფილმები და სტატიები",
 };
 
+import { Header } from "@/components/Header";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ka">
+    <html lang="ka" className="bg-black">
       <head>
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="antialiased">
-        {/* We can add a Global Header here if needed */}
-        <main>{children}</main>
-        {/* We can add a Global Footer here if needed */}
+      <body className="antialiased bg-black text-white">
+        <Header />
+        <main className="pt-20">{children}</main>
       </body>
     </html>
   );
