@@ -4,6 +4,7 @@ import { articles } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { ArticlesGrid } from '@/components/ArticlesDisplay';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // Revalidate every hour
 
 export default async function ArticlesPage() {

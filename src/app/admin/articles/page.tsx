@@ -5,6 +5,8 @@ import { desc } from 'drizzle-orm';
 import Link from 'next/link';
 import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminArticlesPage() {
   const allArticles = await db.select().from(articles).orderBy(desc(articles.createdAt));
 
