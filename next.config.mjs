@@ -6,6 +6,7 @@ const nextConfig = {
     eslint: {
         ignoreDuringBuilds: true,
     },
+    transpilePackages: ['@tiptap/extension-image', '@tiptap/react', '@tiptap/pm', '@tiptap/core']
 };
 
 export default nextConfig;

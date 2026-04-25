@@ -1,9 +1,0 @@
-{
-  "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/watch/:id",
-      "destination": "/watch_movie.html?id=:id"
-    }
-  ]
-}
