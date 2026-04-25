@@ -3,6 +3,9 @@ import { db } from '@/lib/db';
 import { articles } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export default async function ArticleSinglePage({ params }: { params: { slug: string } }) {
   const article = await db.query.articles.findFirst({
@@ -53,5 +56,3 @@ export default async function ArticleSinglePage({ params }: { params: { slug: st
   );
 }
 
-// Helper Link component since we are in a server component and need to import it
-import Link from 'next/link';

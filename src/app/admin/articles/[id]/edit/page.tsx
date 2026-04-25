@@ -6,6 +6,8 @@ import { notFound } from 'next/navigation';
 import { ArticleForm } from '@/components/admin/ArticleForm';
 import { updateArticle } from '@/lib/actions';
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditArticlePage({ params }: { params: { id: string } }) {
   const article = await db.query.articles.findFirst({
     where: eq(articles.id, params.id),
