@@ -279,11 +279,7 @@
 
             top5Movies.forEach(movie => {
                 const officialBadge = movie.is_official ? `<div class="official-badge" title="ოფიციალური დასტური ავტორისგან" onclick="event.stopPropagation(); openOfficialModal()"></div>` : '';
-                const infoIcon = movie.is_official ? '' : `
-                    <div class="info-icon-wrapper">
-                        <div class="info-icon">!</div>
-                        <div class="info-tooltip">გაფრთხილება: ჩვენ პატივს ვცემთ საავტორო უფლებებს. მზად ვართ ვითანამშრომლოთ ავტორებთან, თუმცა ჩვენს შეტყობინებებზე პასუხი ჯერ არ მიგვიღია.</div>
-                    </div>`;
+                const infoIcon = '';
 
                 const cardHtml = `
                     <div class="rank-card-wrapper" onclick="manualHeroUpdate(${JSON.stringify(movie).replace(/"/g, '&quot;')})">
@@ -481,11 +477,7 @@
             // Robust photo URL selection
             const bgUrl = video.photo_url || video.poster_url || video.card_url || 'images/placeholder.webp';
 
-            const infoIcon = video.is_official ? '' : `
-                <div class="info-icon-wrapper">
-                    <div class="info-icon">!</div>
-                    <div class="info-tooltip">გაფრთხილება: ჩვენ პატივს ვცემთ საავტორო უფლებებს. მზად ვართ ვითანამშრომლოთ ავტორებთან, თუმცა ჩვენს შეტყობინებებზე პასუხი ჯერ არ მიგვიღია.</div>
-                </div>`;
+            const infoIcon = '';
 
             card.innerHTML = `
                 <div class="card-16-9" style="background-image: url('${bgUrl}');">
@@ -534,11 +526,7 @@
 
             const date = movie.created_at ? new Date(movie.created_at).toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' }) : '';
             const officialBadge = movie.is_official ? `<div class="official-badge" title="ოფიციალური დასტური ავტორისგან" onclick="event.stopPropagation(); openOfficialModal()"></div>` : '';
-            const infoIcon = movie.is_official ? '' : `
-                <div class="info-icon-wrapper">
-                    <div class="info-icon">!</div>
-                    <div class="info-tooltip">გაფრთხილება: ჩვენ პატივს ვცემთ საავტორო უფლებებს. მზად ვართ ვითანამშრომლოთ ავტორებთან, თუმცა ჩვენს შეტყობინებებზე პასუხი ჯერ არ მიგვიღია.</div>
-                </div>`;
+            const infoIcon = '';
 
             let innerHTML = infoIcon;
             if (isTop10) {
