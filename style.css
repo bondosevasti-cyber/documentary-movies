@@ -646,7 +646,8 @@ nav a:hover, nav a.active {
     scrollbar-width: none; /* Hide scrollbar for cleaner look */
 }
 
-#soon-container {
+#soon-container, 
+#all-movies-container {
     display: flex;
     gap: 20px;
     padding: 0 50px 40px;
@@ -655,32 +656,38 @@ nav a:hover, nav a.active {
     scrollbar-width: none;
 }
 
-#soon-container::-webkit-scrollbar {
+#soon-container::-webkit-scrollbar,
+#all-movies-container::-webkit-scrollbar {
     display: none;
 }
 
-#soon-container .card-item {
-    flex: 0 0 calc(20% - 16px); /* Show exactly 5 items (accounting for gaps) */
+#soon-container .card-item,
+#all-movies-container .card-item {
+    flex: 0 0 calc(20% - 16px); /* Show exactly 5 items */
     min-width: calc(20% - 16px);
     scroll-snap-align: start;
     padding: 0;
 }
 
 #soon-container .card-1-1, 
-#soon-container .card-16-9 {
-    aspect-ratio: 1 / 1; /* Enforce uniform height in this section */
+#soon-container .card-16-9,
+#all-movies-container .card-1-1, 
+#all-movies-container .card-16-9 {
+    aspect-ratio: 1 / 1; /* Enforce uniform height */
     width: 100%;
 }
 
 @media (max-width: 1024px) {
-    #soon-container .card-item {
+    #soon-container .card-item,
+    #all-movies-container .card-item {
         flex: 0 0 calc(33.333% - 14px);
         min-width: calc(33.333% - 14px);
     }
 }
 
 @media (max-width: 768px) {
-    #soon-container .card-item {
+    #soon-container .card-item,
+    #all-movies-container .card-item {
         flex: 0 0 calc(50% - 10px);
         min-width: calc(50% - 10px);
     }
