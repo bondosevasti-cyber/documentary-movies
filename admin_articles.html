@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ka">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>სტატიების მართვა - ადმინ პანელი</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/logo/Logo.png">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Quill.js for Rich Text -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .admin-wrapper {
+            max-width: 1400px;
+            margin: 120px auto 50px;
+            padding: 0 20px;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 15px;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 5px;
+            color: #aaa;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .nav-item.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 2fr;
+            gap: 40px;
+        }
+
+        .form-card {
+            background: #111;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #222;
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 5px;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        #editor-container {
+            height: 400px;
+            background: #222;
+            color: white;
+            border: 1px solid #333;
+            border-radius: 5px;
+        }
+
+        .ql-toolbar.ql-snow {
+            background: #333;
+            border: 1px solid #333;
+        }
+
+        .ql-container.ql-snow {
+            border: 1px solid #333;
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .btn-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .list-card {
+            background: #080808;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .article-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .article-table th {
+            text-align: left;
+            color: #444;
+            padding: 15px;
+            border-bottom: 2px solid #222;
+        }
+
+        .article-table td {
+            padding: 15px;
+            border-bottom: 1px solid #111;
+        }
+
+        .article-row-title {
+            font-weight: bold;
+            color: #eee;
+        }
+
+        .article-row-meta {
+            font-size: 12px;
+            color: #555;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+
+        .btn-edit { background: #3498db; }
+        .btn-delete { background: #e74c3c; }
+
+        #login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        @media (max-width: 1024px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-card {
+                position: static;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Auth Check -->
+    <div id="login-overlay">
+        <div style="text-align: center; background: #111; padding: 40px; border-radius: 15px; width: 320px;">
+            <img src="images/logo/Logo.png" style="height: 60px; margin-bottom: 20px;">
+            <h2 style="margin-bottom: 20px;">სისტემაში შესვლა</h2>
+            <input type="email" id="login-email" placeholder="Email" style="width: 100%; padding: 12px; margin-bottom: 10px; background: #222; border: 1px solid #333; color: white;">
+            <input type="password" id="login-pass" placeholder="Password" style="width: 100%; padding: 12px; margin-bottom: 20px; background: #222; border: 1px solid #333; color: white;">
+            <button onclick="handleLogin()" id="btn-login" style="width: 100%; padding: 12px; background: var(--accent-color); color: white; border: none; font-weight: bold; cursor: pointer;">შესვლა</button>
+            <p id="login-error" style="color: #e74c3c; font-size: 12px; margin-top: 10px; display: none;"></p>
+        </div>
+    </div>
+
+    <header>
+        <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="სტუდია სენაკი" class="logo-img"></a>
+        <nav>
+            <a href="admin.html">ფილმები & ვიდეოები</a>
+            <a href="admin_articles.html" class="active">სტატიები</a>
+            <button onclick="handleLogout()" class="btn-support" style="background: transparent; border: 1px solid #333;">გასვლა</button>
+        </nav>
+    </header>
+
+    <div class="admin-wrapper" id="admin-panel" style="display: none;">
+        <div class="admin-nav">
+            <a href="admin.html" class="nav-item">ფილმები & ვიდეოები</a>
+            <a href="admin_articles.html" class="nav-item active">სტატიების მართვა</a>
+        </div>
+
+        <div class="admin-grid">
+            <!-- Form -->
+            <div class="form-card">
+                <h2 id="form-title" style="margin-bottom: 25px;">ახალი სტატია</h2>
+                <input type="hidden" id="article-id">
+                
+                <div class="form-group">
+                    <label>სტატიის სათაური</label>
+                    <input type="text" id="title" placeholder="მაგ: როგორ გადავიღოთ დოკუმენტური ფილმი">
+                </div>
+
+                <div class="form-group">
+                    <label>კატეგორია</label>
+                    <select id="category">
+                        <option value="დოკუმენტური">დოკუმენტური</option>
+                        <option value="ისტორია">ისტორია</option>
+                        <option value="ტექნოლოგია">ტექნოლოგია</option>
+                        <option value="აგრო">აგრო</option>
+                        <option value="სიახლე">სიახლე</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>მოკლე აღწერა (Excerpt)</label>
+                    <textarea id="excerpt" rows="3" placeholder="მოკლე შინაარსი ბარათისთვის..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>სურათის URL (Thumbnail)</label>
+                    <input type="text" id="thumbnail_url" placeholder="https://...">
+                    <input type="file" id="thumbnail-file" style="margin-top: 10px; font-size: 12px;" accept="image/*">
+                </div>
+
+                <div class="form-group">
+                    <label>სტატიის შინაარსი</label>
+                    <div id="editor-container"></div>
+                </div>
+
+                <button id="btn-save" class="btn-save" onclick="saveArticle()">სტატიის შენახვა</button>
+                <button id="btn-cancel" style="display: none; width: 100%; background: #333; color: white; border: none; padding: 10px; margin-top: 10px; cursor: pointer;" onclick="resetForm()">გაუქმება</button>
+            </div>
+
+            <!-- List -->
+            <div class="list-card">
+                <h2 style="margin-bottom: 25px;">არსებული სტატიები</h2>
+                <table class="article-table">
+                    <thead>
+                        <tr>
+                            <th>სტატია</th>
+                            <th>მოქმედება</th>
+                        </tr>
+                    </thead>
+                    <tbody id="articles-tbody">
+                        <!-- Articles will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="supabase-config.js"></script>
+    <script>
+        // Initialize Quill
+        const quill = new Quill('#editor-container', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            const btn = document.getElementById('btn-login');
+            const errorEl = document.getElementById('login-error');
+
+            btn.disabled = true;
+            btn.innerText = 'ავტორიზაცია...';
+
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password: pass });
+
+            if (error) {
+                errorEl.innerText = 'შეცდომა: ' + error.message;
+                errorEl.style.display = 'block';
+                btn.disabled = false;
+                btn.innerText = 'შესვლა';
+            } else {
+                initAdmin();
+            }
+        }
+
+        async function initAdmin() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) return;
+
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            loadArticles();
+        }
+
+        async function loadArticles() {
+            const { data: articles, error } = await _supabase
+                .from('articles')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) return console.error(error);
+
+            const tbody = document.getElementById('articles-tbody');
+            tbody.innerHTML = '';
+
+            articles.forEach(article => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="article-row-title">${article.title}</div>
+                        <div class="article-row-meta">${article.category} | ${new Date(article.created_at).toLocaleDateString()}</div>
+                    </td>
+                    <td class="actions">
+                        <button class="btn-action btn-edit" onclick='editArticle(${JSON.stringify(article).replace(/'/g, "&apos;")})'>შეცვლა</button>
+                        <button class="btn-action btn-delete" onclick="deleteArticle('${article.id}')">წაშლა</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function saveArticle() {
+            const id = document.getElementById('article-id').value;
+            const title = document.getElementById('title').value;
+            const category = document.getElementById('category').value;
+            const excerpt = document.getElementById('excerpt').value;
+            let thumbnailUrl = document.getElementById('thumbnail_url').value;
+            const content = quill.root.innerHTML;
+            const fileInput = document.getElementById('thumbnail-file');
+
+            if (!title || !content) {
+                alert('გთხოვთ შეავსოთ სათაური და შინაარსი');
+                return;
+            }
+
+            const btn = document.getElementById('btn-save');
+            btn.disabled = true;
+            btn.innerText = 'ინახება...';
+
+            // Handle file upload if present
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+                const { data, error: uploadError } = await _supabase.storage
+                    .from('article-thumbnails')
+                    .upload(fileName, file);
+                
+                if (!uploadError) {
+                    const { data: urlData } = _supabase.storage
+                        .from('article-thumbnails')
+                        .getPublicUrl(fileName);
+                    thumbnailUrl = urlData.publicUrl;
+                }
+            }
+
+            const slug = title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+
+            const articleData = {
+                title,
+                slug,
+                category,
+                excerpt,
+                thumbnail_url: thumbnailUrl,
+                content,
+                updated_at: new Date()
+            };
+
+            let error;
+            if (id) {
+                const { error: err } = await _supabase.from('articles').update(articleData).eq('id', id);
+                error = err;
+            } else {
+                const { error: err } = await _supabase.from('articles').insert([{ ...articleData, created_at: new Date() }]);
+                error = err;
+            }
+
+            if (error) {
+                alert('შეცდომა შენახვისას: ' + error.message);
+            } else {
+                resetForm();
+                loadArticles();
+            }
+
+            btn.disabled = false;
+            btn.innerText = 'სტატიის შენახვა';
+        }
+
+        function editArticle(article) {
+            document.getElementById('article-id').value = article.id;
+            document.getElementById('title').value = article.title;
+            document.getElementById('category').value = article.category;
+            document.getElementById('excerpt').value = article.excerpt || '';
+            document.getElementById('thumbnail_url').value = article.thumbnail_url || '';
+            quill.root.innerHTML = article.content;
+
+            document.getElementById('form-title').innerText = 'სტატიის რედაქტირება';
+            document.getElementById('btn-save').innerText = 'ცვლილებების შენახვა';
+            document.getElementById('btn-cancel').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function deleteArticle(id) {
+            if (!confirm('დარწმუნებული ხართ, რომ გსურთ სტატიის წაშლა?')) return;
+            const { error } = await _supabase.from('articles').delete().eq('id', id);
+            if (error) alert('შეცდომა წაშლისას');
+            else loadArticles();
+        }
+
+        function resetForm() {
+            document.getElementById('article-id').value = '';
+            document.getElementById('title').value = '';
+            document.getElementById('excerpt').value = '';
+            document.getElementById('thumbnail_url').value = '';
+            document.getElementById('thumbnail-file').value = '';
+            quill.root.innerHTML = '';
+            document.getElementById('form-title').innerText = 'ახალი სტატია';
+            document.getElementById('btn-save').innerText = 'სტატიის შენახვა';
+            document.getElementById('btn-cancel').style.display = 'none';
+        }
+
+        async function handleLogout() {
+            await _supabase.auth.signOut();
+            window.location.reload();
+        }
+
+        // Check if already logged in
+        _supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) initAdmin();
+        });
+    </script>
+</body>
+</html>

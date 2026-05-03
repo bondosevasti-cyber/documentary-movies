@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ka">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>სტატია - სტუდია სენაკი</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="images/logo/Logo.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .article-watch-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 150px 20px 100px;
+        }
+
+        .article-header {
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .article-category-tag {
+            display: inline-block;
+            background: rgba(227, 27, 35, 0.1);
+            color: var(--accent-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .article-full-title {
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .article-meta-info {
+            color: #666;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .article-main-image {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 50px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        /* Typography for Content */
+        .article-content {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #ddd;
+        }
+
+        .article-content p {
+            margin-bottom: 25px;
+        }
+
+        .article-content h2, .article-content h3 {
+            color: #fff;
+            margin: 40px 0 20px;
+        }
+
+        .article-content img {
+            max-width: 100%;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .article-content a {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        .article-content blockquote {
+            border-left: 4px solid var(--accent-color);
+            padding-left: 20px;
+            font-style: italic;
+            color: #aaa;
+            margin: 30px 0;
+        }
+
+        .back-to-articles {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            text-decoration: none;
+            margin-bottom: 40px;
+            transition: color 0.3s;
+        }
+
+        .back-to-articles:hover {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .article-watch-container {
+                padding-top: 100px;
+            }
+            .article-full-title {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="სტუდია სენაკი" class="logo-img"></a>
+        <div class="hamburger" id="hamburger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <nav id="navbar">
+            <a href="index.html">ფილმები</a>
+            <a href="index.html?type=videos">ვიდეოები</a>
+            <a href="articles.html" class="active">სტატიები</a>
+            <a href="javascript:void(0)" class="btn-support" onclick="openSupportModal()">მხარდაჭერა</a>
+        </nav>
+    </header>
+
+    <div class="article-watch-container">
+        <a href="articles.html" class="back-to-articles">
+            <i data-lucide="arrow-left"></i> უკან სტატიებზე
+        </a>
+
+        <div id="article-display" style="display: none;">
+            <div class="article-header">
+                <div class="article-category-tag" id="article-category">კატეგორია</div>
+                <h1 class="article-full-title" id="article-title">სათაური</h1>
+                <div class="article-meta-info">
+                    <span id="article-date">თარიღი</span>
+                </div>
+            </div>
+
+            <img src="" alt="" class="article-main-image" id="article-image">
+
+            <div class="article-content" id="article-content">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+
+        <div id="article-loading" style="text-align: center; padding: 100px;">
+            <p>იტვირთება...</p>
+        </div>
+
+        <div id="article-error" style="display: none; text-align: center; padding: 100px;">
+            <h2 style="color: var(--accent-color);">სტატია ვერ მოიძებნა</h2>
+            <p>სტატია შესაძლოა წაიშალა ან ბმული არასწორია.</p>
+            <a href="articles.html" class="btn-primary" style="margin-top: 20px;">დაბრუნება</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script>
+        async function loadArticle() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('slug');
+
+            if (!slug) {
+                showError();
+                return;
+            }
+
+            const { data: article, error } = await _supabase
+                .from('articles')
+                .select('*')
+                .eq('slug', slug)
+                .single();
+
+            if (error || !article) {
+                console.error('Error fetching article:', error);
+                showError();
+                return;
+            }
+
+            // Update UI
+            document.title = `${article.title} - სტუდია სენაკი`;
+            document.getElementById('article-title').innerText = article.title;
+            document.getElementById('article-category').innerText = article.category || 'ზოგადი';
+            
+            const date = new Date(article.created_at).toLocaleDateString('ka-GE', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            document.getElementById('article-date').innerText = date;
+
+            const img = document.getElementById('article-image');
+            if (article.thumbnail_url) {
+                img.src = article.thumbnail_url;
+            } else {
+                img.style.display = 'none';
+            }
+
+            document.getElementById('article-content').innerHTML = article.content;
+
+            document.getElementById('article-loading').style.display = 'none';
+            document.getElementById('article-display').style.display = 'block';
+            
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function showError() {
+            document.getElementById('article-loading').style.display = 'none';
+            document.getElementById('article-error').style.display = 'block';
+        }
+
+        // Mobile Menu Logic
+        const hamburger = document.getElementById('hamburger-menu');
+        const navbar = document.getElementById('navbar');
+
+        hamburger.onclick = () => {
+            hamburger.classList.toggle('active');
+            navbar.classList.toggle('active');
+            document.body.style.overflow = navbar.classList.contains('active') ? 'hidden' : 'auto';
+        };
+
+        window.onload = loadArticle;
+    </script>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="სტუდია სენაკი" class="logo-img"></a>
+                <p class="footer-disclaimer">ეს საიტი არ ინახავს არანაირ ფაილს ჩვენს სერვერზე. ჩვენ მხოლოდ ვაზიარებთ ბმულებს იმ მედიაზე, რომელიც განთავსებულია მესამე მხარის სერვისებზე.</p>
+            </div>
+            <div class="footer-section">
+                <h4>დახმარება</h4>
+                <ul class="footer-links">
+                    <li><a href="privacy.html">კონფიდენციალურობის პოლიტიკა</a></li>
+                    <li><a href="terms.html">სარგებლობის წესები</a></li>
+                    <li><a href="about.html">ჩვენ შესახებ</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>კონტაქტი</h4>
+                <p>Contact: <a href="mailto:studiasenaki@proton.me" class="contact-email">studiasenaki@proton.me</a></p>
+                <div class="footer-socials">
+                    <a href="https://www.facebook.com/StudiaSenakiOfficial" target="_blank" rel="noopener noreferrer" class="social-link">
+                        <span class="social-text-icon">F</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

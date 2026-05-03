@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // ეს ხაზი აგვარებს CJS/ESM კონფლიქტს TipTap-ისთვის
+    // ეს არის მთავარი გასაღები!
     transpilePackages: [
         '@tiptap/react',
         '@tiptap/pm',
@@ -10,16 +10,8 @@ const nextConfig = {
         '@tiptap/extension-placeholder',
         '@tiptap/starter-kit'
     ],
-    typescript: {
-        ignoreBuildErrors: true,
-    },
-    eslint: {
-        ignoreDuringBuilds: true,
-    },
-    // აიძულებს Next-ს გამოიყენოს მხოლოდ ESM მოდულები
-    experimental: {
-        esmExternals: true
-    }
+    typescript: { ignoreBuildErrors: true },
+    eslint: { ignoreDuringBuilds: true },
 };
 
 export default nextConfig;
