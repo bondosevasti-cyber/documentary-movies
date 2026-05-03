@@ -318,8 +318,8 @@
 
         function scrollSection(containerId, direction) {
             const container = document.getElementById(containerId);
-            // Move by roughly 1.5 elements to ensure snap picks the next one
-            const scrollAmount = container.offsetWidth * 0.7;
+            // Scroll by full container width for "page-by-page" feel
+            const scrollAmount = container.offsetWidth;
             container.scrollBy({
                 left: direction * scrollAmount,
                 behavior: 'smooth'

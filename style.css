@@ -640,9 +640,50 @@ nav a:hover, nav a.active {
     padding: 0 50px;
     gap: 40px;
     padding-bottom: 40px;
-    overflow-x: hidden; /* Swipe disabled */
+    overflow-x: auto; /* Allow scroll for the snap functionality */
     scroll-behavior: smooth;
-    scroll-snap-type: x mandatory; /* Enabling snapping for centering */
+    scroll-snap-type: x mandatory; 
+    scrollbar-width: none; /* Hide scrollbar for cleaner look */
+}
+
+#soon-container {
+    display: flex;
+    gap: 20px;
+    padding: 0 50px 40px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+#soon-container::-webkit-scrollbar {
+    display: none;
+}
+
+#soon-container .card-item {
+    flex: 0 0 calc(20% - 16px); /* Show exactly 5 items (accounting for gaps) */
+    min-width: calc(20% - 16px);
+    scroll-snap-align: start;
+    padding: 0;
+}
+
+#soon-container .card-1-1, 
+#soon-container .card-16-9 {
+    aspect-ratio: 1 / 1; /* Enforce uniform height in this section */
+    width: 100%;
+}
+
+@media (max-width: 1024px) {
+    #soon-container .card-item {
+        flex: 0 0 calc(33.333% - 14px);
+        min-width: calc(33.333% - 14px);
+    }
+}
+
+@media (max-width: 768px) {
+    #soon-container .card-item {
+        flex: 0 0 calc(50% - 10px);
+        min-width: calc(50% - 10px);
+    }
 }
 
 #top10-container {
