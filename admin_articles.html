@@ -398,7 +398,8 @@
 
         async function uploadEditorImage(file) {
             const range = quill.getSelection(true);
-            const fileName = `content-${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+            const sanitizedName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+            const fileName = `content-${Date.now()}-${sanitizedName}`;
             
             // Show placeholder/loading state
             const loadingId = 'loading-' + Date.now();
@@ -571,7 +572,8 @@
             // Handle file upload if present
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+                const sanitizedName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+                const fileName = `${Date.now()}-${sanitizedName}`;
                 
                 btn.innerText = 'ფოტო იტვირთება...';
                 const { data, error: uploadError } = await _supabase.storage

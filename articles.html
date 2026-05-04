@@ -187,7 +187,10 @@
             document.body.style.overflow = navbar.classList.contains('active') ? 'hidden' : 'auto';
         };
 
-        window.onload = loadArticles;
+        window.onload = () => {
+            loadArticles();
+            applySiteSettings();
+        };
     </script>
 
     <footer class="site-footer">

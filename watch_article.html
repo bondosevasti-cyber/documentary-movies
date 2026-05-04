@@ -255,7 +255,10 @@
             document.body.style.overflow = navbar.classList.contains('active') ? 'hidden' : 'auto';
         };
 
-        window.onload = loadArticle;
+        window.onload = () => {
+            loadArticle();
+            applySiteSettings();
+        };
     </script>
 
     <footer class="site-footer">

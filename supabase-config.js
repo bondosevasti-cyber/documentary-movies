@@ -11,7 +11,8 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 async function uploadFile(file) {
     try {
         if (!file) throw new Error("ფაილი არ არის შერჩეული.");
-        const fileName = `${Date.now()}_${file.name}`;
+        const sanitizedName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+        const fileName = `${Date.now()}_${sanitizedName}`;
         
         const { data, error } = await _supabase.storage
             .from('movie-images')
