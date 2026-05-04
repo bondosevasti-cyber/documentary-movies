@@ -290,6 +290,8 @@
 
     <script src="supabase-config.js"></script>
     <script>
+        let allArticles = []; // Store articles globally for better edit handling
+
         // Initialize Quill
         const quill = new Quill('#editor-container', {
             theme: 'snow',
@@ -456,10 +458,11 @@
                 return console.error(error);
             }
 
+            allArticles = articles; // Update global state
             const tbody = document.getElementById('articles-tbody');
             tbody.innerHTML = '';
 
-            articles.forEach(article => {
+            articles.forEach((article, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
@@ -467,7 +470,7 @@
                         <div class="article-row-meta">${article.category} | ${new Date(article.created_at).toLocaleDateString()}</div>
                     </td>
                     <td class="actions">
-                        <button class="btn-action btn-edit" onclick='editArticle(${JSON.stringify(article).replace(/'/g, "&apos;")})'>შეცვლა</button>
+                        <button class="btn-action btn-edit" onclick="editArticleByIndex(${index})">შეცვლა</button>
                         <button class="btn-action btn-delete" onclick="deleteArticle('${article.id}')">წაშლა</button>
                     </td>
                 `;
@@ -497,16 +500,23 @@
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+                
+                btn.innerText = 'ფოტო იტვირთება...';
                 const { data, error: uploadError } = await _supabase.storage
                     .from('article-thumbnails')
                     .upload(fileName, file);
                 
-                if (!uploadError) {
-                    const { data: urlData } = _supabase.storage
-                        .from('article-thumbnails')
-                        .getPublicUrl(fileName);
-                    thumbnailUrl = urlData.publicUrl;
+                if (uploadError) {
+                    alert('ფოტოს ატვირთვა ვერ მოხერხდა: ' + uploadError.message);
+                    btn.disabled = false;
+                    btn.innerText = 'სტატიის შენახვა';
+                    return;
                 }
+
+                const { data: urlData } = _supabase.storage
+                    .from('article-thumbnails')
+                    .getPublicUrl(fileName);
+                thumbnailUrl = urlData.publicUrl;
             }
 
             const slug = title
@@ -545,7 +555,10 @@
             btn.innerText = 'სტატიის შენახვა';
         }
 
-        function editArticle(article) {
+        function editArticleByIndex(index) {
+            const article = allArticles[index];
+            if (!article) return;
+
             document.getElementById('article-id').value = article.id;
             document.getElementById('title').value = article.title;
             document.getElementById('category').value = article.category;
@@ -573,6 +586,7 @@
             document.getElementById('excerpt').value = '';
             document.getElementById('thumbnail_url').value = '';
             document.getElementById('thumbnail-file').value = '';
+            updateThumbnailPreview(''); // Reset preview UI
             document.getElementById('thumbnail-drop-zone').querySelector('p').innerText = 'ან ჩააგდეთ ფაილი აქ';
             quill.root.innerHTML = '';
             document.getElementById('form-title').innerText = 'ახალი სტატია';
