@@ -398,7 +398,7 @@
             quill.insertEmbed(range.index, 'image', 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJqZ3R6Z3R6Z3R6Z3R6Z3R6Z3R6Z3R6Z3R6Z3R6Z3R6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7bu3XilJ5BOiSGic/giphy.gif');
             
             const { data, error } = await _supabase.storage
-                .from('article-thumbnails')
+                .from('movie-images')
                 .upload(fileName, file);
 
             if (error) {
@@ -409,7 +409,7 @@
             }
 
             const { data: urlData } = _supabase.storage
-                .from('article-thumbnails')
+                .from('movie-images')
                 .getPublicUrl(fileName);
             
             // Replace loading gif with actual image
@@ -503,7 +503,7 @@
                 
                 btn.innerText = 'ფოტო იტვირთება...';
                 const { data, error: uploadError } = await _supabase.storage
-                    .from('article-thumbnails')
+                    .from('movie-images')
                     .upload(fileName, file);
                 
                 if (uploadError) {
@@ -514,7 +514,7 @@
                 }
 
                 const { data: urlData } = _supabase.storage
-                    .from('article-thumbnails')
+                    .from('movie-images')
                     .getPublicUrl(fileName);
                 thumbnailUrl = urlData.publicUrl;
             }
