@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS articles (
     thumbnail_url TEXT,
     excerpt TEXT,
     content TEXT NOT NULL, -- Supports Markdown or HTML
-    category TEXT DEFAULT 'Articles' CHECK (category IN ('Articles', 'Films', 'Videos')),
+    category TEXT DEFAULT 'Articles',
     is_published BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

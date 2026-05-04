@@ -248,10 +248,11 @@
                     <textarea id="excerpt" rows="3" placeholder="მოკლე შინაარსი ბარათისთვის..."></textarea>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="thumbnail-drop-zone" style="border: 2px dashed #333; padding: 20px; text-align: center; border-radius: 10px; transition: all 0.3s ease;">
                     <label>სურათის URL (Thumbnail)</label>
-                    <input type="text" id="thumbnail_url" placeholder="https://...">
-                    <input type="file" id="thumbnail-file" style="margin-top: 10px; font-size: 12px;" accept="image/*">
+                    <input type="text" id="thumbnail_url" placeholder="https://..." style="margin-bottom: 10px;">
+                    <p style="font-size: 12px; color: #555; margin: 10px 0;">ან ჩააგდეთ ფაილი აქ</p>
+                    <input type="file" id="thumbnail-file" style="font-size: 12px;" accept="image/*">
                 </div>
 
                 <div class="form-group">
@@ -298,6 +299,84 @@
             }
         });
 
+        // Handle Image Drag & Drop and Paste
+        const editorElement = document.getElementById('editor-container');
+        
+        editorElement.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0 && files[0].type.startsWith('image/')) {
+                await uploadEditorImage(files[0]);
+            }
+        });
+
+        editorElement.addEventListener('paste', async (e) => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const file = items[i].getAsFile();
+                    await uploadEditorImage(file);
+                }
+            }
+        });
+
+        // Thumbnail Drag & Drop
+        const thumbZone = document.getElementById('thumbnail-drop-zone');
+        const thumbInput = document.getElementById('thumbnail-file');
+
+        thumbZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            thumbZone.style.borderColor = 'var(--accent-color)';
+            thumbZone.style.background = 'rgba(227, 27, 35, 0.05)';
+        });
+
+        thumbZone.addEventListener('dragleave', () => {
+            thumbZone.style.borderColor = '#333';
+            thumbZone.style.background = 'transparent';
+        });
+
+        thumbZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            thumbZone.style.borderColor = '#333';
+            thumbZone.style.background = 'transparent';
+            
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                thumbInput.files = files;
+                // Optional: show preview or filename
+                const fileName = files[0].name;
+                thumbZone.querySelector('p').innerText = 'არჩეულია: ' + fileName;
+            }
+        });
+
+        async function uploadEditorImage(file) {
+            const range = quill.getSelection(true);
+            const fileName = `content-${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
+            
+            // Show placeholder/loading state
+            const loadingId = 'loading-' + Date.now();
+            quill.insertEmbed(range.index, 'image', 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJqZ3R6Z3R6Z3R6Z3R6Z3R6Z3R6Z3R6Z3R6Z3R6Z3R6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7bu3XilJ5BOiSGic/giphy.gif');
+            
+            const { data, error } = await _supabase.storage
+                .from('article-thumbnails')
+                .upload(fileName, file);
+
+            if (error) {
+                console.error('Upload error:', error);
+                quill.deleteText(range.index, 1);
+                alert('ფოტოს ატვირთვა ვერ მოხერხდა: ' + error.message);
+                return;
+            }
+
+            const { data: urlData } = _supabase.storage
+                .from('article-thumbnails')
+                .getPublicUrl(fileName);
+            
+            // Replace loading gif with actual image
+            quill.deleteText(range.index, 1);
+            quill.insertEmbed(range.index, 'image', urlData.publicUrl);
+        }
+
         async function handleLogin() {
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
@@ -334,7 +413,10 @@
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) return console.error(error);
+            if (error) {
+                alert('სტატიების ჩატვირთვა ვერ მოხერხდა: ' + error.message);
+                return console.error(error);
+            }
 
             const tbody = document.getElementById('articles-tbody');
             tbody.innerHTML = '';
@@ -389,7 +471,11 @@
                 }
             }
 
-            const slug = title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+            const slug = title
+                .toLowerCase()
+                .trim()
+                .replace(/[^\u10D0-\u10FFa-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
 
             const articleData = {
                 title,
@@ -448,6 +534,7 @@
             document.getElementById('excerpt').value = '';
             document.getElementById('thumbnail_url').value = '';
             document.getElementById('thumbnail-file').value = '';
+            document.getElementById('thumbnail-drop-zone').querySelector('p').innerText = 'ან ჩააგდეთ ფაილი აქ';
             quill.root.innerHTML = '';
             document.getElementById('form-title').innerText = 'ახალი სტატია';
             document.getElementById('btn-save').innerText = 'სტატიის შენახვა';
