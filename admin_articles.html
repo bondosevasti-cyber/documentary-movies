@@ -239,13 +239,15 @@
 
                 <div class="form-group">
                     <label>კატეგორია</label>
-                    <select id="category">
-                        <option value="დოკუმენტური">დოკუმენტური</option>
-                        <option value="ისტორია">ისტორია</option>
-                        <option value="ტექნოლოგია">ტექნოლოგია</option>
-                        <option value="აგრო">აგრო</option>
-                        <option value="სიახლე">სიახლე</option>
-                    </select>
+                    <div id="category-list" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                        <!-- Categories will be loaded here -->
+                    </div>
+                    <div id="new-category-input-group" style="display: none; gap: 8px; margin-bottom: 10px;">
+                        <input type="text" id="new-category-name" placeholder="ახალი კატეგორია..." style="flex: 1;">
+                        <button type="button" onclick="addCategory()" class="btn-action btn-edit" style="padding: 10px 15px;">დამატება</button>
+                    </div>
+                    <button type="button" id="btn-toggle-new-cat" onclick="toggleNewCategoryInput()" style="background: transparent; border: 1px dashed #444; color: #888; padding: 5px 15px; border-radius: 20px; cursor: pointer; font-size: 12px;">+ ახალი კატეგორია</button>
+                    <input type="hidden" id="category" value="დოკუმენტური">
                 </div>
 
                 <div class="form-group">
@@ -450,6 +452,71 @@
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('admin-panel').style.display = 'block';
             loadArticles();
+            loadCategories();
+        }
+
+        let articleCategories = [];
+        async function loadCategories() {
+            const { data, error } = await _supabase
+                .from('article_categories')
+                .select('*')
+                .order('name');
+            
+            if (error) {
+                console.error('Error loading categories:', error);
+                return;
+            }
+
+            articleCategories = data;
+            renderCategories();
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('category-list');
+            const currentSelected = document.getElementById('category').value;
+
+            container.innerHTML = articleCategories.map(cat => `
+                <button type="button" class="nav-item ${cat.name === currentSelected ? 'active' : ''}" 
+                    style="padding: 6px 15px; font-size: 13px; text-transform: none; border-radius: 20px; cursor: pointer;" 
+                    onclick="selectCategory('${cat.name}')">${cat.name}</button>
+            `).join('');
+        }
+
+        function selectCategory(name) {
+            document.getElementById('category').value = name;
+            renderCategories();
+        }
+
+        function toggleNewCategoryInput() {
+            const group = document.getElementById('new-category-input-group');
+            const btn = document.getElementById('btn-toggle-new-cat');
+            const isHidden = group.style.display === 'none';
+            
+            group.style.display = isHidden ? 'flex' : 'none';
+            btn.innerText = isHidden ? 'გაუქმება' : '+ ახალი კატეგორია';
+            if (isHidden) document.getElementById('new-category-name').focus();
+        }
+
+        async function addCategory() {
+            const nameInput = document.getElementById('new-category-name');
+            const name = nameInput.value.trim();
+            
+            if (!name) return;
+
+            const { data, error } = await _supabase
+                .from('article_categories')
+                .insert([{ name }])
+                .select();
+
+            if (error) {
+                if (error.code === '23505') alert('ეს კატეგორია უკვე არსებობს');
+                else alert('შეცდომა კატეგორიის დამატებისას: ' + error.message);
+                return;
+            }
+
+            nameInput.value = '';
+            toggleNewCategoryInput();
+            loadCategories().then(() => selectCategory(name));
         }
 
         async function loadArticles() {
@@ -566,7 +633,8 @@
 
             document.getElementById('article-id').value = article.id;
             document.getElementById('title').value = article.title;
-            document.getElementById('category').value = article.category;
+            document.getElementById('category').value = article.category || 'დოკუმენტური';
+            renderCategories();
             document.getElementById('excerpt').value = article.excerpt || '';
             document.getElementById('thumbnail_url').value = article.thumbnail_url || '';
             updateThumbnailPreview(article.thumbnail_url);
@@ -588,6 +656,8 @@
         function resetForm() {
             document.getElementById('article-id').value = '';
             document.getElementById('title').value = '';
+            document.getElementById('category').value = 'დოკუმენტური';
+            renderCategories();
             document.getElementById('excerpt').value = '';
             document.getElementById('thumbnail_url').value = '';
             document.getElementById('thumbnail-file').value = '';
