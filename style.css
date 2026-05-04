@@ -442,20 +442,21 @@ nav a:hover, nav a.active {
 
 
 .card-title {
-    margin-top: 12px;
-    font-size: 16px;
+    margin-top: 5px; /* Tight attachment */
+    font-size: 14px;
     color: var(--text-color);
     text-align: left;
     width: 100%;
     font-weight: 600;
     line-height: 1.4;
-    padding: 0 16px; /* Added padding to text but not the image */
+    padding: 0 5px;
     transition: color 0.3s ease;
     display: -webkit-box;
-    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-word;
+    flex-shrink: 0; /* Prevent title from shrinking */
 }
 
 .card-meta {
@@ -649,7 +650,7 @@ nav a:hover, nav a.active {
 #soon-container, 
 #all-movies-container {
     display: flex;
-    gap: 20px;
+    gap: 15px; /* Reduced gap for tighter look */
     padding: 0 50px 40px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
@@ -663,35 +664,38 @@ nav a:hover, nav a.active {
 
 #soon-container .card-item,
 #all-movies-container .card-item {
-    flex: 0 0 calc(20% - 16px); /* Show exactly 5 items */
-    min-width: calc(20% - 16px);
+    flex: 0 0 auto;
     scroll-snap-align: start;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: auto !important; /* Allow growing to fit title */
+}
+
+#soon-container .card-item.card-1-1,
+#all-movies-container .card-item.card-1-1 {
+    width: var(--card-height);
+}
+
+#soon-container .card-item.card-16-9,
+#all-movies-container .card-item.card-16-9 {
+    width: calc(var(--card-height) * 16 / 9);
 }
 
 #soon-container .card-1-1, 
+#all-movies-container .card-1-1,
 #soon-container .card-16-9,
-#all-movies-container .card-1-1, 
 #all-movies-container .card-16-9 {
-    aspect-ratio: 1 / 1; /* Enforce uniform height */
+    height: var(--card-height);
     width: 100%;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
 }
 
-@media (max-width: 1024px) {
-    #soon-container .card-item,
-    #all-movies-container .card-item {
-        flex: 0 0 calc(33.333% - 14px);
-        min-width: calc(33.333% - 14px);
-    }
-}
+/* Mobile responsive basis removed to allow natural widths */
 
-@media (max-width: 768px) {
-    #soon-container .card-item,
-    #all-movies-container .card-item {
-        flex: 0 0 calc(50% - 10px);
-        min-width: calc(50% - 10px);
-    }
-}
+/* Mobile responsive basis removed to allow natural widths */
 
 #top10-container {
     flex-wrap: nowrap;

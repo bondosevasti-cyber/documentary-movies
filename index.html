@@ -520,8 +520,9 @@
 
 
         function createCard(movie, rank = 0, isTop10 = false, isSoon = false) {
+            const ratioClass = movie.display_ratio === '16:9' ? 'card-16-9' : 'card-1-1';
             const card = document.createElement('div');
-            card.className = 'card-item';
+            card.className = `card-item ${ratioClass}`;
             card.onclick = () => manualHeroUpdate(movie);
 
             const date = movie.created_at ? new Date(movie.created_at).toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' }) : '';
