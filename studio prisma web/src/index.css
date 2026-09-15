@@ -1,0 +1,214 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #07080B;
+    color: #F3F4F6;
+  }
+}
+
+/* Custom glowing and lighting effects matching the reference image */
+.glow-amber-border {
+  border: 1.5px solid rgba(255, 132, 28, 0.85);
+  box-shadow: 
+    0 0 15px rgba(255, 115, 0, 0.45),
+    0 0 35px rgba(255, 90, 0, 0.2),
+    inset 0 0 14px rgba(255, 115, 0, 0.12);
+}
+
+.glow-amber-strong {
+  border: 1.5px solid rgba(255, 145, 36, 0.95);
+  box-shadow: 
+    0 0 18px rgba(255, 120, 0, 0.6),
+    0 0 40px rgba(255, 95, 0, 0.3),
+    inset 0 0 18px rgba(255, 125, 0, 0.18);
+}
+
+.glow-amber-pill {
+  border: 1.5px solid rgba(255, 135, 30, 0.9);
+  box-shadow: 
+    0 0 16px rgba(255, 115, 0, 0.5),
+    0 0 30px rgba(255, 95, 0, 0.25),
+    inset 0 0 12px rgba(255, 115, 0, 0.2);
+}
+
+.glow-amber-text {
+  text-shadow: 0 0 12px rgba(255, 135, 30, 0.7), 0 0 24px rgba(255, 100, 0, 0.4);
+}
+
+.glow-button-orange {
+  background: linear-gradient(135deg, #FF7B00 0%, #E85000 100%);
+  box-shadow: 
+    0 0 22px rgba(255, 115, 0, 0.65),
+    0 0 45px rgba(255, 85, 0, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.glow-button-orange:hover {
+  box-shadow: 
+    0 0 28px rgba(255, 125, 0, 0.85),
+    0 0 55px rgba(255, 95, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.glass-panel-dark {
+  background: linear-gradient(180deg, rgba(20, 23, 31, 0.85) 0%, rgba(10, 12, 16, 0.92) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 135, 35, 0.5);
+  box-shadow: 
+    0 10px 30px -10px rgba(0, 0, 0, 0.9), 
+    0 0 20px -2px rgba(255, 115, 0, 0.3),
+    inset 0 1px 0 rgba(255, 200, 150, 0.2);
+}
+
+/* Cinematic Solar Flare & Lens Bloom */
+.solar-flare-center {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #FFFFFF;
+  border-radius: 9999px;
+  box-shadow: 
+    0 0 10px 4px #FFFFFF,
+    0 0 25px 12px #FFA834,
+    0 0 60px 25px #FF6A00,
+    0 0 120px 50px rgba(255, 100, 0, 0.4);
+}
+
+.solar-flare-streak {
+  position: absolute;
+  height: 2px;
+  width: 260px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 240, 200, 0.8) 45%, #FFFFFF 50%, rgba(255, 240, 200, 0.8) 55%, transparent 100%);
+  box-shadow: 0 0 8px rgba(255, 160, 50, 0.8);
+  pointer-events: none;
+}
+
+.solar-flare-star-vertical {
+  position: absolute;
+  width: 2px;
+  height: 120px;
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 240, 200, 0.8) 45%, #FFFFFF 50%, rgba(255, 240, 200, 0.8) 55%, transparent 100%);
+  box-shadow: 0 0 8px rgba(255, 160, 50, 0.8);
+  pointer-events: none;
+}
+
+.solar-flare-ring {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 180, 70, 0.4);
+  box-shadow: 0 0 20px rgba(255, 140, 20, 0.3);
+  pointer-events: none;
+}
+
+/* Ambient glow underlays */
+.ambient-hero-halo {
+  background: radial-gradient(circle at 60% 40%, rgba(255, 115, 0, 0.3) 0%, rgba(255, 75, 0, 0.08) 50%, transparent 75%);
+}
+
+.ambient-card-halo {
+  background: radial-gradient(circle, rgba(255, 120, 0, 0.22) 0%, transparent 70%);
+}
+
+/* Reference-detail components: restrained warm rim light rather than a solid orange fill. */
+.reference-watch-button {
+  position: relative;
+  isolation: isolate;
+  min-height: 54px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 147, 61, 0.68);
+  background: linear-gradient(90deg, rgba(255, 87, 5, 0.55) 0%, rgba(112, 43, 8, 0.18) 22%, rgba(8, 8, 10, 0.86) 61%, rgba(13, 13, 16, 0.82) 100%);
+  box-shadow: 0 0 8px rgba(255, 112, 15, 0.32), inset 0 1px 0 rgba(255, 220, 178, 0.16);
+}
+.reference-watch-button::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 82px;
+  height: 82px;
+  left: -29px;
+  top: -15px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 235, 186, 0.9) 0%, rgba(255, 114, 12, 0.84) 24%, rgba(194, 55, 0, 0.4) 51%, transparent 72%);
+  filter: blur(5px);
+}
+.reference-watch-button:hover {
+  border-color: rgba(255, 185, 110, 0.92);
+  box-shadow: 0 0 16px rgba(255, 112, 15, 0.5), inset 0 1px 0 rgba(255, 236, 204, 0.25);
+}
+
+.reference-carousel-rail {
+  padding: 0 20px 0 22px;
+  border-left: 1px solid rgba(185, 113, 53, 0.2);
+  text-shadow: 0 0 12px rgba(255, 120, 24, 0.35);
+}
+
+.reference-thumbnail {
+  border-color: rgba(205, 174, 137, 0.36);
+  box-shadow: inset 0 1px 0 rgba(255, 226, 186, 0.1), 0 5px 14px rgba(0, 0, 0, 0.26);
+}
+.reference-thumbnail:hover {
+  border-color: rgba(255, 151, 61, 0.78);
+  box-shadow: 0 0 16px rgba(255, 106, 11, 0.24), inset 0 1px 0 rgba(255, 228, 193, 0.2);
+}
+.reference-duration {
+  background: rgba(5, 5, 6, 0.86);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.45);
+}
+
+.reference-promo {
+  min-height: 194px;
+  border: 1px solid rgba(255, 145, 61, 0.7);
+  background: linear-gradient(118deg, #121216 0%, #0a0a0c 62%, #281109 100%);
+  box-shadow: 0 0 12px rgba(255, 99, 6, 0.28), 0 0 29px rgba(255, 81, 0, 0.12), inset 0 1px 0 rgba(255, 224, 183, 0.16);
+}
+.reference-promo::after {
+  content: '';
+  position: absolute;
+  inset: auto -30px -58px auto;
+  width: 158px;
+  height: 158px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 32%, rgba(255, 212, 153, 0.55), rgba(255, 106, 10, 0.3) 24%, transparent 68%);
+  filter: blur(14px);
+  pointer-events: none;
+}
+.reference-promo-arrow {
+  border: 1px solid rgba(255, 158, 62, 0.78);
+  background: rgba(9, 9, 10, 0.64);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(255, 117, 16, 0.46), inset 0 1px 0 rgba(255, 232, 199, 0.16);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #090A0E;
+}
+::-webkit-scrollbar-thumb {
+  background: #232733;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FF771C;
+}

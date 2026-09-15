@@ -1,0 +1,6 @@
+{
+  "name": "Documentary Movies",
+  "description": "Cinematic streaming dashboard for world-class nature, space, history, and science documentaries with interactive playback, categories, and curated features.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ადმინ პანელი - სტუდია სენაკი</title>
+    <title>ადმინ პანელი — სტუდია პრიზმა</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="images/logo/Logo.png">
     <link rel="stylesheet" href="style.css">
@@ -126,6 +126,22 @@
         .video-card-info h4 { margin: 0 0 5px 0; color: white; }
         .video-card-info p { margin: 0; font-size: 12px; color: #666; }
         .video-card-actions { display: flex; gap: 10px; }
+        /* Prisma admin refresh */
+        body { background: #07080b; }
+        .admin-container { max-width: 1500px; gap: 24px; }
+        .admin-form-container, .movie-list-container { background: #101217; border: 1px solid rgba(255,255,255,.08); border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.28); }
+        .admin-form-container { padding: 26px; top: 90px; max-height: calc(100vh - 110px); overflow-y: auto; scrollbar-width: thin; }
+        .form-group input, .form-group textarea { background: #080a0e; border-color: #292d36; border-radius: 9px; padding: 12px; }
+        .form-group input:focus, .form-group textarea:focus { border-color: #8999c9; outline: none; box-shadow: 0 0 0 3px rgba(130,150,215,.12); }
+        .upload-wrapper { background: #090b10; border-color: #343945; border-radius: 12px; }
+        .admin-nav { position: sticky; top: 0; z-index: 20; padding: 12px; background: rgba(7,8,11,.88); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,.07); border-radius: 16px; }
+        .nav-item { border: 0; border-radius: 11px; background: transparent; }
+        .nav-item.active { background: #e9ebf3; color: #111319; border-color: transparent; box-shadow: none; }
+        .btn-submit { background: linear-gradient(135deg,#aebee9,#d9c5e8); color:#11131a; border-radius: 11px; }
+        .title-art-upload { aspect-ratio: 3 / 1; }
+        .title-art-upload img { width: 100%; height: 100%; object-fit: contain; padding: 16px; }
+        .field-help { display:block; color:#687080; font-size:11px; line-height:1.5; margin-top:6px; }
+        @media(max-width: 900px) { .admin-container { margin-top: 100px; }.admin-section.active { display:block; }.admin-form-container { position:static; max-height:none; margin-bottom:24px; }.admin-lists-grid,.form-row { grid-template-columns:1fr!important; }.admin-nav { overflow-x:auto; }.nav-item { white-space:nowrap; } }
         /* ==== Push Dropzone Styles ==== */
         .push-dropzone {
             border: 2px dashed #333;
@@ -197,13 +213,13 @@
     </div>
 
     <header>
-        <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="სტუდია სენაკი" class="logo-img"></a>
+        <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="სტუდია პრიზმა" class="logo-img"></a>
         <button class="btn-logout" id="logout-btn" style="float: right; margin: 20px;" onclick="handleLogout()">გამოსვლა</button>
     </header>
 
     <div class="admin-container" id="admin-content" style="display: none; grid-template-columns: 1fr;">
         <div class="admin-nav">
-            <div class="nav-item active" onclick="switchSection('movies')">ფილმები & ვიდეოები</div>
+            <div class="nav-item active" id="nav-movies" onclick="switchSection('movies')">ფილმები</div>
             <a href="admin_articles.html" class="nav-item" style="text-decoration: none;">სტატიები</a>
             <div class="nav-item" id="nav-videos" onclick="switchSection('videos')">ვიდეოების მართვა</div>
             <div class="nav-item" id="nav-push" onclick="switchSection('push')">🔔 შეტყობინებები</div>
@@ -261,6 +277,20 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label>სათაურის გამჭვირვალე სურათი (არჩევითი)</label>
+                        <div class="upload-wrapper title-art-upload" id="title-art-preview" onclick="document.getElementById('title-art-input').click()">
+                            <div class="upload-placeholder"><p>PNG/WebP ლოგოს ან სათაურის ატვირთვა</p><small class="field-help">ატვირთე მხოლოდ მაშინ, როცა ბანერის ფოტოზე სათაური არ წერია.</small></div>
+                        </div>
+                        <input type="file" id="title-art-input" accept="image/png,image/webp" style="display:none;">
+                        <button type="button" class="btn-cancel" onclick="clearTitleArt('movie')">სათაურის სურათის წაშლა</button>
+                    </div>
+
+                    <label class="checkbox-item" style="margin: -2px 0 20px;">
+                        <input type="checkbox" name="hide_hero_title">
+                        ბანერზე სათაური უკვე წერია — დამატებითი ტექსტი დამალე
+                    </label>
+
                     <div class="form-group"><label>დასახელება</label><input type="text" name="title"></div>
                     <div class="form-group"><label>ჟანრი</label><input type="text" name="genre"></div>
                     <div class="form-group"><label>აღწერა</label><textarea name="description" rows="2"></textarea></div>
@@ -282,12 +312,27 @@
                     <div class="checkbox-group">
                         <label class="checkbox-item"><input type="checkbox" name="is_top_10"> Top 5</label>
                         <label class="checkbox-item"><input type="checkbox" name="is_coming_soon"> მალე</label>
-                        <label class="checkbox-item"><input type="checkbox" name="is_official" onchange="document.getElementById('creator-url-group').style.display = this.checked ? 'block' : 'none'"> Official Status</label>
+                        <label class="checkbox-item"><input type="checkbox" name="is_official" onchange="document.getElementById('creator-url-group').style.display = this.checked ? 'block' : 'none'"> ოფიციალური წყარო / სტუდია</label>
                     </div>
 
                     <div class="form-group" id="creator-url-group" style="display: none;">
-                        <label>ავტორის საიტი (Creator URL)</label>
-                        <input type="url" name="creator_url" placeholder="https://movingart.com">
+                        <input type="hidden" name="creator_url">
+                        <small class="field-help">ოფიციალური წყაროს ნიშნული დეტალურ გვერდზე გამოჩნდება. ვებსაიტი ქვემოთ, „სტუდიის ოფიციალური ვებსაიტის“ ველში მიუთითე.</small>
+                    </div>
+
+                    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div class="form-group"><label>სტუდიის / მწარმოებლის სახელი</label><input type="text" name="studio_name" placeholder="მაგ: Moving Art"></div>
+                        <div class="form-group"><label>სტუდიის ლოგოს URL (არჩევითი)</label><input type="url" name="studio_logo_url" placeholder="https://.../logo.png"></div>
+                    </div>
+                    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div class="form-group"><label>სტუდიის ოფიციალური ვებსაიტი</label><input type="url" name="studio_website_url" placeholder="https://studio.com"></div>
+                        <div class="form-group"><label>ოფიციალური ტრეილერის URL</label><input type="url" name="trailer_url" placeholder="https://youtube.com/... ან https://rumble.com/..."></div>
+                    </div>
+                    <div class="form-group"><label>მსახიობები / მონაწილეები</label><textarea name="cast_members" rows="4" placeholder="თითო ხაზზე ერთი: სახელი — როლი"></textarea></div>
+                    <div class="form-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+                        <div class="form-group"><label>რეჟისორი</label><input type="text" name="director_name"></div>
+                        <div class="form-group"><label>სცენარის ავტორი</label><input type="text" name="writer_names"></div>
+                        <div class="form-group"><label>პროდიუსერი</label><input type="text" name="producer_names"></div>
                     </div>
 
                     <!-- Focal Point Controls -->
@@ -370,6 +415,20 @@
                     </div>
 
                     <div class="form-group">
+                        <label>სათაურის გამჭვირვალე სურათი (არჩევითი)</label>
+                        <div class="upload-wrapper title-art-upload" id="v-title-art-preview" onclick="document.getElementById('v-title-art-input').click()">
+                            <div class="upload-placeholder"><p>PNG/WebP ლოგოს ან სათაურის ატვირთვა</p><small class="field-help">თუ ვიდეოს ფოტოზე სათაური უკვე წერია, დატოვე ცარიელი.</small></div>
+                        </div>
+                        <input type="file" id="v-title-art-input" accept="image/png,image/webp" style="display:none;">
+                        <button type="button" class="btn-cancel" onclick="clearTitleArt('video')">სათაურის სურათის წაშლა</button>
+                    </div>
+
+                    <label class="checkbox-item" style="margin: -2px 0 20px;">
+                        <input type="checkbox" name="hide_hero_title">
+                        ფოტოზე სათაური უკვე წერია — დამატებითი ტექსტი დამალე
+                    </label>
+
+                    <div class="form-group">
                         <label>სათაური (მხოლოდ ადმინისთვის)</label>
                         <input type="text" name="title" value="აგრო" required>
                     </div>
@@ -395,6 +454,30 @@
                         <label>ორიგინალი ვიდეოს ლინკი</label>
                         <input type="url" name="original_link" placeholder="TikTok, Facebook, ect. (Optional)">
                     </div>
+
+                    <div class="form-group"><label>აღწერა</label><textarea name="description" rows="4" placeholder="ვიდეოს მოკლე აღწერა"></textarea></div>
+                    <div class="form-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+                        <div class="form-group"><label>წელი</label><input type="text" name="release_year"></div>
+                        <div class="form-group"><label>ხანგრძლივობა</label><input type="text" name="duration" placeholder="მაგ: 24m"></div>
+                        <div class="form-group"><label>რეიტინგი</label><input type="number" name="rating" min="0" max="10" step="0.1"></div>
+                    </div>
+                    <div class="form-group"><label>ჟანრები</label><input type="text" name="genre" placeholder="ბუნება / მეცნიერება"></div>
+                    <div class="form-group"><label>დეტალური გვერდის ბანერის URL (არჩევითი)</label><input type="url" name="cover_url" placeholder="თუ ცარიელია, გამოყენებული იქნება პოსტერი"></div>
+                    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div class="form-group"><label>სტუდიის / ავტორის სახელი</label><input type="text" name="studio_name"></div>
+                        <div class="form-group"><label>სტუდიის ლოგოს URL</label><input type="url" name="studio_logo_url" placeholder="https://.../logo.png"></div>
+                    </div>
+                    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div class="form-group"><label>ოფიციალური ვებსაიტი</label><input type="url" name="studio_website_url" placeholder="https://studio.com"></div>
+                        <div class="form-group"><label>ოფიციალური ტრეილერის URL</label><input type="url" name="trailer_url" placeholder="https://youtube.com/... ან https://rumble.com/..."></div>
+                    </div>
+                    <div class="form-group"><label>მონაწილეები</label><textarea name="cast_members" rows="4" placeholder="თითო ხაზზე ერთი: სახელი — როლი"></textarea></div>
+                    <div class="form-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+                        <div class="form-group"><label>რეჟისორი</label><input type="text" name="director_name"></div>
+                        <div class="form-group"><label>სცენარის ავტორი</label><input type="text" name="writer_names"></div>
+                        <div class="form-group"><label>პროდიუსერი</label><input type="text" name="producer_names"></div>
+                    </div>
+                    <label class="checkbox-item" style="margin:0 0 20px;"><input type="checkbox" name="is_official"> ოფიციალური წყარო / სტუდია</label>
 
                     <button type="submit" class="btn-submit" id="video-submit-btn">ვიდეოს შენახვა</button>
                     <button type="button" class="btn-cancel" id="video-cancel-btn" style="display:none;" onclick="resetVideoForm()">გაუქმება</button>
@@ -521,8 +604,34 @@
 
     <script src="supabase-config.js"></script>
     <script>
-        let posterCropper = null, coverCropper = null, cardCropper = null, isEditing = false, existingPosterUrl = '', existingCoverUrl = '', existingCardUrl = '';
-        let vPosterCropper = null, isVideoEditing = false, existingVPosterUrl = '';
+        let posterCropper = null, coverCropper = null, cardCropper = null, isEditing = false, existingPosterUrl = '', existingCoverUrl = '', existingCardUrl = '', existingTitleImageUrl = '';
+        let vPosterCropper = null, isVideoEditing = false, existingVPosterUrl = '', existingVTitleImageUrl = '';
+
+        function showTitleArt(type, url = '') {
+            const preview = document.getElementById(type === 'movie' ? 'title-art-preview' : 'v-title-art-preview');
+            const help = type === 'movie' ? 'თუ ბანერზე სათაური უკვე წერია, დატოვე ცარიელი.' : 'თუ ვიდეოს ფოტოზე სათაური უკვე წერია, დატოვე ცარიელი.';
+            preview.innerHTML = url ? `<img src="${url}" alt="სათაურის სურათის preview">` : `<div class="upload-placeholder"><p>PNG/WebP ლოგოს ან სათაურის ატვირთვა</p><small class="field-help">${help}</small></div>`;
+        }
+        function clearTitleArt(type) {
+            const input = document.getElementById(type === 'movie' ? 'title-art-input' : 'v-title-art-input');
+            input.value = '';
+            if (type === 'movie') existingTitleImageUrl = ''; else existingVTitleImageUrl = '';
+            showTitleArt(type);
+        }
+        function bindTitleArt(type) {
+            const input = document.getElementById(type === 'movie' ? 'title-art-input' : 'v-title-art-input');
+            input.addEventListener('change', () => { const file = input.files[0]; if (file) showTitleArt(type, URL.createObjectURL(file)); });
+        }
+        bindTitleArt('movie'); bindTitleArt('video');
+        async function uploadTitleArt(inputId, existingUrl, prefix) {
+            const file = document.getElementById(inputId).files[0];
+            if (!file) return existingUrl || null;
+            const extension = file.type === 'image/png' ? 'png' : 'webp';
+            const fileName = `${prefix}_${Date.now()}.${extension}`;
+            const { error } = await _supabase.storage.from('movie-images').upload(fileName, file);
+            if (error) throw error;
+            return _supabase.storage.from('movie-images').getPublicUrl(fileName).data.publicUrl;
+        }
         
         // Rumble ID/URL Parser (Supports raw ID, full URL, or entire IFRAME tag)
         function prepareRumbleUrl(input) {
@@ -1031,12 +1140,22 @@
             form['is_top_10'].checked = movie.is_top_10; 
             form['is_coming_soon'].checked = movie.is_coming_soon;
             form['is_official'].checked = movie.is_official || false;
+            form['hide_hero_title'].checked = movie.hide_hero_title || false;
             form['creator_url'].value = movie.creator_url || '';
+            form['studio_name'].value = movie.studio_name || '';
+            form['studio_logo_url'].value = movie.studio_logo_url || '';
+            form['studio_website_url'].value = movie.studio_website_url || movie.creator_url || '';
+            form['trailer_url'].value = movie.trailer_url || '';
+            form['cast_members'].value = movie.cast_members || '';
+            form['director_name'].value = movie.director_name || '';
+            form['writer_names'].value = movie.writer_names || '';
+            form['producer_names'].value = movie.producer_names || '';
             document.getElementById('creator-url-group').style.display = movie.is_official ? 'block' : 'none';
 
             const ratioVal = movie.display_ratio || '1:1';
             document.querySelector(`input[name="ratio_choice"][value="${ratioVal}"]`).checked = true;
-            existingPosterUrl = movie.poster_url; existingCoverUrl = movie.cover_url; existingCardUrl = movie.card_url;
+            existingPosterUrl = movie.poster_url; existingCoverUrl = movie.cover_url; existingCardUrl = movie.card_url; existingTitleImageUrl = movie.title_image_url || '';
+            showTitleArt('movie', existingTitleImageUrl);
             
             // NEW: Set Focal Sliders
             currentX = movie.mobile_pos_x || 50;
@@ -1061,6 +1180,7 @@
             document.getElementById('poster-reset').click(); 
             document.getElementById('cover-reset').click(); 
             document.getElementById('card-reset').click();
+            clearTitleArt('movie');
             
             document.getElementById('poster-placeholder').innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><p>პოსტერის ატვირთვა</p>`;
             document.getElementById('cover-placeholder').innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><p>მთავარი ბანერის ატვირთვა</p>`;
@@ -1141,6 +1261,7 @@
             const btn = document.getElementById('submit-btn'); btn.disabled = true; btn.innerText = 'იტვირთება...';
             try {
                 let poster_url = existingPosterUrl, cover_url = existingCoverUrl, card_url = existingCardUrl;
+                const title_image_url = await uploadTitleArt('title-art-input', existingTitleImageUrl, 'movie_title');
                 if (posterCropper) {
                     const canvas = posterCropper.getCroppedCanvas({ width: 600, height: 600 });
                     const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', 0.8));
@@ -1202,12 +1323,22 @@
                     poster_url: poster_url || null,
                     cover_url: cover_url || null,
                     card_url: card_url || null,
+                    title_image_url,
+                    hide_hero_title: Boolean(form['hide_hero_title'].checked),
                     duration: durationStr,
                     display_ratio: displayRatio,
                     is_top_10: Boolean(form['is_top_10'].checked),
                     is_coming_soon: finalIsSoon,
                     is_official: Boolean(form['is_official'].checked),
                     creator_url: form['is_official'].checked ? getVal('creator_url') : null,
+                    studio_name: getVal('studio_name'),
+                    studio_logo_url: getVal('studio_logo_url'),
+                    studio_website_url: getVal('studio_website_url') || (form['is_official'].checked ? getVal('creator_url') : null),
+                    trailer_url: getVal('trailer_url'),
+                    cast_members: getVal('cast_members'),
+                    director_name: getVal('director_name'),
+                    writer_names: getVal('writer_names'),
+                    producer_names: getVal('producer_names'),
                     mobile_pos_x: parseInt(currentX),
                     mobile_pos_y: parseInt(currentY)
                 };
@@ -1320,8 +1451,26 @@
             renderCategoryButtons(availableCategories);
             form['rumble_link'].value = video.rumble_link;
             form['original_link'].value = video.original_link || '';
+            form['description'].value = video.description || '';
+            form['release_year'].value = video.release_year || '';
+            form['duration'].value = video.duration || '';
+            form['rating'].value = video.rating || '';
+            form['genre'].value = video.genre || '';
+            form['cover_url'].value = video.cover_url || '';
+            form['studio_name'].value = video.studio_name || '';
+            form['studio_logo_url'].value = video.studio_logo_url || '';
+            form['studio_website_url'].value = video.studio_website_url || '';
+            form['trailer_url'].value = video.trailer_url || '';
+            form['cast_members'].value = video.cast_members || '';
+            form['director_name'].value = video.director_name || '';
+            form['writer_names'].value = video.writer_names || '';
+            form['producer_names'].value = video.producer_names || '';
+            form['is_official'].checked = video.is_official || false;
+            form['hide_hero_title'].checked = video.hide_hero_title || false;
             
             existingVPosterUrl = video.photo_url || video.poster_url || '';
+            existingVTitleImageUrl = video.title_image_url || '';
+            showTitleArt('video', existingVTitleImageUrl);
             const imgUrl = video.photo_url || video.poster_url || '';
             document.getElementById('v-poster-placeholder').innerHTML = imgUrl ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>` : `<p>ფოტოს ატვირთვა</p>`;
             
@@ -1342,6 +1491,7 @@
         function resetVideoForm() {
             document.getElementById('video-form').reset();
             document.getElementById('v-poster-reset').click();
+            clearTitleArt('video');
             document.getElementById('v-poster-placeholder').innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><p>ფოტოს ატვირთვა</p>`;
             isVideoEditing = false;
             document.getElementById('video-form-title').innerText = 'ვიდეოს დამატება';
@@ -1358,6 +1508,7 @@
 
             try {
                 let photo_url = existingVPosterUrl;
+                const title_image_url = await uploadTitleArt('v-title-art-input', existingVTitleImageUrl, 'video_title');
                 if (vPosterCropper) {
                     const canvas = vPosterCropper.getCroppedCanvas({ width: 1280, height: 720 });
                     const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', 0.8));
@@ -1376,7 +1527,24 @@
                     category: document.getElementById('video-category-hidden').value,
                     rumble_link: prepareRumbleUrl(form['rumble_link'].value.trim()),
                     original_link: form['original_link'].value.trim() || null,
-                    photo_url: photo_url
+                    photo_url: photo_url,
+                    title_image_url,
+                    hide_hero_title: Boolean(form['hide_hero_title'].checked),
+                    description: form['description'].value.trim() || null,
+                    release_year: form['release_year'].value.trim() || null,
+                    duration: form['duration'].value.trim() || null,
+                    rating: form['rating'].value ? Number(form['rating'].value) : null,
+                    genre: form['genre'].value.trim() || null,
+                    cover_url: form['cover_url'].value.trim() || null,
+                    is_official: Boolean(form['is_official'].checked),
+                    studio_name: form['studio_name'].value.trim() || null,
+                    studio_logo_url: form['studio_logo_url'].value.trim() || null,
+                    studio_website_url: form['studio_website_url'].value.trim() || null,
+                    trailer_url: form['trailer_url'].value.trim() || null,
+                    cast_members: form['cast_members'].value.trim() || null,
+                    director_name: form['director_name'].value.trim() || null,
+                    writer_names: form['writer_names'].value.trim() || null,
+                    producer_names: form['producer_names'].value.trim() || null
                 };
 
                 let result;
