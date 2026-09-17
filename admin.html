@@ -503,12 +503,13 @@
                     <div class="media-upload-grid">
                     <div class="form-group">
                         <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-                            <span>ბარათის ფოტო (სექციების სია)</span>
+                            <span>მთავარი გვერდის ბარათის ფოტო</span>
                             <div style="display: flex; gap: 10px;">
-                                <label style="font-size: 11px; color: #888; display: flex; align-items: center; gap: 4px; cursor: pointer;"><input type="radio" name="ratio_choice" value="1:1" checked onchange="updateAllRatios()" style="width:14px; height:14px;"> 1:1</label>
-                                <label style="font-size: 11px; color: #888; display: flex; align-items: center; gap: 4px; cursor: pointer;"><input type="radio" name="ratio_choice" value="16:9" onchange="updateAllRatios()" style="width:14px; height:14px;"> 16:9</label>
+                                <label style="font-size: 11px; color: #888; display: flex; align-items: center; gap: 4px; cursor: pointer;"><input type="radio" name="ratio_choice" value="1:1" onchange="updateAllRatios()" style="width:14px; height:14px;"> 1:1</label>
+                                <label style="font-size: 11px; color: #888; display: flex; align-items: center; gap: 4px; cursor: pointer;"><input type="radio" name="ratio_choice" value="16:9" checked onchange="updateAllRatios()" style="width:14px; height:14px;"> 16:9</label>
                             </div>
                         </label>
+                        <p style="margin: -4px 0 10px; color: #aeb5c2; font-size: 12px;">აირჩიე <strong>16:9</strong>, თუ გინდა ისეთი ფართო ბარათი, როგორიც მთავარ გვერდზე ჩანს. ფოტოს პირდაპირ ამ ჩარჩოში გადმოათრევ — ქვემოთ „მთავარი გვერდის ბარათი“ ზუსტად საბოლოო შედეგს აჩვენებს.</p>
                         <div class="upload-wrapper poster-wrapper" id="card-drop-zone">
                             <button type="button" class="reset-upload" id="card-reset">&times;</button>
                             <div class="upload-placeholder" id="card-placeholder" onclick="document.getElementById('card-input').click()">
@@ -1390,7 +1391,7 @@
                 cropperImg.src = e.target.result; placeholder.style.display = 'none'; cropperContainer.style.display = 'block'; btnReset.style.display = 'block';
                 let cropperVar = (type === 'poster') ? posterCropper : (type === 'cover' ? coverCropper : cardCropper);
                 if (cropperVar) cropperVar.destroy();
-                const newCropper = new Cropper(cropperImg, { aspectRatio, viewMode: 1, dragMode: 'move', guides: false, center: false, highlight: false, cropBoxMovable: false, cropBoxResizable: false, background: false, ready() { updateLivePreview(); }, cropend() { updateLivePreview(); } });
+                const newCropper = new Cropper(cropperImg, { aspectRatio, viewMode: 1, dragMode: 'move', guides: false, center: false, highlight: false, cropBoxMovable: false, cropBoxResizable: false, background: false, ready() { updateLivePreview(); }, crop() { updateLivePreview(); } });
                 if (type === 'poster') posterCropper = newCropper; 
                 else if (type === 'cover') coverCropper = newCropper;
                 else cardCropper = newCropper;
@@ -1400,7 +1401,7 @@
 
         setupCropZone('poster', 1); 
         setupCropZone('cover', 16 / 9);
-        setupCropZone('card', 1);
+        setupCropZone('card', 16 / 9);
 
         // --- TMDb metadata lookup ---
         const tmdbQueryInput = document.getElementById('tmdb-query');
