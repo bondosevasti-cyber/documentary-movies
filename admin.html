@@ -192,9 +192,247 @@
         }
         .dz-toggle-url:hover { color: #888; }
         /* ==== End Dropzone ==== */
+
+        /* ==== 2026 Admin workspace ==== */
+        .admin-page {
+            --admin-bg: #080b0f;
+            --admin-panel: #10141a;
+            --admin-panel-soft: #0d1117;
+            --admin-line: rgba(185, 197, 218, .12);
+            --admin-muted: #7f8898;
+            --admin-text: #edf1f7;
+            --admin-red: #ff4b51;
+            min-height: 100vh;
+            color: var(--admin-text);
+            background:
+                radial-gradient(circle at 68% 0%, rgba(61, 76, 100, .12), transparent 30%),
+                radial-gradient(circle at 15% 55%, rgba(37, 55, 77, .09), transparent 28%),
+                var(--admin-bg);
+        }
+        .admin-page::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .18;
+            background-image: linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+        .admin-topbar {
+            position: fixed;
+            inset: 0 0 auto 0;
+            height: 76px;
+            padding: 0 28px 0 34px;
+            z-index: 100;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 24px;
+            background: rgba(7, 10, 14, .9);
+            border-bottom: 1px solid rgba(255,255,255,.055);
+            backdrop-filter: blur(22px);
+        }
+        .admin-topbar .admin-brand { display: flex; align-items: center; gap: 13px; width: auto; text-decoration: none; }
+        .admin-topbar .admin-brand .logo-img { width: 34px; height: 34px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(130,151,255,.2)); }
+        .admin-topbar .admin-brand span { color: #bfc5d0; font-size: 13px; letter-spacing: .16em; white-space: nowrap; }
+        .admin-topbar .admin-brand strong { color: #fff; font-weight: 700; }
+        .topbar-actions { display: flex; align-items: center; gap: 12px; }
+        .admin-topbar .btn-logout { margin: 0; padding: 10px 14px; color: #aeb6c3; border: 1px solid var(--admin-line); border-radius: 10px; background: rgba(255,255,255,.025); }
+        .admin-topbar .btn-logout:hover { color: #fff; border-color: rgba(255,255,255,.24); }
+
+        .admin-page #admin-content.admin-container {
+            width: auto;
+            max-width: none;
+            margin: 0;
+            padding: 116px 34px 72px 264px;
+            display: block;
+        }
+        .admin-page #admin-content > .admin-nav {
+            position: fixed;
+            z-index: 90;
+            inset: 76px auto 0 0;
+            width: 224px;
+            margin: 0;
+            padding: 26px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+            overflow-y: auto;
+            background: linear-gradient(180deg, rgba(17,22,29,.96), rgba(10,14,19,.96));
+            border: 0;
+            border-right: 1px solid rgba(255,255,255,.055);
+            border-radius: 0;
+            backdrop-filter: blur(20px);
+        }
+        .sidebar-label { padding: 0 13px 16px; color: #636d7c; font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+        .admin-page #admin-content .admin-nav .nav-item {
+            min-height: 46px;
+            padding: 0 13px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #929baa;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            border-radius: 10px;
+            border-left: 2px solid transparent;
+            cursor: pointer;
+        }
+        .admin-page #admin-content .admin-nav .nav-item:hover { color: #fff; background: rgba(255,255,255,.04); }
+        .admin-page #admin-content .admin-nav .nav-item.active {
+            color: #fff;
+            background: linear-gradient(90deg, rgba(255,75,81,.15), rgba(255,255,255,.045));
+            border-left-color: var(--admin-red);
+            box-shadow: none;
+        }
+        .nav-icon { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; color: #aab3c0; font-size: 18px; }
+        .admin-nav .nav-item.active .nav-icon { color: #ff686d; }
+        .sidebar-support { margin-top: auto; padding: 15px 13px; display: flex; gap: 10px; border: 1px solid var(--admin-line); border-radius: 12px; background: rgba(255,255,255,.025); }
+        .sidebar-support > span { flex: 0 0 27px; height: 27px; display: grid; place-items: center; color: #69a8ff; border: 1px solid #428ef4; border-radius: 50%; font-weight: 700; }
+        .sidebar-support strong, .sidebar-support small { display: block; }
+        .sidebar-support strong { margin: 2px 0 6px; color: #dfe4eb; font-size: 12px; }
+        .sidebar-support small { color: #697382; font-size: 10px; line-height: 1.5; }
+
+        .admin-page #section-movies.admin-section.active {
+            display: grid;
+            grid-template-columns: minmax(0, 1.8fr) minmax(290px, .7fr) !important;
+            align-items: start;
+            gap: 18px;
+        }
+        .movies-page-intro { grid-column: 1 / -1; margin-bottom: 4px; }
+        .breadcrumb { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; color: #9ca5b2; font-size: 13px; }
+        .breadcrumb span { color: #5f6978; }
+        .breadcrumb b { color: #46505f; font-size: 18px; font-weight: 400; }
+        .movies-page-intro h1 { margin: 0 0 7px; font-size: clamp(28px, 3vw, 40px); line-height: 1.15; color: #eef2f7; letter-spacing: -.035em; }
+        .movies-page-intro p { margin: 0; color: #737d8d; font-size: 15px; }
+
+        .admin-page #section-movies > .admin-form-container {
+            position: static;
+            max-height: none;
+            overflow: visible;
+            padding: 24px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(17,22,29,.98), rgba(12,16,21,.98));
+            border: 1px solid var(--admin-line);
+            box-shadow: 0 22px 60px rgba(0,0,0,.22);
+        }
+        .form-card-heading { margin-bottom: 23px; padding-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 18px; border-bottom: 1px solid var(--admin-line); }
+        .form-card-heading h1 { margin: 4px 0 0; font-size: 21px; }
+        .eyebrow { color: #727c8c; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+        .draft-status { color: #aab2be; padding: 7px 10px; border: 1px solid var(--admin-line); border-radius: 999px; font-size: 11px; }
+        .draft-status::first-letter { color: #f2b94b; }
+        .media-upload-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .media-upload-grid > .form-group { margin: 0; }
+        .media-upload-grid > .form-group:first-child { grid-row: span 2; }
+        .media-upload-grid .upload-wrapper { min-height: 155px; height: 100%; margin: 0; border: 1px dashed #4a5361; border-radius: 11px; background: radial-gradient(circle at 50% 0%, rgba(106,124,153,.08), transparent 60%), #0a0e13; }
+        .media-upload-grid .form-group:first-child .upload-wrapper { min-height: 340px; }
+        .media-upload-grid .form-group:nth-child(2) .upload-wrapper,
+        .media-upload-grid .form-group:nth-child(3) .upload-wrapper { aspect-ratio: 16 / 9; }
+        .media-upload-grid .title-art-upload { aspect-ratio: auto; min-height: 132px; }
+        .media-upload-grid label { margin-bottom: 9px; color: #c8cfd9; font-size: 13px; font-weight: 600; }
+        .media-upload-grid .upload-placeholder { color: #a3acba; }
+        .media-upload-grid .upload-placeholder p { margin: 7px 0 0; font-size: 13px; }
+        .media-upload-grid .upload-placeholder svg { width: 34px; height: 34px; fill: #aeb8c7; }
+        .admin-page #movie-form > .form-group label,
+        .admin-page #movie-form > .form-row label { margin-bottom: 8px; color: #c8cfd9; font-size: 13px; font-weight: 600; }
+        .admin-page #movie-form input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+        .admin-page #movie-form textarea {
+            color: #e9edf3;
+            background: #090d12;
+            border: 1px solid #333c49;
+            border-radius: 8px;
+            min-height: 42px;
+        }
+        .admin-page #movie-form textarea { line-height: 1.55; resize: vertical; }
+        .admin-page #movie-form input:focus, .admin-page #movie-form textarea:focus { border-color: #707d90; box-shadow: 0 0 0 3px rgba(111,126,149,.11); }
+        .admin-page #movie-form .checkbox-item { color: #9ca6b5; font-size: 13px; }
+        .admin-page #movie-form .checkbox-item input { accent-color: var(--admin-red); }
+        .admin-page #movie-form > .btn-submit { float: right; width: auto; min-width: 180px; margin-top: 4px; padding: 13px 22px; color: #fff; background: linear-gradient(135deg, #ff595f, #ff343c); border-radius: 9px; box-shadow: 0 10px 28px rgba(255,57,65,.18); }
+        .admin-page #movie-form > .btn-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 13px 32px rgba(255,57,65,.25); }
+        .admin-page #movie-form > .btn-submit:disabled { color: #777f8b; background: #222831; box-shadow: none; }
+        .admin-page #movie-form > #cancel-btn { float: right; margin: 4px 10px 0 0; padding: 12px 18px; color: #aab2bf; background: transparent; border: 1px solid #343c48; border-radius: 9px; }
+        .admin-page #movie-form::after { content: ""; display: block; clear: both; }
+        .tmdb-lookup { margin-bottom: 22px; padding: 16px; background: linear-gradient(135deg, rgba(41, 100, 155, .12), rgba(15, 19, 27, .2)); border: 1px solid rgba(87, 145, 199, .28); border-radius: 11px; }
+        .tmdb-lookup-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+        .tmdb-lookup-title strong { color: #e6edf6; font-size: 14px; }
+        .tmdb-lookup-title small { color: #8492a4; font-size: 11px; }
+        .tmdb-search-row { display: flex; gap: 9px; }
+        .tmdb-search-row input { flex: 1; min-width: 0; }
+        .tmdb-search-row button { flex: 0 0 auto; padding: 0 15px; color: #dcecff; background: rgba(67, 137, 204, .22); border: 1px solid rgba(93, 162, 228, .38); border-radius: 8px; font-family: inherit; font-weight: 600; cursor: pointer; }
+        .tmdb-search-row button:disabled { opacity: .55; cursor: progress; }
+        .tmdb-status { display: none; margin: 10px 0 0; color: #8b9aab; font-size: 12px; }
+        .tmdb-results { display: grid; gap: 7px; margin-top: 11px; }
+        .tmdb-result { width: 100%; padding: 9px; display: flex; align-items: center; gap: 10px; color: #dce3ec; text-align: left; background: rgba(6, 10, 15, .66); border: 1px solid rgba(157, 175, 198, .13); border-radius: 8px; cursor: pointer; font-family: inherit; }
+        .tmdb-result:hover { background: rgba(73, 125, 175, .16); border-color: rgba(107, 167, 224, .42); }
+        .tmdb-result img, .tmdb-result .tmdb-no-poster { flex: 0 0 34px; width: 34px; height: 48px; border-radius: 4px; object-fit: cover; background: #1d2630; }
+        .tmdb-result strong, .tmdb-result small { display: block; }
+        .tmdb-result strong { font-size: 13px; }
+        .tmdb-result small { margin-top: 3px; color: #7f8b9c; font-size: 11px; }
+        .tmdb-extended { clear: both; margin: 22px 0 0; padding: 15px; background: rgba(255,255,255,.018); border: 1px solid var(--admin-line); border-radius: 10px; }
+        .tmdb-extended summary { color: #bac4d1; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .tmdb-extended[open] summary { margin-bottom: 16px; }
+        .tmdb-extra-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .tmdb-extra-grid .form-group { margin: 0; }
+        .tmdb-extra-grid .form-group.full { grid-column: 1 / -1; }
+        @media (max-width: 620px) { .tmdb-search-row { flex-direction: column; }.tmdb-search-row button { min-height: 42px; }.tmdb-extra-grid { grid-template-columns: 1fr; }.tmdb-extra-grid .form-group.full { grid-column: auto; } }
+
+        .admin-page #section-movies > .admin-lists-grid {
+            display: flex !important;
+            flex-direction: column;
+            gap: 14px !important;
+        }
+        .upload-guide-card, .admin-page #section-movies .movie-list-container { padding: 18px; background: linear-gradient(180deg, #11161d, #0d1117); border: 1px solid var(--admin-line); border-radius: 13px; box-shadow: 0 20px 45px rgba(0,0,0,.14); }
+        .upload-guide-card h3, .admin-page #section-movies .movie-list-container h2 { margin: 0 0 15px; color: #dfe4ec; font-size: 14px; }
+        .guide-poster { position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 8px; background: #090c10; }
+        .guide-poster::after { content: ""; position: absolute; inset: 35% 0 0; background: linear-gradient(transparent, rgba(3,4,6,.94)); }
+        .guide-poster img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.75) contrast(1.08); }
+        .guide-poster div { position: absolute; z-index: 1; inset: auto 16px 16px; text-align: center; }
+        .guide-poster strong, .guide-poster small { display: block; }
+        .guide-poster strong { color: #fff; font-size: 16px; }
+        .guide-poster small { margin-top: 5px; color: #939ca9; font-size: 11px; }
+        .requirements-card ul { list-style: none; margin: 0; padding: 0; }
+        .requirements-card li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; color: #9aa4b3; font-size: 12px; line-height: 1.5; }
+        .requirements-card li span { flex: 0 0 18px; height: 18px; display: grid; place-items: center; color: #91dc54; border: 1px solid #74bd3d; border-radius: 50%; font-size: 10px; }
+        .admin-page #section-movies .movie-list-container { overflow-x: auto; }
+        .admin-page #section-movies .movie-table th, .admin-page #section-movies .movie-table td { padding: 10px 7px; font-size: 11px; border-color: rgba(255,255,255,.07); }
+        .admin-page #section-movies .movie-table th { color: #6f7989; font-weight: 500; }
+        .admin-page #section-movies .movie-table td { color: #aab3c0; }
+
+        @media (max-width: 1180px) {
+            .admin-page #section-movies.admin-section.active { grid-template-columns: minmax(0, 1fr) 280px !important; }
+            .media-upload-grid { grid-template-columns: 1fr; }
+            .media-upload-grid > .form-group:first-child { grid-row: auto; }
+            .media-upload-grid .form-group:first-child .upload-wrapper { min-height: 280px; }
+        }
+        @media (max-width: 900px) {
+            .admin-topbar { height: 68px; grid-template-columns: 1fr auto; padding: 0 18px; }
+            .admin-topbar .admin-brand span { display: none; }
+            .admin-page #admin-content.admin-container { padding: 92px 16px 56px; }
+            .admin-page #admin-content > .admin-nav { position: static; width: 100%; margin: 0 0 22px; padding: 7px; flex-direction: row; border: 1px solid var(--admin-line); border-radius: 12px; overflow-x: auto; }
+            .sidebar-label, .sidebar-support { display: none; }
+            .admin-page #admin-content .admin-nav .nav-item { min-width: max-content; min-height: 40px; padding: 0 12px; border-left: 0; border-bottom: 2px solid transparent; }
+            .admin-page #admin-content .admin-nav .nav-item.active { border-left: 0; border-bottom-color: var(--admin-red); }
+            .admin-page #section-movies.admin-section.active { grid-template-columns: 1fr !important; }
+            .movies-page-intro { grid-column: 1; }
+            .admin-page #section-movies > .admin-lists-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+            .admin-page #section-movies .movie-list-container { grid-column: 1 / -1; }
+        }
+        @media (max-width: 620px) {
+            .movies-page-intro h1 { font-size: 30px; }
+            .movies-page-intro p { font-size: 13px; }
+            .admin-page #section-movies > .admin-form-container { padding: 17px; }
+            .admin-page #section-movies > .admin-lists-grid { display: flex !important; }
+            .form-card-heading { align-items: flex-start; }
+            .draft-status { display: none; }
+            .admin-page #movie-form .form-row { grid-template-columns: 1fr !important; flex-direction: column; }
+            .checkbox-group { flex-direction: column; gap: 10px; }
+        }
+        /* ==== End admin workspace ==== */
     </style>
 </head>
-<body>
+<body class="admin-page">
 
     <div id="login-overlay">
         <div class="admin-form-container" style="width: 400px; position: static;">
@@ -212,26 +450,57 @@
         </div>
     </div>
 
-    <header>
-        <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="სტუდია პრიზმა" class="logo-img"></a>
-        <button class="btn-logout" id="logout-btn" style="float: right; margin: 20px;" onclick="handleLogout()">გამოსვლა</button>
+    <header class="admin-topbar">
+        <a href="index.html" class="logo admin-brand">
+            <img src="images/logo/Logo.png" alt="სტუდია პრიზმა" class="logo-img">
+            <span>STUDIO <strong>PRISMA</strong></span>
+        </a>
+        <div class="topbar-actions">
+            <button class="btn-logout" id="logout-btn" onclick="handleLogout()">გამოსვლა</button>
+        </div>
     </header>
 
     <div class="admin-container" id="admin-content" style="display: none; grid-template-columns: 1fr;">
         <div class="admin-nav">
-            <div class="nav-item active" id="nav-movies" onclick="switchSection('movies')">ფილმები</div>
-            <a href="admin_articles.html" class="nav-item" style="text-decoration: none;">სტატიები</a>
-            <div class="nav-item" id="nav-videos" onclick="switchSection('videos')">ვიდეოების მართვა</div>
-            <div class="nav-item" id="nav-push" onclick="switchSection('push')">🔔 შეტყობინებები</div>
-            <div class="nav-item" id="nav-settings" onclick="switchSection('settings')">⚙️ პარამეტრები</div>
+            <div class="sidebar-label">ადმინპანელი</div>
+            <div class="nav-item active" id="nav-movies" onclick="switchSection('movies')"><span class="nav-icon">＋</span> ფილმის ატვირთვა</div>
+            <a href="admin_articles.html" class="nav-item"><span class="nav-icon">▤</span> სტატიები</a>
+            <div class="nav-item" id="nav-videos" onclick="switchSection('videos')"><span class="nav-icon">▶</span> ვიდეოების მართვა</div>
+            <div class="nav-item" id="nav-push" onclick="switchSection('push')"><span class="nav-icon">♢</span> შეტყობინებები</div>
+            <div class="nav-item" id="nav-settings" onclick="switchSection('settings')"><span class="nav-icon">⚙</span> პარამეტრები</div>
+            <div class="sidebar-support">
+                <span>?</span>
+                <div><strong>დახმარება?</strong><small>თუ რაიმე კითხვა გაქვს, დაგვიკავშირდი.</small></div>
+            </div>
         </div>
 
         <!-- MOVIES SECTION -->
         <div id="section-movies" class="admin-section active" style="grid-template-columns: 1fr 2fr;">
+            <div class="movies-page-intro">
+                <div class="breadcrumb"><span>მთავარი</span><b>›</b>ფილმის ატვირთვა</div>
+                <h1>ფილმის ატვირთვა</h1>
+                <p>შეავსე ინფორმაცია, დაამატე ვიზუალური მასალა და გამოაქვეყნე ფილმი.</p>
+            </div>
             <div class="admin-form-container">
-                <h1 id="form-title">ფილმის დამატება</h1>
+                <div class="form-card-heading">
+                    <div><span class="eyebrow">ახალი ჩანაწერი</span><h1 id="form-title">ფილმის დამატება</h1></div>
+                    <span class="draft-status">● მონახაზი</span>
+                </div>
                 <form id="movie-form">
                     <input type="hidden" name="movie_id" id="movie-id">
+                    <section class="tmdb-lookup" aria-label="TMDb-დან ფილმის დეტალების წამოღება">
+                        <div class="tmdb-lookup-title">
+                            <strong>IMDb / TMDb ბმულით ავტომატური შევსება</strong>
+                            <small>ჩასვით ფილმის ბმული — ყველა ველი და სურათი შეივსება</small>
+                        </div>
+                        <div class="tmdb-search-row">
+                            <input type="search" id="tmdb-query" placeholder="ჩასვით IMDb ან TMDb ფილმის ბმული" autocomplete="off">
+                            <button type="button" id="tmdb-search-btn">ავტომატური შევსება</button>
+                        </div>
+                        <p class="tmdb-status" id="tmdb-status" aria-live="polite"></p>
+                        <div class="tmdb-results" id="tmdb-results"></div>
+                    </section>
+                    <div class="media-upload-grid">
                     <div class="form-group">
                         <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
                             <span>ბარათის ფოტო (სექციების სია)</span>
@@ -285,6 +554,7 @@
                         <input type="file" id="title-art-input" accept="image/png,image/webp" style="display:none;">
                         <button type="button" class="btn-cancel" onclick="clearTitleArt('movie')">სათაურის სურათის წაშლა</button>
                     </div>
+                    </div>
 
                     <label class="checkbox-item" style="margin: -2px 0 20px;">
                         <input type="checkbox" name="hide_hero_title">
@@ -335,6 +605,26 @@
                         <div class="form-group"><label>პროდიუსერი</label><input type="text" name="producer_names"></div>
                     </div>
 
+                    <details class="tmdb-extended">
+                        <summary>დამატებითი მონაცემები TMDb / IMDb-დან</summary>
+                        <div class="tmdb-extra-grid">
+                            <div class="form-group"><label>TMDb ID</label><input type="number" name="tmdb_id" readonly></div>
+                            <div class="form-group"><label>IMDb ID</label><input type="text" name="imdb_id" readonly></div>
+                            <div class="form-group"><label>ორიგინალი სათაური</label><input type="text" name="original_title"></div>
+                            <div class="form-group"><label>ორიგინალი ენა</label><input type="text" name="original_language"></div>
+                            <div class="form-group"><label>ასაკობრივი შეზღუდვა</label><input type="text" name="content_rating"></div>
+                            <div class="form-group"><label>ხმების რაოდენობა</label><input type="number" name="vote_count"></div>
+                            <div class="form-group"><label>ბიუჯეტი (USD)</label><input type="number" name="budget"></div>
+                            <div class="form-group"><label>შემოსავალი (USD)</label><input type="number" name="revenue"></div>
+                            <div class="form-group full"><label>სლოგანი</label><input type="text" name="tagline"></div>
+                            <div class="form-group full"><label>მწარმოებელი კომპანიები</label><input type="text" name="production_companies"></div>
+                            <div class="form-group"><label>მწარმოებელი ქვეყნები</label><input type="text" name="production_countries"></div>
+                            <div class="form-group"><label>სასაუბრო ენები</label><input type="text" name="spoken_languages"></div>
+                            <div class="form-group"><label>TMDb ბმული</label><input type="url" name="tmdb_url" placeholder="https://www.themoviedb.org/movie/..." title="ჩასვით ბმული და მონაცემები ავტომატურად შეივსება"></div>
+                            <div class="form-group"><label>IMDb ბმული</label><input type="url" name="imdb_url" placeholder="https://www.imdb.com/title/tt.../" title="ჩასვით ბმული და მონაცემები ავტომატურად შეივსება"></div>
+                        </div>
+                    </details>
+
                     <!-- Focal Point Controls -->
                     <div style="background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333;">
                         <h4 style="margin-top: 0; color: #aaa; font-size: 14px;">Mobile Focal Point (მობილურის ფოკუსი)</h4>
@@ -379,6 +669,24 @@
             </div>
 
             <div class="admin-lists-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                <aside class="upload-guide-card">
+                    <h3>წინასწარი ნახვა</h3>
+                    <div class="guide-poster">
+                        <img src="images/first/ჰობიტი.webp" alt="ფილმის ბარათის მაგალითი">
+                        <div><strong>ფილმის სათაური</strong><small>დოკუმენტური • 2026</small></div>
+                    </div>
+                </aside>
+
+                <aside class="upload-guide-card requirements-card">
+                    <h3>მოთხოვნები</h3>
+                    <ul>
+                        <li><span>✓</span> გამოიყენე მაღალი ხარისხის ფოტო</li>
+                        <li><span>✓</span> მთავარი ბანერის ფორმატი — 16:9</li>
+                        <li><span>✓</span> შეავსე ყველა აუცილებელი ველი</li>
+                        <li><span>✓</span> გადაამოწმე ბმულები გამოქვეყნებამდე</li>
+                    </ul>
+                </aside>
+
                 <div class="movie-list-container">
                     <h2>ფილმების სია</h2>
                     <table class="movie-table">
@@ -975,8 +1283,13 @@
             document.getElementById('admin-content').style.display = 'grid';
             document.getElementById('submit-btn').disabled = false;
             document.getElementById('submit-btn').innerText = 'ფილმის შენახვა';
-            loadMovies();
-            loadTop5Manager();
+            const requestedSection = window.location.hash.replace('#', '');
+            if (['videos', 'push', 'settings'].includes(requestedSection)) {
+                switchSection(requestedSection);
+            } else {
+                loadMovies();
+                loadTop5Manager();
+            }
         }
 
         let allMovies = [];
@@ -1066,6 +1379,176 @@
         setupCropZone('poster', 1); 
         setupCropZone('cover', 16 / 9);
         setupCropZone('card', 1);
+
+        // --- TMDb metadata lookup ---
+        const tmdbQueryInput = document.getElementById('tmdb-query');
+        const tmdbSearchButton = document.getElementById('tmdb-search-btn');
+        const tmdbResults = document.getElementById('tmdb-results');
+        const tmdbStatus = document.getElementById('tmdb-status');
+
+        function setTmdbStatus(message = '', isError = false) {
+            tmdbStatus.textContent = message;
+            tmdbStatus.style.display = message ? 'block' : 'none';
+            tmdbStatus.style.color = isError ? '#ff8f94' : '#8b9aab';
+        }
+
+        async function callTmdbLookup(payload) {
+            const { data, error } = await _supabase.functions.invoke('tmdb-movie-lookup', { body: payload });
+            if (error) throw new Error(error.message || 'TMDb ფუნქცია ვერ გაეშვა.');
+            if (data?.error) throw new Error(data.error);
+            return data;
+        }
+
+        function renderTmdbResults(results) {
+            tmdbResults.innerHTML = '';
+            results.forEach((movie) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'tmdb-result';
+                const poster = movie.posterUrl
+                    ? `<img src="${movie.posterUrl}" alt="">`
+                    : '<span class="tmdb-no-poster">—</span>';
+                const year = movie.releaseDate ? movie.releaseDate.slice(0, 4) : 'წელი უცნობია';
+                button.innerHTML = `${poster}<span><strong></strong><small></small></span>`;
+                button.querySelector('strong').textContent = movie.title || movie.originalTitle || 'უსათაურო ფილმი';
+                button.querySelector('small').textContent = `${year}${movie.originalTitle && movie.originalTitle !== movie.title ? ` • ${movie.originalTitle}` : ''}`;
+                button.addEventListener('click', () => fillMovieFromTmdb(movie.id));
+                tmdbResults.appendChild(button);
+            });
+        }
+
+        async function searchTmdbMovies() {
+            const query = tmdbQueryInput.value.trim();
+            if (query.length < 2) {
+                setTmdbStatus('ჩასვით IMDb/TMDb ბმული ან ჩაწერეთ ფილმის სათაური.', true);
+                return;
+            }
+            tmdbSearchButton.disabled = true;
+            tmdbSearchButton.textContent = 'იტვირთება...';
+            tmdbResults.innerHTML = '';
+            setTmdbStatus('ფილმის მონაცემები იტვირთება...');
+            try {
+                const result = await callTmdbLookup({ action: 'lookup', query });
+                if (result.movie) {
+                    await fillMovieFromTmdb(result.movie.tmdbId, result.movie);
+                    return;
+                }
+                const { results } = result;
+                if (!results?.length) {
+                    setTmdbStatus('ფილმი ვერ მოიძებნა. სცადეთ IMDb/TMDb ბმული ან ორიგინალი სათაური.', true);
+                    return;
+                }
+                renderTmdbResults(results);
+                setTmdbStatus('სათაურით ძიებისას აირჩიეთ ზუსტი ფილმი სიიდან.');
+            } catch (error) {
+                setTmdbStatus(error.message, true);
+            } finally {
+                tmdbSearchButton.disabled = false;
+                tmdbSearchButton.textContent = 'ავტომატური შევსება';
+            }
+        }
+
+        async function setTmdbImage(url, type, aspectRatio) {
+            if (!url) return;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('TMDb სურათის ჩამოტვირთვა ვერ მოხერხდა.');
+            const blob = await response.blob();
+            const file = new File([blob], `tmdb_${type}.jpg`, { type: blob.type || 'image/jpeg' });
+            initCropper(file, type, aspectRatio);
+        }
+
+        function setMovieField(form, name, value) {
+            if (form[name]) form[name].value = value ?? '';
+        }
+
+        async function fillMovieFromTmdb(movieId, prefetchedMovie = null) {
+            tmdbResults.innerHTML = '';
+            tmdbSearchButton.disabled = true;
+            tmdbSearchButton.textContent = 'ივსება...';
+            setTmdbStatus('ინფორმაცია და სურათები იტვირთება...');
+            try {
+                const movie = prefetchedMovie || (await callTmdbLookup({ action: 'details', movieId })).movie;
+                const form = document.getElementById('movie-form');
+                setMovieField(form, 'title', movie.title);
+                setMovieField(form, 'genre', movie.genres);
+                setMovieField(form, 'description', movie.overview);
+                setMovieField(form, 'release_year', movie.year);
+                setMovieField(form, 'rating', movie.rating);
+                setMovieField(form, 'cast_members', movie.cast);
+                setMovieField(form, 'director_name', movie.directors);
+                setMovieField(form, 'writer_names', movie.writers);
+                setMovieField(form, 'producer_names', movie.producers);
+                setMovieField(form, 'trailer_url', movie.trailerUrl);
+                setMovieField(form, 'tmdb_id', movie.tmdbId);
+                setMovieField(form, 'imdb_id', movie.imdbId);
+                setMovieField(form, 'original_title', movie.originalTitle);
+                setMovieField(form, 'original_language', movie.originalLanguage);
+                setMovieField(form, 'tagline', movie.tagline);
+                setMovieField(form, 'content_rating', movie.certification);
+                setMovieField(form, 'vote_count', movie.voteCount);
+                setMovieField(form, 'production_companies', movie.productionCompanies);
+                setMovieField(form, 'production_countries', movie.productionCountries);
+                setMovieField(form, 'spoken_languages', movie.spokenLanguages);
+                setMovieField(form, 'budget', movie.budget);
+                setMovieField(form, 'revenue', movie.revenue);
+                setMovieField(form, 'tmdb_url', movie.tmdbUrl);
+                setMovieField(form, 'imdb_url', movie.imdbUrl);
+
+                const runtime = Number(movie.runtime || 0);
+                form['dur_h'].value = runtime ? Math.floor(runtime / 60) : '';
+                form['dur_m'].value = runtime ? runtime % 60 : '';
+                const cardRatio = document.querySelector('input[name="ratio_choice"]:checked').value === '16:9' ? 16 / 9 : 1;
+                const imageTasks = [
+                    setTmdbImage(movie.posterUrl, 'poster', 1),
+                    setTmdbImage(movie.posterUrl, 'card', cardRatio),
+                    setTmdbImage(movie.backdropUrl, 'cover', 16 / 9),
+                ].filter(Boolean);
+                const imageResults = await Promise.allSettled(imageTasks);
+                if (imageResults.some((result) => result.status === 'rejected')) {
+                    setTmdbStatus('მონაცემები შეივსო. ერთი ან მეტი სურათი ხელით ატვირთეთ.', true);
+                } else {
+                    setTmdbStatus('მონაცემები და სურათები შეივსო. შეამოწმეთ და შეინახეთ ფილმი.');
+                }
+                document.querySelector('.tmdb-extended').open = true;
+                updateLivePreview();
+            } catch (error) {
+                setTmdbStatus(error.message, true);
+            } finally {
+                tmdbSearchButton.disabled = false;
+                tmdbSearchButton.textContent = 'ავტომატური შევსება';
+            }
+        }
+
+        tmdbSearchButton.addEventListener('click', searchTmdbMovies);
+        tmdbQueryInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                searchTmdbMovies();
+            }
+        });
+
+        let lastMetadataLookup = '';
+        function lookupFromMetadataLink(value) {
+            const link = value.trim();
+            if (!link || link === lastMetadataLookup) return;
+            lastMetadataLookup = link;
+            tmdbQueryInput.value = link;
+            searchTmdbMovies();
+        }
+
+        ['tmdb_url', 'imdb_url'].forEach((fieldName) => {
+            const field = document.querySelector(`#movie-form [name="${fieldName}"]`);
+            field.addEventListener('paste', () => {
+                window.setTimeout(() => lookupFromMetadataLink(field.value), 0);
+            });
+            field.addEventListener('change', () => lookupFromMetadataLink(field.value));
+            field.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    lookupFromMetadataLink(field.value);
+                }
+            });
+        });
         
         // Setup for video poster
         const vDropZone = document.getElementById('v-poster-drop-zone'), 
@@ -1150,6 +1633,9 @@
             form['director_name'].value = movie.director_name || '';
             form['writer_names'].value = movie.writer_names || '';
             form['producer_names'].value = movie.producer_names || '';
+            ['tmdb_id', 'imdb_id', 'original_title', 'original_language', 'tagline', 'content_rating', 'vote_count', 'production_companies', 'production_countries', 'spoken_languages', 'budget', 'revenue', 'tmdb_url', 'imdb_url'].forEach((field) => {
+                if (form[field]) form[field].value = movie[field] || '';
+            });
             document.getElementById('creator-url-group').style.display = movie.is_official ? 'block' : 'none';
 
             const ratioVal = movie.display_ratio || '1:1';
@@ -1189,6 +1675,10 @@
             document.getElementById('preview-image-desktop').src = '';
             document.getElementById('preview-image-mobile').src = '';
             currentX = 50; currentY = 50;
+            tmdbQueryInput.value = '';
+            tmdbResults.innerHTML = '';
+            setTmdbStatus();
+            lastMetadataLookup = '';
             isEditing = false; document.getElementById('form-title').innerText = 'ფილმის დამატება'; document.getElementById('submit-btn').innerText = 'ფილმის შენახვა'; document.getElementById('cancel-btn').style.display = 'none';
             document.getElementById('creator-url-group').style.display = 'none';
         }
@@ -1339,6 +1829,20 @@
                     director_name: getVal('director_name'),
                     writer_names: getVal('writer_names'),
                     producer_names: getVal('producer_names'),
+                    tmdb_id: form['tmdb_id'].value ? parseInt(form['tmdb_id'].value) : null,
+                    imdb_id: getVal('imdb_id'),
+                    original_title: getVal('original_title'),
+                    original_language: getVal('original_language'),
+                    tagline: getVal('tagline'),
+                    content_rating: getVal('content_rating'),
+                    vote_count: form['vote_count'].value ? parseInt(form['vote_count'].value) : null,
+                    production_companies: getVal('production_companies'),
+                    production_countries: getVal('production_countries'),
+                    spoken_languages: getVal('spoken_languages'),
+                    budget: form['budget'].value ? parseInt(form['budget'].value) : null,
+                    revenue: form['revenue'].value ? parseInt(form['revenue'].value) : null,
+                    tmdb_url: getVal('tmdb_url'),
+                    imdb_url: getVal('imdb_url'),
                     mobile_pos_x: parseInt(currentX),
                     mobile_pos_y: parseInt(currentY)
                 };

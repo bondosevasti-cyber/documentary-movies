@@ -195,10 +195,185 @@
                 position: static;
             }
         }
+
+        /* 2026 article workspace */
+        .articles-admin-page {
+            --admin-bg: #080b0f;
+            --admin-panel: #10151c;
+            --admin-line: rgba(185, 197, 218, .12);
+            --admin-muted: #7c8696;
+            --admin-red: #ff4b51;
+            min-height: 100vh;
+            color: #edf1f7;
+            background:
+                radial-gradient(circle at 72% 0%, rgba(61, 76, 100, .12), transparent 30%),
+                radial-gradient(circle at 14% 55%, rgba(37, 55, 77, .08), transparent 28%),
+                var(--admin-bg);
+        }
+        .articles-admin-page::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .16;
+            background-image: linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+        .articles-topbar {
+            position: fixed;
+            inset: 0 0 auto;
+            z-index: 100;
+            height: 76px;
+            padding: 0 28px 0 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(7,10,14,.91);
+            border-bottom: 1px solid rgba(255,255,255,.055);
+            backdrop-filter: blur(22px);
+        }
+        .articles-brand { display: flex; align-items: center; gap: 13px; color: #bfc5d0; text-decoration: none; }
+        .articles-brand img { width: 34px; height: 34px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(130,151,255,.2)); }
+        .articles-brand span { font-size: 13px; letter-spacing: .16em; }
+        .articles-brand strong { color: #fff; }
+        .articles-logout { padding: 10px 15px; color: #aeb6c3; border: 1px solid var(--admin-line); border-radius: 10px; background: rgba(255,255,255,.025); cursor: pointer; font-family: inherit; }
+        .articles-logout:hover { color: #fff; border-color: rgba(255,255,255,.24); }
+
+        .articles-admin-page .admin-wrapper {
+            width: auto;
+            max-width: none;
+            margin: 0;
+            padding: 116px 34px 70px 264px;
+        }
+        .articles-admin-page .admin-wrapper > .admin-nav {
+            position: fixed;
+            z-index: 90;
+            inset: 76px auto 0 0;
+            width: 224px;
+            margin: 0;
+            padding: 26px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+            overflow-y: auto;
+            background: linear-gradient(180deg, rgba(17,22,29,.96), rgba(10,14,19,.96));
+            border: 0;
+            border-right: 1px solid rgba(255,255,255,.055);
+        }
+        .sidebar-label { padding: 0 13px 16px; color: #636d7c; font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+        .articles-admin-page .admin-wrapper > .admin-nav .nav-item {
+            min-height: 46px;
+            padding: 0 13px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #929baa;
+            background: transparent;
+            border: 0;
+            border-left: 2px solid transparent;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .articles-admin-page .admin-wrapper > .admin-nav .nav-item:hover { color: #fff; background: rgba(255,255,255,.04); }
+        .articles-admin-page .admin-wrapper > .admin-nav .nav-item.active { color: #fff; background: linear-gradient(90deg, rgba(255,75,81,.15), rgba(255,255,255,.045)); border-left-color: var(--admin-red); }
+        .nav-icon { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; color: #aab3c0; font-size: 18px; }
+        .admin-nav .nav-item.active .nav-icon { color: #ff686d; }
+        .sidebar-support { margin-top: auto; padding: 15px 13px; display: flex; gap: 10px; border: 1px solid var(--admin-line); border-radius: 12px; background: rgba(255,255,255,.025); }
+        .sidebar-support > span { flex: 0 0 27px; height: 27px; display: grid; place-items: center; color: #69a8ff; border: 1px solid #428ef4; border-radius: 50%; font-weight: 700; }
+        .sidebar-support strong, .sidebar-support small { display: block; }
+        .sidebar-support strong { margin: 2px 0 6px; color: #dfe4eb; font-size: 12px; }
+        .sidebar-support small { color: #697382; font-size: 10px; line-height: 1.5; }
+
+        .articles-page-intro { margin-bottom: 24px; }
+        .breadcrumb { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; color: #9ca5b2; font-size: 13px; }
+        .breadcrumb span { color: #5f6978; }
+        .breadcrumb b { color: #46505f; font-size: 18px; font-weight: 400; }
+        .articles-page-intro h1 { margin: 0 0 7px; color: #eef2f7; font-size: clamp(28px, 3vw, 40px); line-height: 1.15; letter-spacing: -.035em; }
+        .articles-page-intro p { margin: 0; color: #737d8d; font-size: 15px; }
+
+        .articles-admin-page .admin-grid { grid-template-columns: minmax(390px, .95fr) minmax(0, 1.55fr); gap: 18px; align-items: start; }
+        .articles-admin-page .form-card,
+        .articles-admin-page .list-card {
+            background: linear-gradient(180deg, rgba(17,22,29,.98), rgba(12,16,21,.98));
+            border: 1px solid var(--admin-line);
+            border-radius: 14px;
+            box-shadow: 0 22px 60px rgba(0,0,0,.2);
+        }
+        .articles-admin-page .form-card { top: 94px; padding: 24px; }
+        .articles-admin-page .list-card { padding: 24px; overflow: hidden; }
+        .form-card-heading, .list-card-heading { margin-bottom: 23px; padding-bottom: 18px; display: flex; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 1px solid var(--admin-line); }
+        .form-card-heading span, .list-card-heading span { color: #727c8c; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }
+        .form-card-heading h2, .list-card-heading h2 { margin: 4px 0 0; color: #edf1f7; font-size: 21px; }
+        .form-card-heading small { padding: 7px 10px; color: #aab2be; border: 1px solid var(--admin-line); border-radius: 999px; font-size: 11px; }
+        .list-card-heading strong { padding: 7px 10px; color: #9ca6b5; border: 1px solid var(--admin-line); border-radius: 999px; font-size: 11px; font-weight: 500; }
+        .articles-admin-page .form-group { margin-bottom: 18px; }
+        .articles-admin-page .form-group label { margin-bottom: 8px; color: #c8cfd9; font-size: 13px; font-weight: 600; }
+        .articles-admin-page .form-group input,
+        .articles-admin-page .form-group textarea,
+        .articles-admin-page .form-group select {
+            min-height: 43px;
+            padding: 11px 12px;
+            color: #e9edf3;
+            background: #090d12;
+            border: 1px solid #333c49;
+            border-radius: 8px;
+            outline: none;
+        }
+        .articles-admin-page .form-group input:focus,
+        .articles-admin-page .form-group textarea:focus { border-color: #707d90; box-shadow: 0 0 0 3px rgba(111,126,149,.11); }
+        #category-list .nav-item { min-height: 34px; padding: 6px 13px !important; color: #a9b2c0; background: #0b0f14; border: 1px solid #353d49; border-radius: 999px !important; font-weight: 500; }
+        #category-list .nav-item.active { color: #fff; background: #ef434a; border-color: #ef434a; box-shadow: 0 7px 18px rgba(239,67,74,.18); }
+        #btn-toggle-new-cat { padding: 8px 14px !important; color: #818b9a !important; border-color: #3a4350 !important; }
+        #thumbnail-drop-zone { padding: 20px !important; background: radial-gradient(circle at 50% 0%, rgba(106,124,153,.08), transparent 60%), #090d12; border: 1px dashed #4a5361 !important; border-radius: 11px !important; }
+        #thumbnail-drop-zone:hover { border-color: #778396 !important; }
+        #thumbnail-file { padding: 10px !important; font-size: 12px; }
+        #editor-container { height: 360px; color: #e9edf3; background: #090d12; border: 1px solid #333c49; border-radius: 0 0 9px 9px; }
+        .ql-toolbar.ql-snow { background: #151b23; border: 1px solid #333c49; border-radius: 9px 9px 0 0; }
+        .ql-container.ql-snow { border: 1px solid #333c49; }
+        .ql-snow .ql-stroke { stroke: #aeb7c4; }
+        .ql-snow .ql-fill { fill: #aeb7c4; }
+        .ql-snow .ql-picker { color: #aeb7c4; }
+        .articles-admin-page .btn-save { width: auto; min-width: 180px; float: right; margin-top: 4px; padding: 13px 22px; border-radius: 9px; background: linear-gradient(135deg, #ff595f, #ff343c); box-shadow: 0 10px 28px rgba(255,57,65,.18); }
+        .articles-admin-page #btn-cancel { width: auto !important; float: right; margin: 4px 10px 0 0 !important; padding: 12px 18px !important; color: #aab2bf !important; background: transparent !important; border: 1px solid #343c48 !important; border-radius: 9px; }
+        .articles-admin-page .form-card::after { content: ""; display: block; clear: both; }
+
+        .articles-admin-page .article-table th { padding: 12px 10px; color: #687383; border-bottom: 1px solid var(--admin-line); font-size: 12px; font-weight: 600; }
+        .articles-admin-page .article-table td { padding: 16px 10px; border-bottom: 1px solid rgba(255,255,255,.065); }
+        .articles-admin-page .article-row-title { color: #e5eaf1; font-size: 14px; line-height: 1.45; }
+        .articles-admin-page .article-row-meta { margin-top: 5px; color: #667181; font-size: 11px; }
+        .articles-admin-page .actions { justify-content: flex-end; }
+        .articles-admin-page .btn-action { padding: 8px 11px; border-radius: 7px; font-family: inherit; font-size: 11px; }
+        .articles-admin-page .btn-edit { color: #cfe6ff; background: rgba(61,143,224,.25); border: 1px solid rgba(77,158,235,.35); }
+        .articles-admin-page .btn-delete { color: #ffd5d2; background: rgba(231,76,60,.22); border: 1px solid rgba(239,83,69,.32); }
+
+        @media (max-width: 1120px) {
+            .articles-admin-page .admin-grid { grid-template-columns: 1fr; }
+            .articles-admin-page .form-card { position: static; }
+        }
+        @media (max-width: 900px) {
+            .articles-topbar { height: 68px; padding: 0 18px; }
+            .articles-brand span { display: none; }
+            .articles-admin-page .admin-wrapper { padding: 92px 16px 56px; }
+            .articles-admin-page .admin-wrapper > .admin-nav { position: static; width: 100%; margin: 0 0 22px; padding: 7px; flex-direction: row; border: 1px solid var(--admin-line); border-radius: 12px; overflow-x: auto; }
+            .sidebar-label, .sidebar-support { display: none; }
+            .articles-admin-page .admin-wrapper > .admin-nav .nav-item { min-width: max-content; min-height: 40px; padding: 0 12px; border-left: 0; border-bottom: 2px solid transparent; }
+            .articles-admin-page .admin-wrapper > .admin-nav .nav-item.active { border-left: 0; border-bottom-color: var(--admin-red); }
+        }
+        @media (max-width: 620px) {
+            .articles-page-intro h1 { font-size: 30px; }
+            .articles-page-intro p { font-size: 13px; }
+            .articles-admin-page .form-card, .articles-admin-page .list-card { padding: 17px; }
+            .form-card-heading small { display: none; }
+            .articles-admin-page .article-table th:last-child { text-align: right; }
+            .articles-admin-page .actions { flex-direction: column; }
+        }
     </style>
 </head>
 
-<body>
+<body class="articles-admin-page">
     <!-- Auth Check -->
     <div id="login-overlay">
         <div style="text-align: center; background: #111; padding: 40px; border-radius: 15px; width: 320px;">
@@ -211,25 +386,41 @@
         </div>
     </div>
 
-    <header>
-        <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="სტუდია სენაკი" class="logo-img"></a>
-        <nav>
-            <a href="admin.html">ფილმები & ვიდეოები</a>
-            <a href="admin_articles.html" class="active">სტატიები</a>
-            <button onclick="handleLogout()" class="btn-support" style="background: transparent; border: 1px solid #333;">გასვლა</button>
-        </nav>
+    <header class="articles-topbar">
+        <a href="index.html" class="articles-brand">
+            <img src="images/logo/Logo.png" alt="სტუდია პრიზმა">
+            <span>STUDIO <strong>PRISMA</strong></span>
+        </a>
+        <button onclick="handleLogout()" class="articles-logout">გამოსვლა</button>
     </header>
 
     <div class="admin-wrapper" id="admin-panel" style="display: none;">
         <div class="admin-nav">
-            <a href="admin.html" class="nav-item">ფილმები & ვიდეოები</a>
-            <a href="admin_articles.html" class="nav-item active">სტატიების მართვა</a>
+            <div class="sidebar-label">ადმინპანელი</div>
+            <a href="admin.html" class="nav-item"><span class="nav-icon">＋</span> ფილმის ატვირთვა</a>
+            <a href="admin_articles.html" class="nav-item active"><span class="nav-icon">▤</span> სტატიები</a>
+            <a href="admin.html#videos" class="nav-item"><span class="nav-icon">▶</span> ვიდეოების მართვა</a>
+            <a href="admin.html#push" class="nav-item"><span class="nav-icon">♢</span> შეტყობინებები</a>
+            <a href="admin.html#settings" class="nav-item"><span class="nav-icon">⚙</span> პარამეტრები</a>
+            <div class="sidebar-support">
+                <span>?</span>
+                <div><strong>დახმარება?</strong><small>თუ რაიმე კითხვა გაქვს, დაგვიკავშირდი.</small></div>
+            </div>
+        </div>
+
+        <div class="articles-page-intro">
+            <div class="breadcrumb"><span>ადმინპანელი</span><b>›</b>სტატიები</div>
+            <h1>სტატიების მართვა</h1>
+            <p>შექმენი ახალი სტატია, დაამატე მთავარი სურათი და მართე გამოქვეყნებული მასალები.</p>
         </div>
 
         <div class="admin-grid">
             <!-- Form -->
             <div class="form-card">
-                <h2 id="form-title" style="margin-bottom: 25px;">ახალი სტატია</h2>
+                <div class="form-card-heading">
+                    <div><span>ახალი ჩანაწერი</span><h2 id="form-title">ახალი სტატია</h2></div>
+                    <small>● მონახაზი</small>
+                </div>
                 <input type="hidden" id="article-id">
                 
                 <div class="form-group">
@@ -279,7 +470,10 @@
 
             <!-- List -->
             <div class="list-card">
-                <h2 style="margin-bottom: 25px;">არსებული სტატიები</h2>
+                <div class="list-card-heading">
+                    <div><span>ბიბლიოთეკა</span><h2>არსებული სტატიები</h2></div>
+                    <strong id="articles-count">სტატიები</strong>
+                </div>
                 <table class="article-table">
                     <thead>
                         <tr>
@@ -533,6 +727,7 @@
 
             allArticles = articles; // Update global state
             const tbody = document.getElementById('articles-tbody');
+            document.getElementById('articles-count').innerText = `${articles.length} სტატია`;
             tbody.innerHTML = '';
 
             articles.forEach((article, index) => {
