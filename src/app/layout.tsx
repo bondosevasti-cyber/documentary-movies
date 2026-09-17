@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "სტატიები - სტუდია სენაკი",
+  title: "სტატიები - სტუდია პრიზმა",
   description: "დოკუმენტური ფილმები და სტატიები",
 };
 

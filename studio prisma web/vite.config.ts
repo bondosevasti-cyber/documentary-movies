@@ -18,7 +18,7 @@ function legacyAssets(): Plugin {
     return file.endsWith('.html') ? Buffer.from(data.toString().replaceAll('href="articles.html"', 'href="/?section=Articles"').replaceAll('href="index.html#videos"', 'href="/?section=Videos"').replaceAll('href="index.html?type=videos"', 'href="/?section=Videos"')) : data;
   };
   return {
-    name: 'senaki-legacy-assets',
+    name: 'prisma-legacy-assets',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         let file: string;

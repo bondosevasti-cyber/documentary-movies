@@ -1,9 +1,9 @@
 self.addEventListener('push', function(event) {
     let data = {
-        title: 'სტუდია სენაკი',
+        title: 'სტუდია პრიზმა',
         body: 'ახალი კონტენტი დაემატა!',
-        icon: 'images/logo/Logo.png',
-        image: 'images/logo/Logo.png',
+        icon: 'images/logo/prisma-mark.svg',
+        image: 'images/logo/prisma-mark.svg',
         url: 'https://documentary-movies.vercel.app/'
     };
 
@@ -18,8 +18,8 @@ self.addEventListener('push', function(event) {
 
     const options = {
         body: data.body,
-        icon: data.icon || 'images/logo/Logo.png',
-        badge: 'images/logo/Logo.png',
+        icon: data.icon || 'images/logo/prisma-mark.svg',
+        badge: 'images/logo/prisma-mark.svg',
         image: data.image || null,
         vibrate: [200, 100, 200],
         requireInteraction: false,

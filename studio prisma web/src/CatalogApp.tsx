@@ -29,8 +29,8 @@ export default function CatalogApp() {
   const [retry, setRetry] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
-  const [saved, setSaved] = useState(() => readSaved('senaki-saved'));
-  const [history, setHistory] = useState(() => readSaved('senaki-history'));
+  const [saved, setSaved] = useState(() => readSaved('prisma-saved'));
+  const [history, setHistory] = useState(() => readSaved('prisma-history'));
   const [details, setDetails] = useState<CatalogItem | null>(null);
   const [player, setPlayer] = useState<CatalogItem | null>(null);
   const selectTab = (tab: ActiveNavTab) => {
@@ -53,8 +53,8 @@ export default function CatalogApp() {
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [activeTab, retry]);
-  useEffect(() => { try { localStorage.setItem('senaki-saved', JSON.stringify(saved)); } catch {} }, [saved]);
-  useEffect(() => { try { localStorage.setItem('senaki-history', JSON.stringify(history)); } catch {} }, [history]);
+  useEffect(() => { try { localStorage.setItem('prisma-saved', JSON.stringify(saved)); } catch {} }, [saved]);
+  useEffect(() => { try { localStorage.setItem('prisma-history', JSON.stringify(history)); } catch {} }, [history]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { setDetails(null); setPlayer(null); setMobileOpen(false); }
@@ -65,14 +65,14 @@ export default function CatalogApp() {
   }, []);
   const open = (item: CatalogItem) => {
     const next = [item, ...history.filter(entry => entry.id !== item.id)].slice(0, 50);
-    try { localStorage.setItem('senaki-history', JSON.stringify(next)); } catch {}
+    try { localStorage.setItem('prisma-history', JSON.stringify(next)); } catch {}
     setHistory(next);
     if (item.section === 'Articles') location.assign(item.href);
     else setPlayer(item);
   };
   const visit = (item: CatalogItem) => {
     const next = [item, ...history.filter(entry => entry.id !== item.id)].slice(0, 50);
-    try { localStorage.setItem('senaki-history', JSON.stringify(next)); } catch {}
+    try { localStorage.setItem('prisma-history', JSON.stringify(next)); } catch {}
     setHistory(next);
     location.assign(item.href);
   };

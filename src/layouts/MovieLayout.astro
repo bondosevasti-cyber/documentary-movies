@@ -12,7 +12,7 @@ interface Props {
 
 const { title_ge, title_en, description, image, director, id } = Astro.props;
 
-const siteName = "სტუდია სენაკი";
+const siteName = "სტუდია პრიზმა";
 const pageTitle = `${title_ge} ქართულად - ${siteName}`;
 const metaDescription = description || `უყურეთ ფილმს ${title_ge} ქართული გახმოვანებით სტუდია სენაკში. ექსკლუზიური თარგმანი.`;
 const siteUrl = "https://documentary-movies.vercel.app";
@@ -43,7 +43,7 @@ const movieUrl = `${siteUrl}/watch_movie.html?id=${id}`;
   <meta name="twitter:image" content={image} />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/images/logo/Logo.png" />
+  <link rel="icon" type="image/svg+xml" href="/images/logo/prisma-mark.svg" />
 
   <!-- Structured Data -->
   <MovieSchema 

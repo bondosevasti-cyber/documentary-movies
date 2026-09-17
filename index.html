@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="google-site-verification" content="wgZarI_zifHKJvi4l312gnmib5a_PDjpNmuc_EUTiUI" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>სტუდია სენაკი</title>
+    <title>სტუდია პრიზმა</title>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2TFBP7GM8T"></script>
@@ -16,13 +16,12 @@
         gtag('js', new Date());
         gtag('config', 'G-2TFBP7GM8T');
     </script>
-    <meta property="og:title" content="სტუდია სენაკი">
+    <meta property="og:title" content="სტუდია პრიზმა">
     <meta property="og:description" content="უყურეთ თქვენს საყვარელ ფილმებსა და დოკუმენტურებს სტუდია სენაკში.">
-    <meta property="og:image" content="https://documentary-movies.vercel.app/images/logo/social.jpeg">
     <meta property="og:url" content="https://documentary-movies.vercel.app/">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="icon" type="image/png" href="images/logo/Logo.png">
+    <link rel="icon" type="image/svg+xml" href="images/logo/prisma-mark.svg">
     <link rel="stylesheet" href="style.css">
     <style>
         /* Extra styles for empty states or layout */
@@ -109,7 +108,7 @@
 <body>
 
     <header>
-        <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="სტუდია სენაკი" class="logo-img"></a>
+        <a href="index.html" class="logo"><span class="prisma-wordmark">STUDIO <strong>PRISMA</strong></span></a>
         <div class="hamburger" id="hamburger-menu">
             <span></span>
             <span></span>
@@ -287,7 +286,7 @@
                         <div class="rank-number">${movie.top_10_position}</div>
                         <div class="rank-poster-container">
                             ${officialBadge}
-                            <img src="${movie.card_url || movie.poster_url}" alt="${movie.title}">
+                            <img src="${movie.card_url || movie.poster_url}" alt="${movie.title}" style="object-position: ${movie.card_pos_x ?? 50}% ${movie.card_pos_y ?? 50}%">
                         </div>
                     </div>
                 `;
@@ -546,7 +545,7 @@
                 const ratioClass = movie.display_ratio === '16:9' ? 'card-16-9' : 'card-1-1';
                 // Grids MUST use card_url with poster_url fallback
                 const bgUrl = movie.card_url || movie.poster_url;
-                const focalPos = 'center'; // Reset focal to center for standard grids
+                const focalPos = `${movie.card_pos_x ?? 50}% ${movie.card_pos_y ?? 50}%`;
 
                 innerHTML += `
                     <div class="${ratioClass}" style="background-image: url('${bgUrl}'); background-position: ${focalPos};">
@@ -730,7 +729,7 @@
             </div>
             <div class="modal-body" style="padding: 30px; color: #ccc; line-height: 1.8; font-size: 15px;">
                 <p>საიტზე ზოგიერთ ფილმს კუთხეში აქვს ოქროსფერ-ზურმუხტისფერი ემბლემა. ეს ნიშნავს, რომ <strong>„სტუდია
-                        სენაკი“</strong>-მ მიიღო ოფიციალური, წერილობითი ნებართვა ფილმის შემქმნელებისგან მისი
+                        პრიზმა“</strong>-მ მიიღო ოფიციალური, წერილობითი ნებართვა ფილმის შემქმნელებისგან მისი
                     საქართველოში, ქართულ ენაზე ჩვენების უფლებაზე.</p>
                 <p style="margin-top: 20px;">ეს ემბლემა არის გარანტი იმისა, რომ ჩვენ მიერ წარმოდგენილი კონტენტი
                     ლეგალურია და მხარდაჭერილია ორიგინალი ავტორების მიერ.</p>
@@ -746,8 +745,7 @@
 
         <div class="footer-content">
             <div class="footer-section">
-                <a href="index.html" class="logo"><img src="images/logo/Logo.png" alt="სტუდია სენაკი"
-                        class="logo-img"></a>
+                <a href="index.html" class="logo"><span class="prisma-wordmark">STUDIO <strong>PRISMA</strong></span></a>
                 <p class="footer-disclaimer">ეს საიტი არ ინახავს არანაირ ფაილს ჩვენს სერვერზე. ჩვენ მხოლოდ ვაზიარებთ
                     ბმულებს იმ მედიაზე, რომელიც განთავსებულია მესამე მხარის სერვისებზე.</p>
             </div>
@@ -762,13 +760,7 @@
             </div>
             <div class="footer-section">
                 <h4>კონტაქტი</h4>
-                <p>Contact: <a href="mailto:studiasenaki@proton.me" class="contact-email">studiasenaki@proton.me</a></p>
-                <div class="footer-socials">
-                    <a href="https://www.facebook.com/StudiaSenakiOfficial" target="_blank" rel="noopener noreferrer" class="social-link"
-                        aria-label="Follow Studio Senaki on Facebook">
-                        <span class="social-text-icon">F</span>
-                    </a>
-                </div>
+                <p>კონტაქტის ინფორმაცია მალე დაემატება.</p>
             </div>
         </div>
     </footer>

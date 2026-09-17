@@ -74,6 +74,19 @@ header {
     color: var(--accent-color);
 }
 
+.prisma-wordmark {
+    color: #cbd2dd;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .16em;
+    white-space: nowrap;
+}
+
+.prisma-wordmark strong {
+    color: #fff;
+    font-weight: 700;
+}
+
 nav {
     display: flex;
     align-items: center;

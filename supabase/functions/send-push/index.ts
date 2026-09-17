@@ -28,7 +28,9 @@ serve(async (req) => {
       })
     }
 
-    webpush.setVapidDetails('mailto:studiasenaki@proton.me', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
+    const vapidEmail = Deno.env.get('VAPID_EMAIL') ?? ''
+    if (!vapidEmail) throw new Error('VAPID_EMAIL secret is not configured.')
+    webpush.setVapidDetails(vapidEmail, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',

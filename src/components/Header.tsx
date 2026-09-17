@@ -19,7 +19,7 @@ export const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-[#222]">
       <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center">
-          <img src="/images/logo/Logo.png" alt="სტუდია სენაკი" className="h-10 md:h-12 w-auto" />
+          <img src="/images/logo/prisma-mark.svg" alt="სტუდია პრიზმა" className="h-10 md:h-12 w-auto" />
         </Link>
 
         {/* Desktop Nav */}

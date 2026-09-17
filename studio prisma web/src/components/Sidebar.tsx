@@ -60,7 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               სტუდია
             </span>
             <span className="text-sm font-semibold tracking-wider text-neutral-300 leading-tight">
-              სენაკი
+              PRISMA
             </span>
           </div>
         </div>
