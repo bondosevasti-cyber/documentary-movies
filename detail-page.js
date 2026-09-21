@@ -3,6 +3,7 @@
   const table = body.dataset.table;
   const videoField = body.dataset.videoField;
   const kind = table === 'movies' ? 'ფილმი' : 'ვიდეო';
+  let playerEmbed = '';
   const byId = id => document.getElementById(id);
   const value = (row, ...keys) => keys.map(key => row[key]).find(item => item !== null && item !== undefined && String(item).trim()) || '';
 
@@ -53,7 +54,6 @@
     setLink('website-link', value(row, 'studio_website_url', 'creator_url'));
     setLink('trailer-link', value(row, 'trailer_url'));
     const original = value(row, 'original_link'); setLink('original-link', original);
-    setLink('video-source-link', value(row, 'rumble_link'));
     const cast = String(value(row, 'cast_members')).split('\n').map(item => item.trim()).filter(Boolean);
     const creative = [
       ['რეჟისორი', value(row, 'director_name')],
@@ -73,7 +73,7 @@
     const embed = prepareRumbleUrl(value(row, videoField));
     byId('watch-button').disabled = !embed;
     byId('watch-label').textContent = embed ? `${kind}ს ყურება` : 'მალე დაემატება';
-    if (embed) byId('player-frame').innerHTML = `<iframe src="${embed.replaceAll('"', '&quot;')}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+    playerEmbed = embed;
     document.title = `${title} — სტუდია პრიზმა`;
     document.querySelector('meta[name="description"]')?.setAttribute('content', value(row, 'description') || title);
     const saved = JSON.parse(localStorage.getItem('prisma-detail-saved') || '[]');
@@ -100,8 +100,18 @@
     _supabase.rpc(rpc[0], rpc[1]).then(() => {}).catch(() => {});
   }
 
-  byId('watch-button').addEventListener('click', () => byId('player-overlay').classList.add('open'));
-  byId('player-close').addEventListener('click', () => { byId('player-overlay').classList.remove('open'); byId('player-frame').querySelector('iframe')?.contentWindow?.postMessage('{"method":"pause"}', '*'); });
+  byId('watch-button').addEventListener('click', () => {
+    if (!playerEmbed) return;
+    const frame = byId('player-frame');
+    frame.innerHTML = `<iframe src="${playerEmbed.replaceAll('"', '&quot;')}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+    byId('player-overlay').classList.add('open');
+  });
+  byId('player-close').addEventListener('click', () => {
+    const overlay = byId('player-overlay');
+    overlay.classList.remove('open');
+    byId('player-frame').querySelector('iframe')?.contentWindow?.postMessage('{"method":"pause"}', '*');
+    window.setTimeout(() => { if (!overlay.classList.contains('open')) byId('player-frame').innerHTML = ''; }, 320);
+  });
   byId('player-overlay').addEventListener('click', event => { if (event.target === byId('player-overlay')) byId('player-close').click(); });
   byId('share-button').addEventListener('click', async () => { try { if (navigator.share) await navigator.share({ title: document.title, url: location.href }); else { await navigator.clipboard.writeText(location.href); byId('share-label').textContent = 'დაკოპირდა'; } } catch {} });
   addEventListener('keydown', event => { if (event.key === 'Escape') byId('player-close').click(); });
