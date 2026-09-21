@@ -49,10 +49,10 @@
     const studioLogo = externalUrl(value(row, 'studio_logo_url'));
     if (studioLogo) { byId('studio-logo').src = studioLogo; byId('studio-logo').alt = studioName; byId('studio-logo').hidden = false; }
     byId('official-note').hidden = !row.is_official;
-    setLink('website-link', value(row, 'studio_website_url', 'creator_url', 'original_link'));
+    setLink('website-link', value(row, 'studio_website_url', 'creator_url'));
     setLink('trailer-link', value(row, 'trailer_url'));
     const original = value(row, 'original_link'); setLink('original-link', original);
-    if (original && original === value(row, 'studio_website_url', 'creator_url', 'original_link')) byId('original-link').hidden = true;
+    setLink('video-source-link', value(row, 'rumble_link'));
     const cast = String(value(row, 'cast_members')).split('\n').map(item => item.trim()).filter(Boolean);
     const creative = [
       ['რეჟისორი', value(row, 'director_name')],

@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import './cinema.css';
 import { HeroFeatured } from './components/HeroFeatured';
 import { InlinePlayerModal } from './components/InlinePlayerModal';
+import { Top5Coverflow } from './components/Top5Coverflow';
 import { loadSection, sectionLabels, type CatalogItem, type Section } from './data/catalog';
 import type { ActiveNavTab } from './types';
 
@@ -117,7 +118,9 @@ export default function CatalogApp() {
         {browsing && featured.length > 0 && <HeroFeatured key={activeTab} featuredList={featured} onPlay={doc => open(doc as CatalogItem)} onMoreInfo={doc => visit(doc as CatalogItem)} actionLabel={activeTab === 'Articles' ? 'წაკითხვა' : 'ყურება'} />}
         <div className={`cinema-content ${browsing && featured.length ? 'with-hero' : ''}`}>
           {browsing && history.some(item => item.section === activeTab) && <ContentRail title="ბოლოს გახსნილი" onSeeAll={() => selectTab('History')}>{history.filter(item => item.section === activeTab).slice(0,8).map(item => card(item))}</ContentRail>}
-          {browsing && activeTab === 'Movies' && ranked.length > 0 && <ContentRail title="TOP 5" subtitle="გამორჩეული ფილმები">{ranked.map((item,index) => card(item,index+1))}</ContentRail>}
+          {browsing && activeTab === 'Movies' && ranked.length > 0 && (
+            <Top5Coverflow items={ranked} saved={saved} onOpen={visit} onToggleSave={toggleSaved} />
+          )}
           {browsing && activeTab === 'Movies' && items.some(item => item.comingSoon) && <ContentRail title="მალე დაემატება">{items.filter(item => item.comingSoon).map(item => card(item))}</ContentRail>}
           <section className="catalog-section">
             <div className="catalog-heading"><div><p className="eyebrow">აღმოაჩინე მეტი</p><h2>{title}</h2></div>

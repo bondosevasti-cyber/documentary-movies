@@ -10,6 +10,7 @@ export interface CatalogItem extends Documentary {
   href: string;
   topPosition?: number;
   comingSoon?: boolean;
+  posterUrl?: string;
 }
 type Row = Record<string, unknown>;
 const url = legacyConfig.match(/const SUPABASE_URL = '([^']+)'/)?.[1];
@@ -54,7 +55,7 @@ export async function loadSection(section: Section, signal: AbortSignal) {
       comingSoon: row.is_coming_soon === true,
       title: text('title'), category: categories.join(' / '), titleImageUrl: text('title_image_url'), hideHeroTitle: Boolean(row.hide_hero_title),
       description: text('excerpt') || text('description'), longDescription: text('description') || text('excerpt'),
-      thumbnailUrl: thumbnail, backdropUrl: text('cover_url') || thumbnail,
+      thumbnailUrl: thumbnail, posterUrl: text('poster_url') || text('card_url') || thumbnail, backdropUrl: text('cover_url') || thumbnail,
       duration: text('duration'), views: `${Number(row.views || 0).toLocaleString('ka-GE')} ნახვა`,
       rating: Number(row.rating || 0), year: Number(row.release_year || 0), quality: 'HD',
       videoUrl: section === 'Videos' ? rumbleEmbed(text('rumble_link')) : section === 'Movies' ? rumbleEmbed(text('video_id')) : '', tags: categories,

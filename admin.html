@@ -731,7 +731,7 @@
                     <input type="hidden" name="video_id" id="video-db-id">
                     
                     <div class="form-group">
-                        <label>პოსტერი (16:9)</label>
+                        <label>ვიდეოს Thumbnail / ბარათის ფოტო (16:9)</label>
                         <div class="upload-wrapper poster-wrapper" id="v-poster-drop-zone">
                             <button type="button" class="reset-upload" id="v-poster-reset">&times;</button>
                             <div class="upload-placeholder" id="v-poster-placeholder" onclick="document.getElementById('v-poster-input').click()">
@@ -740,6 +740,20 @@
                             </div>
                             <div class="cropper-container-div" id="v-poster-cropper-container"><img id="v-poster-cropper-image"></div>
                             <input type="file" id="v-poster-input" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>დეტალური გვერდის Cover ფოტო (16:9, არჩევითი)</label>
+                        <p class="field-help">ეს სურათი გამოიყენება მხოლოდ ვიდეოს დეტალური გვერდის ფონად; thumbnail ცალკე რჩება.</p>
+                        <div class="upload-wrapper cover-wrapper" id="v-cover-drop-zone">
+                            <button type="button" class="reset-upload" id="v-cover-reset">&times;</button>
+                            <div class="upload-placeholder" id="v-cover-placeholder" onclick="document.getElementById('v-cover-input').click()">
+                                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                <p>Cover ფოტოს არჩევა</p>
+                            </div>
+                            <div class="cropper-container-div" id="v-cover-cropper-container"><img id="v-cover-cropper-image"></div>
+                            <input type="file" id="v-cover-input" accept="image/*" style="display: none;">
                         </div>
                     </div>
 
@@ -791,7 +805,7 @@
                         <div class="form-group"><label>რეიტინგი</label><input type="number" name="rating" min="0" max="10" step="0.1"></div>
                     </div>
                     <div class="form-group"><label>ჟანრები</label><input type="text" name="genre" placeholder="ბუნება / მეცნიერება"></div>
-                    <div class="form-group"><label>დეტალური გვერდის ბანერის URL (არჩევითი)</label><input type="url" name="cover_url" placeholder="თუ ცარიელია, გამოყენებული იქნება პოსტერი"></div>
+                    <div class="form-group"><label>დეტალური გვერდის Cover URL (არჩევითი)</label><input type="url" name="cover_url" placeholder="თუ ფაილს არ ტვირთავ, ჩასვი cover სურათის URL"></div>
                     <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                         <div class="form-group"><label>სტუდიის / ავტორის სახელი</label><input type="text" name="studio_name"></div>
                         <div class="form-group"><label>სტუდიის ლოგოს URL</label><input type="url" name="studio_logo_url" placeholder="https://.../logo.png"></div>
@@ -934,7 +948,7 @@
     <script src="supabase-config.js"></script>
     <script>
         let posterCropper = null, coverCropper = null, cardCropper = null, isEditing = false, existingPosterUrl = '', existingCoverUrl = '', existingCardUrl = '', existingTitleImageUrl = '';
-        let vPosterCropper = null, isVideoEditing = false, existingVPosterUrl = '', existingVTitleImageUrl = '';
+        let vPosterCropper = null, vCoverCropper = null, isVideoEditing = false, existingVPosterUrl = '', existingVCoverUrl = '', existingVTitleImageUrl = '';
 
         function showTitleArt(type, url = '') {
             const preview = document.getElementById(type === 'movie' ? 'title-art-preview' : 'v-title-art-preview');
@@ -1610,6 +1624,36 @@
             reader.readAsDataURL(file);
         }
 
+        const vCoverDropZone = document.getElementById('v-cover-drop-zone'),
+              vCoverFileInput = document.getElementById('v-cover-input'),
+              vCoverCropperImg = document.getElementById('v-cover-cropper-image'),
+              vCoverCropperContainer = document.getElementById('v-cover-cropper-container'),
+              vCoverPlaceholder = document.getElementById('v-cover-placeholder'),
+              vCoverBtnReset = document.getElementById('v-cover-reset');
+
+        function initVideoCoverCropper(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                vCoverCropperImg.src = e.target.result;
+                vCoverPlaceholder.style.display = 'none';
+                vCoverCropperContainer.style.display = 'block';
+                vCoverBtnReset.style.display = 'block';
+                if (vCoverCropper) vCoverCropper.destroy();
+                vCoverCropper = new Cropper(vCoverCropperImg, { aspectRatio: 16 / 9, viewMode: 1, dragMode: 'move', guides: false, center: false, highlight: false, cropBoxMovable: false, cropBoxResizable: false, background: false });
+            };
+            reader.readAsDataURL(file);
+        }
+        ['dragenter', 'dragover'].forEach(eventName => vCoverDropZone.addEventListener(eventName, (e) => { e.preventDefault(); vCoverDropZone.classList.add('drag-active'); }));
+        ['dragleave', 'drop'].forEach(eventName => vCoverDropZone.addEventListener(eventName, (e) => { e.preventDefault(); vCoverDropZone.classList.remove('drag-active'); }));
+        vCoverDropZone.addEventListener('drop', (e) => { const file = e.dataTransfer.files[0]; if (file?.type.startsWith('image/')) initVideoCoverCropper(file); });
+        vCoverFileInput.addEventListener('change', (e) => { if (e.target.files[0]) initVideoCoverCropper(e.target.files[0]); });
+        vCoverBtnReset.onclick = () => {
+            if (vCoverCropper) vCoverCropper.destroy();
+            vCoverCropper = null; existingVCoverUrl = ''; vCoverCropperImg.src = '';
+            vCoverCropperContainer.style.display = 'none'; vCoverPlaceholder.style.display = 'flex';
+            vCoverBtnReset.style.display = 'none'; vCoverFileInput.value = '';
+        };
+
         async function loadMovies() {
             const { data: movies, error } = await _supabase.from('movies').select('*').order('created_at', { ascending: false });
             if (error) return console.error(error);
@@ -2027,10 +2071,12 @@
             form['hide_hero_title'].checked = video.hide_hero_title || false;
             
             existingVPosterUrl = video.photo_url || video.poster_url || '';
+            existingVCoverUrl = video.cover_url || '';
             existingVTitleImageUrl = video.title_image_url || '';
             showTitleArt('video', existingVTitleImageUrl);
             const imgUrl = video.photo_url || video.poster_url || '';
             document.getElementById('v-poster-placeholder').innerHTML = imgUrl ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>` : `<p>ფოტოს ატვირთვა</p>`;
+            document.getElementById('v-cover-placeholder').innerHTML = existingVCoverUrl ? `<img src="${existingVCoverUrl}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>` : `<p>Cover ფოტოს არჩევა</p>`;
             
             isVideoEditing = true;
             document.getElementById('video-form-title').innerText = 'ვიდეოს განახლება';
@@ -2049,8 +2095,10 @@
         function resetVideoForm() {
             document.getElementById('video-form').reset();
             document.getElementById('v-poster-reset').click();
+            document.getElementById('v-cover-reset').click();
             clearTitleArt('video');
             document.getElementById('v-poster-placeholder').innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><p>ფოტოს ატვირთვა</p>`;
+            document.getElementById('v-cover-placeholder').innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><p>Cover ფოტოს არჩევა</p>`;
             isVideoEditing = false;
             document.getElementById('video-form-title').innerText = 'ვიდეოს დამატება';
             document.getElementById('video-submit-btn').innerText = 'ვიდეოს შენახვა';
@@ -2066,6 +2114,7 @@
 
             try {
                 let photo_url = existingVPosterUrl;
+                let cover_url = form['cover_url'].value.trim() || existingVCoverUrl || null;
                 const title_image_url = await uploadTitleArt('v-title-art-input', existingVTitleImageUrl, 'video_title');
                 if (vPosterCropper) {
                     const canvas = vPosterCropper.getCroppedCanvas({ width: 1280, height: 720 });
@@ -2078,6 +2127,15 @@
 
                 if (!photo_url) {
                     throw new Error('გთხოვთ ატვირთოთ ფოტო');
+                }
+
+                if (vCoverCropper) {
+                    const canvas = vCoverCropper.getCroppedCanvas({ width: 1920, height: 1080 });
+                    const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', 0.85));
+                    const fileName = `video_cover_${Date.now()}.webp`;
+                    const { error } = await _supabase.storage.from('movie-images').upload(fileName, blob);
+                    if (error) throw error;
+                    cover_url = _supabase.storage.from('movie-images').getPublicUrl(fileName).data.publicUrl;
                 }
 
                 const videoData = {
@@ -2093,7 +2151,7 @@
                     duration: form['duration'].value.trim() || null,
                     rating: form['rating'].value ? Number(form['rating'].value) : null,
                     genre: form['genre'].value.trim() || null,
-                    cover_url: form['cover_url'].value.trim() || null,
+                    cover_url,
                     is_official: Boolean(form['is_official'].checked),
                     studio_name: form['studio_name'].value.trim() || null,
                     studio_logo_url: form['studio_logo_url'].value.trim() || null,
