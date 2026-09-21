@@ -25,6 +25,7 @@
     const link = byId(id); const url = externalUrl(raw);
     if (!url) { link.hidden = true; return; }
     link.href = url;
+    link.hidden = false;
   }
 
   function render(row) {
