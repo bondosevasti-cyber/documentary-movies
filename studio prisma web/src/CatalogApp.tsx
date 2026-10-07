@@ -117,10 +117,10 @@ export default function CatalogApp() {
       {loading ? <div className="cinema-status" role="status">იტვირთება…</div> : error ? <div className="cinema-status" role="alert">{error}<button onClick={() => setRetry(value => value+1)}>ხელახლა ცდა</button></div> : <>
         {browsing && featured.length > 0 && <HeroFeatured key={activeTab} featuredList={featured} onPlay={doc => open(doc as CatalogItem)} onMoreInfo={doc => visit(doc as CatalogItem)} actionLabel={activeTab === 'Articles' ? 'წაკითხვა' : 'ყურება'} />}
         <div className={`cinema-content ${browsing && featured.length ? 'with-hero' : ''}`}>
-          {browsing && history.some(item => item.section === activeTab) && <ContentRail title="ბოლოს გახსნილი" onSeeAll={() => selectTab('History')}>{history.filter(item => item.section === activeTab).slice(0,8).map(item => card(item))}</ContentRail>}
           {browsing && activeTab === 'Movies' && ranked.length > 0 && (
             <Top5Coverflow items={ranked} saved={saved} onOpen={visit} onToggleSave={toggleSaved} />
           )}
+          {browsing && history.some(item => item.section === activeTab) && <ContentRail title="ბოლოს გახსნილი" onSeeAll={() => selectTab('History')}>{history.filter(item => item.section === activeTab).slice(0,8).map(item => card(item))}</ContentRail>}
           {browsing && activeTab === 'Movies' && items.some(item => item.comingSoon) && <ContentRail title="მალე დაემატება">{items.filter(item => item.comingSoon).map(item => card(item))}</ContentRail>}
           <section className="catalog-section">
             <div className="catalog-heading"><div><p className="eyebrow">აღმოაჩინე მეტი</p><h2>{title}</h2></div>

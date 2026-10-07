@@ -46,7 +46,7 @@ export async function loadSection(section: Section, signal: AbortSignal) {
     const categories = section === 'Movies'
       ? (text('genre') || text('category') || 'სხვა').split(/\s*[/,]\s*/).filter(Boolean)
       : [text('category') || (section === 'Videos' ? 'აგრო' : 'ზოგადი')];
-    const thumbnail = text('thumbnail_url') || text('photo_url') || text('poster_url') || text('card_url') || text('cover_url');
+    const thumbnail = text('thumbnail_url') || text('photo_url') || text('card_url') || text('poster_url') || text('cover_url');
     const page = section === 'Movies' ? 'watch_movie' : section === 'Videos' ? 'watch_video' : 'watch_article';
     const param = section === 'Articles' ? `slug=${encodeURIComponent(text('slug'))}` : `id=${encodeURIComponent(String(row.id))}`;
     return {

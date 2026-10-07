@@ -488,6 +488,13 @@
                 </div>
                 <form id="movie-form">
                     <input type="hidden" name="movie_id" id="movie-id">
+                    <div class="form-group"><label>კონტენტის ტიპი</label><select name="content_type" onchange="document.getElementById('series-editor').hidden=this.value!=='series'"><option value="movie">ფილმი</option><option value="series">სერიალი</option></select></div>
+                    <section id="series-editor" hidden class="tmdb-lookup">
+                        <h3>სეზონები და ეპიზოდები</h3>
+                        <p class="field-help">დაამატე სეზონი, შემდეგ ეპიზოდები და თითოეულის ვიდეოს embed ბმული. ცვლილებები ინახება ფილმის „შენახვა“ ღილაკით.</p>
+                        <div id="series-seasons"></div>
+                        <button type="button" class="btn-edit" onclick="addSeriesSeason()">+ სეზონის დამატება</button>
+                    </section>
                     <section class="tmdb-lookup" aria-label="TMDb-დან ფილმის დეტალების წამოღება">
                         <div class="tmdb-lookup-title">
                             <strong>IMDb / TMDb ბმულით ავტომატური შევსება</strong>
@@ -522,7 +529,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label>პატარა ბარათი (Original Poster) (16:9)</label>
+                        <label>ვერტიკალური პოსტერი — TOP 5 და დეტალური გვერდი (2:3)</label>
+                        <p class="field-help">წიგნის ყდის მსგავსი ვერტიკალური ფოტო. TOP 5-ის მაღალ ბარათზე და „ვრცლად“ გვერდზე გამოჩნდება.</p>
                         <div class="upload-wrapper poster-wrapper" id="poster-drop-zone">
                             <button type="button" class="reset-upload" id="poster-reset">&times;</button>
                             <div class="upload-placeholder" id="poster-placeholder" onclick="document.getElementById('poster-input').click()">
@@ -535,7 +543,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label>მთავარი ბანერი (ზედა Featured section) (16:9)</label>
+                        <label>ფართო Cover — მთავარი გვერდის ზედა ფონი (16:9)</label>
+                        <p class="field-help">დიდი ფონური სურათი სათაურისა და ღილაკების უკან; ასევე „ვრცლად“ გვერდის ფონი.</p>
                         <div class="upload-wrapper cover-wrapper" id="cover-drop-zone">
                             <button type="button" class="reset-upload" id="cover-reset">&times;</button>
                             <div class="upload-placeholder" id="cover-placeholder" onclick="document.getElementById('cover-input').click()">
@@ -1368,6 +1377,48 @@
         }
 
         // --- Generic Cropper Logic ---
+        let seriesSeasons = [];
+        const seriesEscape = value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        function readSeriesEditor() {
+            const seasons = [...document.querySelectorAll('[data-series-season]')].map(season => ({
+                number: Number(season.querySelector('[data-season-number]').value),
+                title: season.querySelector('[data-season-title]').value.trim(),
+                episodes: [...season.querySelectorAll('[data-series-episode]')].map(episode => ({
+                    number: Number(episode.querySelector('[data-episode-number]').value),
+                    title: episode.querySelector('[data-episode-title]').value.trim(),
+                    video_url: prepareRumbleUrl(episode.querySelector('[data-episode-url]').value.trim()),
+                    description: episode.querySelector('[data-episode-description]').value.trim()
+                }))
+            }));
+            return seasons;
+        }
+        function renderSeriesEditor() {
+            document.getElementById('series-seasons').innerHTML = seriesSeasons.map((season, s) => `
+                <div data-series-season style="border:1px solid #343946;border-radius:12px;padding:16px;margin-bottom:16px">
+                    <label>სეზონის ნომერი<input data-season-number type="number" min="1" value="${season.number}" required></label>
+                    <label>სეზონის სახელი (არჩევითი)<input data-season-title value="${seriesEscape(season.title)}"></label>
+                    ${(season.episodes || []).map((episode, e) => `<div data-series-episode style="background:#151820;padding:12px;margin:12px 0;border-radius:8px">
+                        <label>ეპიზოდის ნომერი<input data-episode-number type="number" min="1" value="${episode.number}" required></label>
+                        <label>ეპიზოდის სათაური<input data-episode-title value="${seriesEscape(episode.title)}" required></label>
+                        <label>ვიდეოს Embed URL<input data-episode-url type="url" value="${seriesEscape(episode.video_url)}" placeholder="https://rumble.com/embed/..." required></label>
+                        <label>აღწერა<textarea data-episode-description>${seriesEscape(episode.description)}</textarea></label>
+                        <button type="button" onclick="seriesSeasons=readSeriesEditor();seriesSeasons[${s}].episodes.splice(${e},1);renderSeriesEditor()">ეპიზოდის ამოღება</button>
+                    </div>`).join('')}
+                    <button type="button" class="btn-edit" onclick="addSeriesEpisode(${s})">+ ეპიზოდი</button>
+                    <button type="button" onclick="seriesSeasons=readSeriesEditor();seriesSeasons.splice(${s},1);renderSeriesEditor()">სეზონის ამოღება</button>
+                </div>`).join('');
+        }
+        function addSeriesSeason() {
+            seriesSeasons = readSeriesEditor();
+            seriesSeasons.push({number: Math.max(0, ...seriesSeasons.map(s => s.number)) + 1, title: '', episodes: []});
+            renderSeriesEditor();
+        }
+        function addSeriesEpisode(index) {
+            seriesSeasons = readSeriesEditor();
+            const episodes = seriesSeasons[index].episodes;
+            episodes.push({number: Math.max(0, ...episodes.map(e => e.number)) + 1, title: '', video_url: '', description: ''});
+            renderSeriesEditor();
+        }
         function setupCropZone(type, aspectRatio) {
             const dropZone = document.getElementById(`${type}-drop-zone`), fileInput = document.getElementById(`${type}-input`), cropperImg = document.getElementById(`${type}-cropper-image`), cropperContainer = document.getElementById(`${type}-cropper-container`), placeholder = document.getElementById(`${type}-placeholder`), btnReset = document.getElementById(`${type}-reset`);
             ['dragenter', 'dragover'].forEach(n => dropZone.addEventListener(n, (e) => { e.preventDefault(); dropZone.classList.add('drag-active'); }));
@@ -1413,7 +1464,7 @@
             reader.readAsDataURL(file);
         }
 
-        setupCropZone('poster', 1); 
+        setupCropZone('poster', 2 / 3);
         setupCropZone('cover', 16 / 9);
         setupCropZone('card', 16 / 9);
 
@@ -1668,6 +1719,10 @@
             const { data: movie } = await _supabase.from('movies').select('*').eq('id', id).single();
             const form = document.getElementById('movie-form');
             form['movie_id'].value = movie.id; 
+            form['content_type'].value = movie.content_type || 'movie';
+            document.getElementById('series-editor').hidden = form['content_type'].value !== 'series';
+            seriesSeasons = structuredClone(movie.seasons || []);
+            renderSeriesEditor();
             form['title'].value = movie.title || ''; 
             form['genre'].value = movie.genre || ''; 
             form['description'].value = movie.description || ''; 
@@ -1734,6 +1789,8 @@
 
         function resetForm() {
             document.getElementById('movie-form').reset(); 
+            seriesSeasons = []; renderSeriesEditor();
+            document.getElementById('series-editor').hidden = true;
             document.getElementById('poster-reset').click(); 
             document.getElementById('cover-reset').click(); 
             document.getElementById('card-reset').click();
@@ -1849,7 +1906,7 @@
                 let poster_url = existingPosterUrl, cover_url = existingCoverUrl, card_url = existingCardUrl;
                 const title_image_url = await uploadTitleArt('title-art-input', existingTitleImageUrl, 'movie_title');
                 if (posterCropper) {
-                    const canvas = posterCropper.getCroppedCanvas({ width: 600, height: 600 });
+                    const canvas = posterCropper.getCroppedCanvas({ width: 600, height: 900 });
                     const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', 0.8));
                     const fileName = `poster_${Date.now()}.webp`;
                     const { data, error } = await _supabase.storage.from('movie-images').upload(fileName, blob);
@@ -1865,7 +1922,7 @@
                     cover_url = _supabase.storage.from('movie-images').getPublicUrl(fileName).data.publicUrl;
                 }
                 if (cardCropper) {
-                    const canvas = cardCropper.getCroppedCanvas({ width: 600, height: 600 });
+                    const canvas = cardCropper.getCroppedCanvas({ width: 1280 });
                     const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', 0.8));
                     const fileName = `card_${Date.now()}.webp`;
                     const { data, error } = await _supabase.storage.from('movie-images').upload(fileName, blob);
@@ -1900,6 +1957,8 @@
                 const displayRatio = document.querySelector('input[name="ratio_choice"]:checked').value;
 
                 const movieData = {
+                    content_type: form['content_type'].value,
+                    seasons: form['content_type'].value === 'series' ? readSeriesEditor() : [],
                     title: getVal('title'),
                     genre: getVal('genre'),
                     description: getVal('description'),
@@ -1944,6 +2003,13 @@
                     card_pos_x: parseInt(currentCardX),
                     card_pos_y: parseInt(currentCardY)
                 };
+                if (movieData.content_type === 'series') {
+                    if (!movieData.seasons.length || !movieData.seasons.some(s => s.episodes.length)) throw new Error('სერიალს დაამატე სეზონი და მინიმუმ ერთი ეპიზოდი.');
+                    if (new Set(movieData.seasons.map(s => s.number)).size !== movieData.seasons.length) throw new Error('სეზონის ნომერი არ უნდა განმეორდეს.');
+                    for (const season of movieData.seasons) {
+                        if (new Set(season.episodes.map(e => e.number)).size !== season.episodes.length) throw new Error(`სეზონი ${season.number}: ეპიზოდის ნომერი არ უნდა განმეორდეს.`);
+                    }
+                }
                 let result;
                 if (isEditing) {
                     result = await _supabase.from('movies').update(movieData).eq('id', form['movie_id'].value);

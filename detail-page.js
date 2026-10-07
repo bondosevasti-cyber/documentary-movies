@@ -74,6 +74,31 @@
     byId('watch-button').disabled = !embed;
     byId('watch-label').textContent = embed ? `${kind}ს ყურება` : 'მალე დაემატება';
     playerEmbed = embed;
+    if (row.content_type === 'series' && Array.isArray(row.seasons)) {
+      const panel = document.createElement('section'); panel.className = 'detail-panel';
+      const heading = document.createElement('h2'); heading.textContent = 'სეზონები და ეპიზოდები'; panel.append(heading);
+      const select = document.createElement('select'); select.className = 'detail-action'; select.setAttribute('aria-label', 'სეზონის არჩევა');
+      const seasons = [...row.seasons].sort((a,b) => a.number - b.number);
+      seasons.forEach((season, index) => { const option = document.createElement('option'); option.value = index; option.textContent = `სეზონი ${season.number}${season.title ? ' — ' + season.title : ''}`; select.append(option); });
+      const list = document.createElement('div'); list.style.cssText = 'display:grid;gap:12px;margin-top:18px';
+      function renderEpisodes() {
+        list.replaceChildren();
+        [...(seasons[Number(select.value)]?.episodes || [])].sort((a,b) => a.number-b.number).forEach(episode => {
+          const item = document.createElement('div'); item.style.cssText = 'border:1px solid #343640;padding:16px;border-radius:12px';
+          const button = document.createElement('button'); button.className = 'detail-action';
+          button.textContent = `${episode.number}. ${episode.title || 'ეპიზოდი'} ▶`;
+          button.disabled = !episode.video_url;
+          button.onclick = () => { playerEmbed = prepareRumbleUrl(episode.video_url); byId('watch-button').disabled = false; byId('watch-button').click(); };
+          item.append(button);
+          if (episode.description) { const description = document.createElement('p'); description.className = 'detail-description'; description.textContent = episode.description; item.append(description); }
+          list.append(item);
+        });
+      }
+      select.onchange = renderEpisodes; panel.append(select,list); renderEpisodes();
+      document.querySelector('.detail-grid > section').prepend(panel);
+      const firstEpisode = seasons.flatMap(season => season.episodes || []).find(episode => episode.video_url);
+      if (firstEpisode) { playerEmbed = prepareRumbleUrl(firstEpisode.video_url); byId('watch-button').disabled = false; byId('watch-label').textContent = 'პირველი ეპიზოდის ყურება'; }
+    }
     document.title = `${title} — სტუდია პრიზმა`;
     document.querySelector('meta[name="description"]')?.setAttribute('content', value(row, 'description') || title);
     const saved = JSON.parse(localStorage.getItem('prisma-detail-saved') || '[]');
