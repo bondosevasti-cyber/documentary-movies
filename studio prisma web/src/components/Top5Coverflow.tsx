@@ -176,7 +176,7 @@ export function Top5Coverflow({ items, saved, onOpen, onToggleSave }: Top5Coverf
   return (
     <section className="top5-coverflow" aria-label="TOP 5 გამორჩეული ფილმები">
       <div className="rail-heading">
-        <h2>TOP 5<span>გამორჩეული ფილმები</span></h2>
+        <h2>TOP 5</h2>
         <div>
           <button type="button" aria-label="TOP 5: წინა" onClick={() => nudge(-1)}><ChevronLeft size={18} /></button>
           <button type="button" aria-label="TOP 5: შემდეგი" onClick={() => nudge(1)}><ChevronRight size={18} /></button>

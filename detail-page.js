@@ -4,6 +4,9 @@
   const videoField = body.dataset.videoField;
   const kind = table === 'movies' ? 'ფილმი' : 'ვიდეო';
   let playerEmbed = '';
+  let currentRow = null;
+  let posterSrc = '';
+  let mountedSrc = '';
   const byId = id => document.getElementById(id);
   const value = (row, ...keys) => keys.map(key => row[key]).find(item => item !== null && item !== undefined && String(item).trim()) || '';
 
@@ -70,35 +73,13 @@
       creative.forEach(([label, names]) => { const item = document.createElement('div'); const small = document.createElement('small'); small.style.cssText = 'display:block;color:#777b86;margin-bottom:4px'; small.textContent = label; const strong = document.createElement('strong'); strong.textContent = names; item.append(small, strong); team.appendChild(item); });
       columns.append(castList, team); panel.appendChild(columns); document.querySelector('.detail-grid > section').appendChild(panel);
     }
-    const embed = prepareRumbleUrl(value(row, videoField));
+    currentRow = row;
+    posterSrc = poster;
+    const episodes = playlist(row);
+    const embed = episodes.length ? prepareRumbleUrl(episodes.find(item => item.video_url)?.video_url || '') : prepareRumbleUrl(value(row, videoField));
     byId('watch-button').disabled = !embed;
-    byId('watch-label').textContent = embed ? `${kind}ს ყურება` : 'მალე დაემატება';
+    byId('watch-label').textContent = embed ? (episodes.length ? 'ეპიზოდების ყურება' : `${kind}ს ყურება`) : 'მალე დაემატება';
     playerEmbed = embed;
-    if (row.content_type === 'series' && Array.isArray(row.seasons)) {
-      const panel = document.createElement('section'); panel.className = 'detail-panel';
-      const heading = document.createElement('h2'); heading.textContent = 'სეზონები და ეპიზოდები'; panel.append(heading);
-      const select = document.createElement('select'); select.className = 'detail-action'; select.setAttribute('aria-label', 'სეზონის არჩევა');
-      const seasons = [...row.seasons].sort((a,b) => a.number - b.number);
-      seasons.forEach((season, index) => { const option = document.createElement('option'); option.value = index; option.textContent = `სეზონი ${season.number}${season.title ? ' — ' + season.title : ''}`; select.append(option); });
-      const list = document.createElement('div'); list.style.cssText = 'display:grid;gap:12px;margin-top:18px';
-      function renderEpisodes() {
-        list.replaceChildren();
-        [...(seasons[Number(select.value)]?.episodes || [])].sort((a,b) => a.number-b.number).forEach(episode => {
-          const item = document.createElement('div'); item.style.cssText = 'border:1px solid #343640;padding:16px;border-radius:12px';
-          const button = document.createElement('button'); button.className = 'detail-action';
-          button.textContent = `${episode.number}. ${episode.title || 'ეპიზოდი'} ▶`;
-          button.disabled = !episode.video_url;
-          button.onclick = () => { playerEmbed = prepareRumbleUrl(episode.video_url); byId('watch-button').disabled = false; byId('watch-button').click(); };
-          item.append(button);
-          if (episode.description) { const description = document.createElement('p'); description.className = 'detail-description'; description.textContent = episode.description; item.append(description); }
-          list.append(item);
-        });
-      }
-      select.onchange = renderEpisodes; panel.append(select,list); renderEpisodes();
-      document.querySelector('.detail-grid > section').prepend(panel);
-      const firstEpisode = seasons.flatMap(season => season.episodes || []).find(episode => episode.video_url);
-      if (firstEpisode) { playerEmbed = prepareRumbleUrl(firstEpisode.video_url); byId('watch-button').disabled = false; byId('watch-label').textContent = 'პირველი ეპიზოდის ყურება'; }
-    }
     document.title = `${title} — სტუდია პრიზმა`;
     document.querySelector('meta[name="description"]')?.setAttribute('content', value(row, 'description') || title);
     const saved = JSON.parse(localStorage.getItem('prisma-detail-saved') || '[]');
@@ -111,8 +92,153 @@
       byId('save-button').classList.toggle('active', next.includes(row.id));
       byId('save-label').textContent = next.includes(row.id) ? 'შენახულია' : 'შენახვა';
     };
-    byId('detail-content').hidden = false; byId('detail-status').hidden = true;
+    const playing = new URLSearchParams(location.search).get('play') === '1';
+    byId('detail-content').hidden = playing;
+    byId('detail-status').hidden = true;
+    if (playing) paintWatch(false);
     if (window.lucide) window.lucide.createIcons();
+  }
+
+  function playlist(row) {
+    if (row.content_type !== 'series' || !Array.isArray(row.seasons)) return [];
+    return [...row.seasons]
+      .sort((a, b) => Number(a.number) - Number(b.number))
+      .flatMap(season => [...(season.episodes || [])]
+        .sort((a, b) => Number(a.number) - Number(b.number))
+        .map(episode => ({
+          season: Number(season.number),
+          seasonTitle: season.title || '',
+          episode: Number(episode.number),
+          title: episode.title || 'ეპიზოდი',
+          description: episode.description || '',
+          video_url: prepareRumbleUrl(episode.video_url),
+        })));
+  }
+
+  function chosenEpisode(items) {
+    const params = new URLSearchParams(location.search);
+    const season = Number(params.get('season'));
+    const episode = Number(params.get('episode'));
+    return items.find(item => item.season === season && item.episode === episode)
+      || items.find(item => item.video_url)
+      || items[0]
+      || null;
+  }
+
+  function watchHref(item) {
+    const params = new URLSearchParams(location.search);
+    params.set('play', '1');
+    params.delete('season');
+    params.delete('episode');
+    if (item) { params.set('season', String(item.season)); params.set('episode', String(item.episode)); }
+    return `${location.pathname}?${params}`;
+  }
+
+  function detailHref() {
+    const params = new URLSearchParams(location.search);
+    params.delete('play'); params.delete('season'); params.delete('episode');
+    return `${location.pathname}?${params}`;
+  }
+
+  function mountPlayer(url) {
+    const frame = byId('watch-frame');
+    const error = byId('watch-error');
+    const skeleton = byId('watch-skeleton');
+    if (!url) {
+      frame.replaceChildren();
+      mountedSrc = '';
+      skeleton.hidden = true;
+      byId('watch-error-text').textContent = 'ვიდეოს ბმული ჯერ არ არის დამატებული.';
+      byId('watch-retry').hidden = true;
+      error.hidden = false;
+      return;
+    }
+    if (mountedSrc === url && frame.querySelector('iframe')) return;
+    mountedSrc = url;
+    error.hidden = true;
+    byId('watch-retry').hidden = false;
+    skeleton.hidden = false;
+    const iframe = document.createElement('iframe');
+    iframe.title = byId('watch-heading').textContent || 'ვიდეო';
+    iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.addEventListener('load', () => { skeleton.hidden = true; });
+    frame.replaceChildren(iframe);
+    iframe.src = url;
+  }
+
+  function paintWatch(push, explicit) {
+    if (!currentRow) return;
+    const items = playlist(currentRow);
+    const current = explicit || (items.length ? chosenEpisode(items) : null);
+    const show = value(currentRow, 'title') || kind;
+    const facts = [value(currentRow, 'release_year'), value(currentRow, 'duration'), Number(currentRow.rating) ? Number(currentRow.rating).toFixed(1) : ''].filter(Boolean);
+    byId('watch-show').textContent = show;
+    byId('watch-position').textContent = current ? `სეზონი ${current.season} · ეპიზოდი ${current.episode}` : '';
+    byId('watch-kicker').textContent = current ? `${show}` : (table === 'movies' ? 'ფილმი' : 'ვიდეო');
+    byId('watch-heading').textContent = current ? current.title : show.split('|')[0].trim();
+    byId('watch-facts').textContent = current ? `სეზონი ${current.season} · ეპიზოდი ${current.episode}` : facts.join(' · ');
+    byId('watch-blurb').textContent = current?.description || value(currentRow, 'description') || '';
+    byId('watch-ambient').style.backgroundImage = posterSrc ? `url("${posterSrc.replaceAll('"', '%22')}")` : '';
+    document.body.classList.add('is-watching');
+    byId('watch-shell').hidden = false;
+    byId('detail-content').hidden = true;
+    document.querySelector('.detail-header').hidden = true;
+    const index = current ? items.indexOf(current) : -1;
+    const previous = index > 0 ? items[index - 1] : null;
+    const next = index >= 0 && index < items.length - 1 ? items[index + 1] : null;
+    byId('watch-jump').hidden = !items.length;
+    byId('watch-prev').hidden = !previous;
+    byId('watch-next').hidden = !next;
+    byId('watch-prev').onclick = () => previous && paintWatch(true, previous);
+    byId('watch-next').onclick = () => next && paintWatch(true, next);
+    const episodePanel = byId('watch-episodes');
+    episodePanel.hidden = !items.length;
+    if (items.length) {
+      const seasonNumbers = [...new Set(items.map(item => item.season))];
+      const seasonSelect = byId('watch-season');
+      const activeSeason = current ? current.season : seasonNumbers[0];
+      seasonSelect.replaceChildren();
+      seasonNumbers.forEach(number => {
+        const option = document.createElement('option');
+        option.value = String(number);
+        const named = items.find(item => item.season === number && item.seasonTitle);
+        option.textContent = named?.seasonTitle ? `სეზონი ${number} — ${named.seasonTitle}` : `სეზონი ${number}`;
+        option.selected = number === activeSeason;
+        seasonSelect.append(option);
+      });
+      seasonSelect.onchange = () => {
+        const first = items.find(item => item.season === Number(seasonSelect.value));
+        if (first) paintWatch(true, first);
+      };
+      const list = byId('watch-episode-list');
+      list.replaceChildren();
+      items.filter(item => item.season === activeSeason).forEach(item => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `episode-row${current && item.season === current.season && item.episode === current.episode ? ' is-current' : ''}`;
+        button.disabled = !item.video_url;
+        const thumb = document.createElement('span');
+        thumb.className = 'episode-thumb';
+        if (posterSrc) { const image = document.createElement('img'); image.src = posterSrc; image.alt = ''; image.loading = 'lazy'; thumb.append(image); }
+        const copy = document.createElement('span');
+        const title = document.createElement('strong');
+        title.textContent = `${item.episode}. ${item.title}`;
+        copy.append(title);
+        if (current && item.season === current.season && item.episode === current.episode) {
+          const badge = document.createElement('em'); badge.textContent = 'ახლა უყურებ'; copy.append(badge);
+        }
+        if (item.description) { const text = document.createElement('small'); text.textContent = item.description; copy.append(text); }
+        button.append(thumb, copy);
+        button.addEventListener('click', () => paintWatch(true, item));
+        list.append(button);
+      });
+    }
+    const target = current?.video_url || playerEmbed;
+    if (push) history.pushState({ play: true }, '', watchHref(current));
+    else if (current && new URLSearchParams(location.search).get('episode') !== String(current.episode)) history.replaceState({ play: true }, '', watchHref(current));
+    document.title = current ? `${show} — ს${current.season} ე${current.episode}` : `${show} — ყურება`;
+    mountPlayer(target);
   }
 
   async function load() {
@@ -125,20 +251,30 @@
     _supabase.rpc(rpc[0], rpc[1]).then(() => {}).catch(() => {});
   }
 
-  byId('watch-button').addEventListener('click', () => {
-    if (!playerEmbed) return;
-    const frame = byId('player-frame');
-    frame.innerHTML = `<iframe src="${playerEmbed.replaceAll('"', '&quot;')}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
-    byId('player-overlay').classList.add('open');
+  function leaveWatch() {
+    byId('watch-frame').querySelector('iframe')?.contentWindow?.postMessage('{"method":"pause"}', '*');
+    document.body.classList.remove('is-watching');
+    byId('watch-shell').hidden = true;
+    byId('detail-content').hidden = false;
+    document.querySelector('.detail-header').hidden = false;
+    document.title = `${value(currentRow || {}, 'title') || kind} — სტუდია პრიზმა`;
+  }
+
+  byId('watch-button').addEventListener('click', () => { if (playerEmbed) paintWatch(true); });
+  byId('watch-back').addEventListener('click', () => {
+    if (history.state && history.state.play) history.back();
+    else location.assign(detailHref());
   });
-  byId('player-close').addEventListener('click', () => {
-    const overlay = byId('player-overlay');
-    overlay.classList.remove('open');
-    byId('player-frame').querySelector('iframe')?.contentWindow?.postMessage('{"method":"pause"}', '*');
-    window.setTimeout(() => { if (!overlay.classList.contains('open')) byId('player-frame').innerHTML = ''; }, 320);
+  byId('watch-retry').addEventListener('click', () => { const src = mountedSrc; mountedSrc = ''; mountPlayer(src); });
+  addEventListener('popstate', () => {
+    if (!currentRow) return;
+    if (new URLSearchParams(location.search).get('play') === '1') paintWatch(false);
+    else leaveWatch();
   });
-  byId('player-overlay').addEventListener('click', event => { if (event.target === byId('player-overlay')) byId('player-close').click(); });
   byId('share-button').addEventListener('click', async () => { try { if (navigator.share) await navigator.share({ title: document.title, url: location.href }); else { await navigator.clipboard.writeText(location.href); byId('share-label').textContent = 'დაკოპირდა'; } } catch {} });
-  addEventListener('keydown', event => { if (event.key === 'Escape') byId('player-close').click(); });
+  addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
+    if (document.body.classList.contains('is-watching')) byId('watch-back').click();
+  });
   load();
 })();
