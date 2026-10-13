@@ -1408,13 +1408,21 @@
                     ${(season.episodes || []).map((episode, e) => `<div data-series-episode style="background:#151820;padding:12px;margin:12px 0;border-radius:8px">
                         <label>ეპიზოდის ნომერი<input data-episode-number type="number" min="1" value="${episode.number}" required></label>
                         <label>ეპიზოდის სათაური<input data-episode-title value="${seriesEscape(episode.title)}" required></label>
-                        <label>ვიდეოს Embed URL<input data-episode-url type="url" value="${seriesEscape(episode.video_url)}" placeholder="https://rumble.com/embed/..." required></label>
+                        <label>ვიდეოს Embed URL (არასავალდებულო)<input data-episode-url type="url" value="${seriesEscape(episode.video_url)}" placeholder="https://rumble.com/embed/...">
+                            <small class="field-help episode-video-hint" style="${episode.video_url ? 'display:none;' : ''}">ვიდეოს ბმული დასამატებელია, თუმცა შენახვა შეგიძლია მის გარეშეც. ცარიელი ბმულისას მაყურებელს ეჩვენება „ვიდეო ჯერ არ ატვირთულა“.</small>
+                        </label>
                         <label>აღწერა<textarea data-episode-description>${seriesEscape(episode.description)}</textarea></label>
                         <button type="button" onclick="seriesSeasons=readSeriesEditor();seriesSeasons[${s}].episodes.splice(${e},1);renderSeriesEditor()">ეპიზოდის ამოღება</button>
                     </div>`).join('')}
                     <button type="button" class="btn-edit" onclick="addSeriesEpisode(${s})">+ ეპიზოდი</button>
                     <button type="button" onclick="seriesSeasons=readSeriesEditor();seriesSeasons.splice(${s},1);renderSeriesEditor()">სეზონის ამოღება</button>
                 </div>`).join('');
+            document.querySelectorAll('[data-episode-url]').forEach(input => {
+                input.addEventListener('input', () => {
+                    const hint = input.parentElement.querySelector('.episode-video-hint');
+                    if (hint) hint.style.display = input.value.trim() ? 'none' : 'block';
+                });
+            });
         }
         function addSeriesSeason() {
             seriesSeasons = readSeriesEditor();

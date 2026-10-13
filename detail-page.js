@@ -77,8 +77,8 @@
     posterSrc = poster;
     const episodes = playlist(row);
     const embed = episodes.length ? prepareRumbleUrl(episodes.find(item => item.video_url)?.video_url || '') : prepareRumbleUrl(value(row, videoField));
-    byId('watch-button').disabled = !embed;
-    byId('watch-label').textContent = embed ? (episodes.length ? 'ეპიზოდების ყურება' : `${kind}ს ყურება`) : 'მალე დაემატება';
+    byId('watch-button').disabled = false;
+    byId('watch-label').textContent = episodes.length ? 'ეპიზოდების ყურება' : `${kind}ს ყურება`;
     playerEmbed = embed;
     document.title = `${title} — სტუდია პრიზმა`;
     document.querySelector('meta[name="description"]')?.setAttribute('content', value(row, 'description') || title);
@@ -148,7 +148,7 @@
       frame.replaceChildren();
       mountedSrc = '';
       skeleton.hidden = true;
-      byId('watch-error-text').textContent = 'ვიდეოს ბმული ჯერ არ არის დამატებული.';
+      byId('watch-error-text').textContent = 'ვიდეო ჯერ არ ატვირთულა';
       byId('watch-retry').hidden = true;
       error.hidden = false;
       return;
@@ -225,7 +225,6 @@
         const button = document.createElement('button');
         button.type = 'button';
         button.className = `episode-row${current && item.season === current.season && item.episode === current.episode ? ' is-current' : ''}`;
-        button.disabled = !item.video_url;
         const thumb = document.createElement('span');
         thumb.className = 'episode-thumb';
         if (posterSrc) { const image = document.createElement('img'); image.src = posterSrc; image.alt = ''; image.loading = 'lazy'; thumb.append(image); }
@@ -242,7 +241,7 @@
         list.append(button);
       });
     }
-    const target = current?.video_url || playerEmbed;
+    const target = current ? current.video_url : playerEmbed;
     if (push) history.pushState({ play: true }, '', watchHref(current));
     else if (current && new URLSearchParams(location.search).get('episode') !== String(current.episode)) history.replaceState({ play: true }, '', watchHref(current));
     document.title = current ? `${show} — ს${current.season} ე${current.episode}` : `${show} — ყურება`;
@@ -268,7 +267,7 @@
     document.title = `${value(currentRow || {}, 'title') || kind} — სტუდია პრიზმა`;
   }
 
-  byId('watch-button').addEventListener('click', () => { if (playerEmbed) paintWatch(true); });
+  byId('watch-button').addEventListener('click', () => paintWatch(true));
   byId('watch-back').addEventListener('click', () => {
     location.assign(table === 'movies' ? '/?section=Movies' : '/?section=Videos');
   });
