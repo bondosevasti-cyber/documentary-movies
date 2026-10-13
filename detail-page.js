@@ -186,8 +186,8 @@
     byId('watch-facts').textContent = current ? `სეზონი ${current.season} · ეპიზოდი ${current.episode}` : facts.join(' · ');
     byId('watch-blurb').textContent = current?.description || value(currentRow, 'description') || '';
     byId('watch-ambient').style.backgroundImage = posterSrc ? `url("${posterSrc.replaceAll('"', '%22')}")` : '';
-    byId('watch-poster').src = posterSrc;
-    byId('watch-poster').alt = show;
+    const watchPoster = byId('watch-poster');
+    if (watchPoster) { watchPoster.src = posterSrc; watchPoster.alt = show; }
     document.body.classList.add('is-watching');
     byId('watch-shell').hidden = false;
     byId('detail-content').hidden = true;
