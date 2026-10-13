@@ -15,7 +15,7 @@ export function MediaCard({ item, saved, onOpen, onToggleSave }: {
   return (
     <article className="media-card">
       <div className="media-card-art">
-        <button type="button" onClick={() => onOpen(item)} aria-label={`${item.title} — დეტალები`}>
+        <button type="button" onClick={() => onOpen(item)} aria-label={`${item.title} — ${item.section === 'Articles' ? 'წაკითხვა' : 'ყურება'}`}>
           {src && <img src={src} alt="" loading="lazy" decoding="async" className={loaded ? 'is-loaded' : ''} onLoad={() => setLoaded(true)} />}
           <span className="media-card-hover">
             <strong>{item.title.split('|')[0].trim()}</strong>

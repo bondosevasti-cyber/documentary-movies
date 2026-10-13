@@ -109,7 +109,8 @@ export default function CatalogApp() {
   };
   const visit = (item: CatalogItem) => {
     remember(item);
-    location.assign(item.href);
+    if (item.section === 'Articles') location.assign(item.href);
+    else location.assign(`${item.href}${item.href.includes('?') ? '&' : '?'}play=1`);
   };
   const toggleSaved = (item: CatalogItem) => setSaved(prev => prev.some(entry => entry.id === item.id) ? prev.filter(entry => entry.id !== item.id) : [...prev, item]);
 
