@@ -5,7 +5,8 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "npm --prefix \"studio prisma web\" run dev",
+    "dev:next": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

@@ -164,7 +164,13 @@
     iframe.allowFullscreen = true;
     iframe.addEventListener('load', () => { skeleton.hidden = true; });
     frame.replaceChildren(iframe);
-    iframe.src = url;
+    try {
+      const embedUrl = new URL(url);
+      if (embedUrl.hostname.endsWith('rumble.com')) embedUrl.searchParams.set('autoplay', '2');
+      iframe.src = embedUrl.href;
+    } catch {
+      iframe.src = url;
+    }
   }
 
   function paintWatch(push, explicit) {
@@ -180,6 +186,8 @@
     byId('watch-facts').textContent = current ? `სეზონი ${current.season} · ეპიზოდი ${current.episode}` : facts.join(' · ');
     byId('watch-blurb').textContent = current?.description || value(currentRow, 'description') || '';
     byId('watch-ambient').style.backgroundImage = posterSrc ? `url("${posterSrc.replaceAll('"', '%22')}")` : '';
+    byId('watch-poster').src = posterSrc;
+    byId('watch-poster').alt = show;
     document.body.classList.add('is-watching');
     byId('watch-shell').hidden = false;
     byId('detail-content').hidden = true;
@@ -262,8 +270,7 @@
 
   byId('watch-button').addEventListener('click', () => { if (playerEmbed) paintWatch(true); });
   byId('watch-back').addEventListener('click', () => {
-    if (history.state && history.state.play) history.back();
-    else location.assign(detailHref());
+    location.assign(table === 'movies' ? '/?section=Movies' : '/?section=Videos');
   });
   byId('watch-retry').addEventListener('click', () => { const src = mountedSrc; mountedSrc = ''; mountPlayer(src); });
   addEventListener('popstate', () => {

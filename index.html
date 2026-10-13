@@ -281,12 +281,12 @@
                 const infoIcon = '';
 
                 const cardHtml = `
-                    <div class="rank-card-wrapper" onclick="manualHeroUpdate(${JSON.stringify(movie).replace(/"/g, '&quot;')})">
+                    <div class="rank-card-wrapper" onclick="window.location.href='watch_movie.html?id=${movie.id}&play=1'">
                         ${infoIcon}
                         <div class="rank-number">${movie.top_10_position}</div>
                         <div class="rank-poster-container">
                             ${officialBadge}
-                            <img src="${movie.card_url || movie.poster_url}" alt="${movie.title}" style="object-position: ${movie.card_pos_x ?? 50}% ${movie.card_pos_y ?? 50}%">
+                            <img src="${movie.poster_url || movie.card_url}" alt="${movie.title}">
                         </div>
                     </div>
                 `;
@@ -522,7 +522,9 @@
             const ratioClass = movie.display_ratio === '16:9' ? 'card-16-9' : 'card-1-1';
             const card = document.createElement('div');
             card.className = `card-item ${ratioClass}`;
-            card.onclick = () => manualHeroUpdate(movie);
+            card.onclick = () => movie.video_id
+                ? window.location.assign(`watch_movie.html?id=${encodeURIComponent(movie.id)}&play=1`)
+                : manualHeroUpdate(movie);
 
             const date = movie.created_at ? new Date(movie.created_at).toLocaleDateString('ka-GE', { month: 'short', day: 'numeric' }) : '';
             const officialBadge = movie.is_official ? `<div class="official-badge" title="ოფიციალური დასტური ავტორისგან" onclick="event.stopPropagation(); openOfficialModal()"></div>` : '';
@@ -578,7 +580,7 @@
                 hero.style.backgroundImage = 'none';
             }
 
-            document.getElementById('hero-play-btn').href = `watch_movie.html?id=${movie.id}`;
+            document.getElementById('hero-play-btn').href = `watch_movie.html?id=${encodeURIComponent(movie.id)}&play=1`;
 
             // Smooth scroll to top only if a card was manually clicked
             if (shouldScroll) {

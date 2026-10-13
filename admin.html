@@ -328,9 +328,11 @@
         .media-upload-grid > .form-group:first-child { grid-row: span 2; }
         .media-upload-grid .upload-wrapper { min-height: 155px; height: 100%; margin: 0; border: 1px dashed #4a5361; border-radius: 11px; background: radial-gradient(circle at 50% 0%, rgba(106,124,153,.08), transparent 60%), #0a0e13; }
         .media-upload-grid .form-group:first-child .upload-wrapper { min-height: 340px; }
-        .media-upload-grid .form-group:nth-child(2) .upload-wrapper,
+        .media-upload-grid .form-group:nth-child(2) .upload-wrapper { aspect-ratio: 2 / 3; height: auto; min-height: 0; }
         .media-upload-grid .form-group:nth-child(3) .upload-wrapper { aspect-ratio: 16 / 9; }
         .media-upload-grid .title-art-upload { aspect-ratio: auto; min-height: 132px; }
+        .media-preview-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px; align-items:end; }
+        @media (max-width: 640px) { .media-preview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
         .media-upload-grid label { margin-bottom: 9px; color: #c8cfd9; font-size: 13px; font-weight: 600; }
         .media-upload-grid .upload-placeholder { color: #a3acba; }
         .media-upload-grid .upload-placeholder p { margin: 7px 0 0; font-size: 13px; }
@@ -530,7 +532,7 @@
 
                     <div class="form-group">
                         <label>ვერტიკალური პოსტერი — TOP 5 და დეტალური გვერდი (2:3)</label>
-                        <p class="field-help">წიგნის ყდის მსგავსი ვერტიკალური ფოტო. TOP 5-ის მაღალ ბარათზე და „ვრცლად“ გვერდზე გამოჩნდება.</p>
+                        <p class="field-help">ატვირთე ვერტიკალური, წიგნის ყდის მსგავსი ფოტო. საბოლოო კადრი ინახება 600 × 900 px ზომით და გამოიყენება TOP 5-ში და ფილმის დეტალურ გვერდზე. ჩარჩოში გადაადგილებით აირჩიე მოსაჭრელი ნაწილი.</p>
                         <div class="upload-wrapper poster-wrapper" id="poster-drop-zone">
                             <button type="button" class="reset-upload" id="poster-reset">&times;</button>
                             <div class="upload-placeholder" id="poster-placeholder" onclick="document.getElementById('poster-input').click()">
@@ -673,23 +675,29 @@
                 <!-- Live Preview Frames -->
                 <div style="margin-top: 30px; border-top: 1px solid #222; padding-top: 20px;">
                     <h3 style="color: #666; font-size: 16px; margin-bottom: 20px;">ვიზუალური შემოწმება</h3>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: end;">
+                    <div class="media-preview-grid">
                         <!-- Desktop Frame -->
                         <div style="text-align: center;">
-                            <p style="font-size: 11px; color: #444; margin-bottom: 5px;">Desktop View (16:9)</p>
+                            <p style="font-size: 11px; color: #444; margin-bottom: 5px;">ფართო ბანერი (16:9)</p>
                             <div style="width: 100%; aspect-ratio: 16/9; background: #000; border: 4px solid #333; border-radius: 5px; overflow: hidden; position: relative;" id="preview-desktop-frame">
                                 <img id="preview-image-desktop" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                         </div>
                         <!-- Mobile Frame -->
                         <div style="text-align: center;">
-                            <p style="font-size: 11px; color: #444; margin-bottom: 5px;">Mobile View (9:16)</p>
+                            <p style="font-size: 11px; color: #444; margin-bottom: 5px;">მობილურის ბანერი (9:16)</p>
                             <div style="width: 100px; height: 178px; margin: 0 auto; background: #000; border: 6px solid #222; border-radius: 12px; overflow: hidden; position: relative;" id="preview-mobile-frame">
                                 <img id="preview-image-mobile" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%;">
                             </div>
                         </div>
                         <div style="text-align: center;">
-                            <p style="font-size: 11px; color: #aaa; margin-bottom: 5px;">მთავარი გვერდის ბარათი</p>
+                            <p style="font-size: 11px; color: #aaa; margin-bottom: 5px;">TOP 5 და დეტალური გვერდი (2:3)</p>
+                            <div style="width: 100%; max-width: 120px; aspect-ratio: 2/3; margin: 0 auto; background: #000; border: 4px solid #444; border-radius: 10px; overflow: hidden; position: relative;" id="preview-poster-frame">
+                                <img id="preview-image-poster" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        </div>
+                        <div style="text-align: center;">
+                            <p style="font-size: 11px; color: #aaa; margin-bottom: 5px;">მთავარი გვერდის ფართო ბარათი</p>
                             <div id="preview-card-frame" style="width: 100%; aspect-ratio: 16/9; margin: 0 auto; background: #000; border: 4px solid #444; border-radius: 10px; overflow: hidden; position: relative;">
                                 <img id="preview-image-card" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%;">
                             </div>
@@ -1802,6 +1810,8 @@
             
             document.getElementById('preview-image-desktop').src = '';
             document.getElementById('preview-image-mobile').src = '';
+            document.getElementById('preview-image-poster').src = '';
+            document.getElementById('preview-image-card').src = '';
             currentX = 50; currentY = 50; currentCardX = 50; currentCardY = 50;
             tmdbQueryInput.value = '';
             tmdbResults.innerHTML = '';
@@ -1833,6 +1843,7 @@
             const previewMobile = document.getElementById('preview-image-mobile');
             const previewCard = document.getElementById('preview-image-card');
             const previewCardFrame = document.getElementById('preview-card-frame');
+            const previewPoster = document.getElementById('preview-image-poster');
 
             // Find current Banner (16:9) image for preview
             let bannerImg = '';
@@ -1861,6 +1872,10 @@
             }
             previewCard.src = cardImg;
             previewCard.style.objectPosition = `${currentCardX}% ${currentCardY}%`;
+            const posterImg = posterCropper
+                ? posterCropper.getCroppedCanvas({ width: 300, height: 450 }).toDataURL()
+                : existingPosterUrl;
+            previewPoster.src = posterImg;
             const cardRatio = document.querySelector('input[name="ratio_choice"]:checked')?.value;
             previewCardFrame.style.aspectRatio = cardRatio === '1:1' ? '1 / 1' : '16 / 9';
             document.getElementById('val-card-x').innerText = currentCardX;
