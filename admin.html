@@ -497,13 +497,13 @@
                         <div id="series-seasons"></div>
                         <button type="button" class="btn-edit" onclick="addSeriesSeason()">+ სეზონის დამატება</button>
                     </section>
-                    <section class="tmdb-lookup" aria-label="TMDb-დან ფილმის დეტალების წამოღება">
+                    <section class="tmdb-lookup" aria-label="IMDb ან TMDb-დან ფილმის ან სერიალის დეტალების წამოღება">
                         <div class="tmdb-lookup-title">
                             <strong>IMDb / TMDb ბმულით ავტომატური შევსება</strong>
-                            <small>ჩასვით ფილმის ბმული — ყველა ველი და სურათი შეივსება</small>
+                            <small>ჩასვით ფილმის ან სერიალის ბმული — ველები და ფოტოები შეივსება</small>
                         </div>
                         <div class="tmdb-search-row">
-                            <input type="search" id="tmdb-query" placeholder="ჩასვით IMDb ან TMDb ფილმის ბმული" autocomplete="off">
+                            <input type="search" id="tmdb-query" placeholder="ჩასვით IMDb/TMDb ფილმის ან სერიალის ბმული" autocomplete="off">
                             <button type="button" id="tmdb-search-btn">ავტომატური შევსება</button>
                         </div>
                         <p class="tmdb-status" id="tmdb-status" aria-live="polite"></p>
@@ -1507,8 +1507,8 @@
                 const year = movie.releaseDate ? movie.releaseDate.slice(0, 4) : 'წელი უცნობია';
                 button.innerHTML = `${poster}<span><strong></strong><small></small></span>`;
                 button.querySelector('strong').textContent = movie.title || movie.originalTitle || 'უსათაურო ფილმი';
-                button.querySelector('small').textContent = `${year}${movie.originalTitle && movie.originalTitle !== movie.title ? ` • ${movie.originalTitle}` : ''}`;
-                button.addEventListener('click', () => fillMovieFromTmdb(movie.id));
+                button.querySelector('small').textContent = `${movie.mediaType === 'tv' ? 'სერიალი' : 'ფილმი'} • ${year}${movie.originalTitle && movie.originalTitle !== movie.title ? ` • ${movie.originalTitle}` : ''}`;
+                button.addEventListener('click', () => fillMovieFromTmdb(movie.id, null, movie.mediaType));
                 tmdbResults.appendChild(button);
             });
         }
@@ -1522,7 +1522,7 @@
             tmdbSearchButton.disabled = true;
             tmdbSearchButton.textContent = 'იტვირთება...';
             tmdbResults.innerHTML = '';
-            setTmdbStatus('ფილმის მონაცემები იტვირთება...');
+            setTmdbStatus('ფილმის ან სერიალის მონაცემები იტვირთება...');
             try {
                 const result = await callTmdbLookup({ action: 'lookup', query });
                 if (result.movie) {
@@ -1531,11 +1531,11 @@
                 }
                 const { results } = result;
                 if (!results?.length) {
-                    setTmdbStatus('ფილმი ვერ მოიძებნა. სცადეთ IMDb/TMDb ბმული ან ორიგინალი სათაური.', true);
+                    setTmdbStatus('ფილმი ან სერიალი ვერ მოიძებნა. გადაამოწმეთ IMDb/TMDb ბმული ან სათაური.', true);
                     return;
                 }
                 renderTmdbResults(results);
-                setTmdbStatus('სათაურით ძიებისას აირჩიეთ ზუსტი ფილმი სიიდან.');
+                setTmdbStatus('აირჩიეთ სწორი ფილმი ან სერიალი სიიდან.');
             } catch (error) {
                 setTmdbStatus(error.message, true);
             } finally {
@@ -1557,21 +1557,26 @@
             if (form[name]) form[name].value = value ?? '';
         }
 
-        async function fillMovieFromTmdb(movieId, prefetchedMovie = null) {
+        async function fillMovieFromTmdb(movieId, prefetchedMovie = null, mediaType = null) {
             tmdbResults.innerHTML = '';
             tmdbSearchButton.disabled = true;
             tmdbSearchButton.textContent = 'ივსება...';
             setTmdbStatus('ინფორმაცია და სურათები იტვირთება...');
             try {
-                const movie = prefetchedMovie || (await callTmdbLookup({ action: 'details', movieId })).movie;
+                const movie = prefetchedMovie || (await callTmdbLookup({ action: 'details', movieId, mediaType })).movie;
                 const form = document.getElementById('movie-form');
+                const isSeries = movie.mediaType === 'tv';
+                form['content_type'].value = isSeries ? 'series' : 'movie';
+                document.getElementById('series-editor').hidden = !isSeries;
+                seriesSeasons = isSeries ? (movie.seasons || []) : [];
+                renderSeriesEditor();
                 setMovieField(form, 'title', movie.title);
                 setMovieField(form, 'genre', movie.genres);
                 setMovieField(form, 'description', movie.overview);
                 setMovieField(form, 'release_year', movie.year);
                 setMovieField(form, 'rating', movie.rating);
                 setMovieField(form, 'cast_members', movie.cast);
-                setMovieField(form, 'director_name', movie.directors);
+                setMovieField(form, 'director_name', movie.directors || movie.creators);
                 setMovieField(form, 'writer_names', movie.writers);
                 setMovieField(form, 'producer_names', movie.producers);
                 setMovieField(form, 'trailer_url', movie.trailerUrl);
@@ -1595,15 +1600,15 @@
                 form['dur_m'].value = runtime ? runtime % 60 : '';
                 const cardRatio = document.querySelector('input[name="ratio_choice"]:checked').value === '16:9' ? 16 / 9 : 1;
                 const imageTasks = [
-                    setTmdbImage(movie.posterUrl, 'poster', 1),
+                    setTmdbImage(movie.posterUrl, 'poster', 2 / 3),
                     setTmdbImage(movie.posterUrl, 'card', cardRatio),
                     setTmdbImage(movie.backdropUrl, 'cover', 16 / 9),
                 ].filter(Boolean);
                 const imageResults = await Promise.allSettled(imageTasks);
                 if (imageResults.some((result) => result.status === 'rejected')) {
-                    setTmdbStatus('მონაცემები შეივსო. ერთი ან მეტი სურათი ხელით ატვირთეთ.', true);
+                    setTmdbStatus(`${isSeries ? 'სერიალის' : 'ფილმის'} მონაცემები შეივსო. ერთი ან მეტი სურათი ხელით ატვირთეთ.${isSeries ? ' ეპიზოდებს ვიდეოს ბმულებიც დაუმატეთ.' : ''}`, true);
                 } else {
-                    setTmdbStatus('მონაცემები და სურათები შეივსო. შეამოწმეთ და შეინახეთ ფილმი.');
+                    setTmdbStatus(`${isSeries ? 'სერიალის' : 'ფილმის'} მონაცემები და სურათები შეივსო.${isSeries ? ' სეზონებისა და ეპიზოდების სახელები დაემატა; თითოეულ ეპიზოდს ვიდეოს ბმული მიუთითეთ.' : ''} შეამოწმეთ და შეინახეთ.`);
                 }
                 document.querySelector('.tmdb-extended').open = true;
                 updateLivePreview();

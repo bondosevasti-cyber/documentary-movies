@@ -383,6 +383,38 @@ function normalizeDetails(
   }
 }
 
+async function normalizeTvSeasons(
+  tvId: number,
+  details: any,
+  accessToken: string,
+) {
+  const seasons = (details.seasons ?? [])
+    .filter((season: any) => Number(season.season_number) > 0)
+
+  return Promise.all(seasons.map(async (season: any) => {
+    const number = Number(season.season_number)
+    const { response, data } = await tmdbRequest(
+      `/tv/${tvId}/season/${number}?language=en-US`,
+      accessToken,
+    )
+
+    const episodes = response.ok && Array.isArray(data?.episodes)
+      ? data.episodes.map((episode: any) => ({
+        number: Number(episode.episode_number),
+        title: episode.name ?? `ეპიზოდი ${episode.episode_number}`,
+        description: episode.overview ?? "",
+        video_url: "",
+      }))
+      : []
+
+    return {
+      number,
+      title: season.name ?? `სეზონი ${number}`,
+      episodes,
+    }
+  }))
+}
+
 Deno.serve(async (request) => {
   /*
    * CORS
@@ -732,11 +764,7 @@ Deno.serve(async (request) => {
     }
 
     /*
-     * SEARCH
-     *
-     * ძველ ფუნქციონალთან
-     * თავსებადობისთვის აქ ძირითადად
-     * ფილმებს ვეძებთ.
+     * SEARCH movies and TV series.
      */
     if (action === "search") {
       if (
@@ -745,7 +773,7 @@ Deno.serve(async (request) => {
         return jsonResponse(
           {
             error:
-              "მიუთითეთ ფილმის მინიმუმ ორი სიმბოლო.",
+              "მიუთითეთ ფილმის ან სერიალის მინიმუმ ორი სიმბოლო.",
           },
           400,
         )
@@ -756,7 +784,7 @@ Deno.serve(async (request) => {
         data,
       } =
         await tmdbRequest(
-          `/search/movie?language=en-US&include_adult=false&query=${encodeURIComponent(query)}`,
+          `/search/multi?language=en-US&include_adult=false&query=${encodeURIComponent(query)}`,
           accessToken,
         )
 
@@ -777,40 +805,34 @@ Deno.serve(async (request) => {
       }
 
       const results =
-        (
-          data?.results ??
-          []
-        )
+        (data?.results ?? [])
+          .filter((item: any) => item.media_type === "movie" || item.media_type === "tv")
           .slice(0, 8)
           .map(
             (
-              movie: any,
+              item: any,
             ) => ({
               id:
-                movie.id,
+                item.id,
 
               mediaType:
-                "movie",
+                item.media_type,
 
               title:
-                movie.title ??
-                "",
+                item.media_type === "tv" ? item.name ?? "" : item.title ?? "",
 
               originalTitle:
-                movie.original_title ??
-                "",
+                item.media_type === "tv" ? item.original_name ?? "" : item.original_title ?? "",
 
               releaseDate:
-                movie.release_date ??
-                "",
+                item.media_type === "tv" ? item.first_air_date ?? "" : item.release_date ?? "",
 
               overview:
-                movie.overview ??
-                "",
+                item.overview ?? "",
 
               posterUrl:
                 tmdbImageUrl(
-                  movie.poster_path,
+                  item.poster_path,
                   "w342",
                 ),
             }),
@@ -884,11 +906,10 @@ Deno.serve(async (request) => {
           )
         }
 
-        const movie =
-          normalizeDetails(
-            data,
-            mediaType,
-          )
+        const movie: any = normalizeDetails(data, mediaType)
+        if (mediaType === "tv") {
+          movie.seasons = await normalizeTvSeasons(numericId, data, accessToken)
+        }
 
         return jsonResponse({
           movie,
@@ -939,13 +960,9 @@ Deno.serve(async (request) => {
           tvAttempt
             .response.ok
         ) {
-          return jsonResponse({
-            movie:
-              normalizeDetails(
-                tvAttempt.data,
-                "tv",
-              ),
-          })
+          const movie: any = normalizeDetails(tvAttempt.data, "tv")
+          movie.seasons = await normalizeTvSeasons(numericId, tvAttempt.data, accessToken)
+          return jsonResponse({ movie })
         }
       }
 
