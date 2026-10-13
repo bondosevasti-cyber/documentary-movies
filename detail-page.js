@@ -9,6 +9,120 @@
   let mountedSrc = '';
   const byId = id => document.getElementById(id);
   const value = (row, ...keys) => keys.map(key => row[key]).find(item => item !== null && item !== undefined && String(item).trim()) || '';
+  const escapeHtml = text => String(text || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+
+  function splitNames(raw) {
+    return String(raw || '').split(/\n|,/).map(item => item.trim()).filter(Boolean);
+  }
+
+  function createAvatar(name) {
+    const initials = name.split(/\s+/).map(word => word[0]).join('').slice(0, 2).toUpperCase();
+    return `<span class="person-avatar" aria-hidden="true">${escapeHtml(initials || '•')}</span>`;
+  }
+
+  function episodeImageStyle(index) {
+    const positions = ['50% 18%', '30% 35%', '70% 42%', '50% 65%', '25% 70%', '75% 24%'];
+    return `object-position:${positions[index % positions.length]}`;
+  }
+
+  function renderDetailHub(row, episodes, cast, creative, poster) {
+    const existing = byId('detail-hub');
+    if (existing) existing.remove();
+
+    const seasons = [...new Set(episodes.map(item => item.season))];
+    const isSeries = row.content_type === 'series';
+    const language = value(row, 'original_language', 'spoken_languages') || '—';
+    const companies = splitNames(value(row, 'production_companies'));
+    const countries = splitNames(value(row, 'production_countries'));
+    const hub = document.createElement('div');
+    hub.id = 'detail-hub';
+    hub.className = 'detail-hub';
+
+    const stats = [
+      ['ტიპი', isSeries ? 'სერიალი' : kind],
+      ['ენა', language],
+      ['გამოშვება', value(row, 'release_year') || '—'],
+      ...(isSeries ? [['სეზონები', String(seasons.length)], ['ეპიზოდები', String(episodes.length)]] : []),
+    ];
+
+    hub.innerHTML = `
+      <section class="title-facts" aria-label="${isSeries ? 'სერიალის' : 'ფილმის'} ინფორმაცია">
+        ${stats.map(([label, content]) => `<div><small>${escapeHtml(label)}</small><strong>${escapeHtml(content)}</strong></div>`).join('')}
+        ${value(row, 'studio_name') ? `<div class="fact-studio"><small>სტუდია</small><strong>${escapeHtml(value(row, 'studio_name'))}</strong></div>` : ''}
+      </section>
+      ${isSeries ? `<section class="hub-section hub-episodes">
+        <div class="hub-heading"><div><span>სეზონები და ეპიზოდები</span><h2>უყურე ეპიზოდებს</h2></div><label class="episode-season-picker">სეზონი <select id="detail-season-picker"></select></label></div>
+        <div class="episode-rail" id="detail-episode-rail"></div>
+      </section>` : ''}
+      <div class="hub-columns">
+        <section class="hub-section hub-copy"><div class="hub-heading"><span>შესახებ</span><h2>აღწერილობა</h2></div><p>${escapeHtml(value(row, 'description') || 'აღწერა ჯერ არ არის დამატებული.')}</p></section>
+        <section class="hub-section hub-production"><div class="hub-heading"><span>ინფორმაცია</span><h2>წარმოება</h2></div>
+          <dl>
+            ${value(row, 'director_name') ? `<div><dt>რეჟისორი</dt><dd>${escapeHtml(value(row, 'director_name'))}</dd></div>` : ''}
+            ${value(row, 'writer_names') ? `<div><dt>სცენარი</dt><dd>${escapeHtml(value(row, 'writer_names'))}</dd></div>` : ''}
+            ${companies.length ? `<div><dt>კომპანია</dt><dd>${companies.map(company => `<span>${escapeHtml(company)}</span>`).join('')}</dd></div>` : ''}
+            ${countries.length ? `<div><dt>ქვეყანა</dt><dd>${countries.map(country => `<span>${escapeHtml(country)}</span>`).join('')}</dd></div>` : ''}
+          </dl>
+        </section>
+      </div>
+      ${(cast.length || creative.length) ? `<section class="hub-section cast-section"><div class="hub-heading"><span>შემოქმედებითი ჯგუფი</span><h2>მსახიობები და გუნდი</h2></div><div class="people-grid">
+        ${cast.map(person => { const [name, role] = person.split(/\s+—\s+|\s+-\s+/, 2); return `<article class="person-card">${createAvatar(name)}<div><strong>${escapeHtml(name)}</strong>${role ? `<small>${escapeHtml(role)}</small>` : ''}</div></article>`; }).join('')}
+        ${creative.flatMap(([role, names]) => splitNames(names).map(name => `<article class="person-card crew-card">${createAvatar(name)}<div><strong>${escapeHtml(name)}</strong><small>${escapeHtml(role)}</small></div></article>`)).join('')}
+      </div></section>` : ''}
+    `;
+    document.querySelector('.detail-grid').after(hub);
+
+    if (!isSeries) return;
+    const seasonPicker = byId('detail-season-picker');
+    const rail = byId('detail-episode-rail');
+    const drawEpisodes = number => {
+      rail.replaceChildren();
+      episodes.filter(item => item.season === number).forEach((item, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `episode-card${item.video_url ? '' : ' is-pending'}`;
+        button.innerHTML = `${poster ? `<img src="${escapeHtml(poster)}" alt="" style="${episodeImageStyle(index)}">` : '<span class="episode-card-art"></span>'}<span class="episode-chip">E${item.episode}</span><span class="episode-card-copy"><strong>${escapeHtml(item.title)}</strong><small>${item.video_url ? 'ყურება' : 'ვიდეო მალე დაემატება'}</small></span>`;
+        button.addEventListener('click', () => paintWatch(true, item));
+        rail.append(button);
+      });
+    };
+    seasons.forEach(number => {
+      const option = document.createElement('option'); option.value = String(number); option.textContent = `სეზონი ${number}`; seasonPicker.append(option);
+    });
+    seasonPicker.onchange = () => drawEpisodes(Number(seasonPicker.value));
+    drawEpisodes(seasons[0]);
+  }
+
+  function renderWatchControls(items, current) {
+    const info = document.querySelector('.watch-info');
+    byId('watch-source-card')?.remove();
+    byId('watch-selector-card')?.remove();
+    const source = document.createElement('section');
+    source.id = 'watch-source-card';
+    source.className = 'watch-side-card watch-source-card';
+    source.innerHTML = `<div class="watch-card-title"><span>◉</span> ვიდეოს წყარო</div><button type="button" class="source-option${current?.video_url || (!items.length && playerEmbed) ? ' is-ready' : ''}"><span><b>სტუდია პრიზმა</b><small>${current?.video_url || (!items.length && playerEmbed) ? 'მთავარი წყარო · მზადაა' : 'ვიდეო ჯერ არ ატვირთულა'}</small></span><strong>${current?.video_url || (!items.length && playerEmbed) ? '✓' : '—'}</strong></button><p class="source-note">ხარისხი ავტომატურად განისაზღვრება პლეიერის მიერ.</p>`;
+    info.append(source);
+
+    if (!items.length) return;
+    const picker = document.createElement('aside');
+    picker.id = 'watch-selector-card';
+    picker.className = 'watch-side-card watch-selector-card';
+    picker.innerHTML = `<div class="watch-card-title"><span>▤</span> ეპიზოდის არჩევა</div><label>სეზონი <select id="watch-season-side"></select></label><label>ეპიზოდი <select id="watch-episode-side"></select></label><p class="picker-count">${items.length} ეპიზოდი</p>`;
+    info.append(picker);
+    const seasonSelect = byId('watch-season-side');
+    const episodeSelect = byId('watch-episode-side');
+    const seasons = [...new Set(items.map(item => item.season))];
+    seasons.forEach(number => { const option = new Option(`სეზონი ${number}`, String(number), false, number === current?.season); seasonSelect.append(option); });
+    const drawEpisodeOptions = season => {
+      episodeSelect.replaceChildren();
+      items.filter(item => item.season === season).forEach(item => {
+        const option = new Option(`${item.episode}. ${item.title}`, String(item.episode), false, item.episode === current?.episode); episodeSelect.append(option);
+      });
+    };
+    drawEpisodeOptions(current?.season || seasons[0]);
+    seasonSelect.onchange = () => { drawEpisodeOptions(Number(seasonSelect.value)); const next = items.find(item => item.season === Number(seasonSelect.value)); if (next) paintWatch(true, next); };
+    episodeSelect.onchange = () => { const next = items.find(item => item.season === Number(seasonSelect.value) && item.episode === Number(episodeSelect.value)); if (next) paintWatch(true, next); };
+  }
 
   function prepareRumbleUrl(raw) {
     let input = String(raw || '').trim();
@@ -63,16 +177,6 @@
       ['სცენარის ავტორი', value(row, 'writer_names')],
       ['პროდიუსერი', value(row, 'producer_names')],
     ].filter(item => item[1]);
-    if (cast.length || creative.length) {
-      const panel = document.createElement('section'); panel.className = 'detail-panel';
-      const heading = document.createElement('h2'); heading.textContent = 'მსახიობები და შემოქმედებითი გუნდი'; panel.appendChild(heading);
-      const columns = document.createElement('div'); columns.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px';
-      const castList = document.createElement('div'); castList.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px';
-      cast.forEach(person => { const item = document.createElement('div'); item.className = 'detail-link'; item.style.justifyContent = 'flex-start'; item.textContent = person; castList.appendChild(item); });
-      const team = document.createElement('div'); team.style.cssText = 'display:grid;gap:14px';
-      creative.forEach(([label, names]) => { const item = document.createElement('div'); const small = document.createElement('small'); small.style.cssText = 'display:block;color:#777b86;margin-bottom:4px'; small.textContent = label; const strong = document.createElement('strong'); strong.textContent = names; item.append(small, strong); team.appendChild(item); });
-      columns.append(castList, team); panel.appendChild(columns); document.querySelector('.detail-grid > section').appendChild(panel);
-    }
     currentRow = row;
     posterSrc = poster;
     const episodes = playlist(row);
@@ -80,6 +184,7 @@
     byId('watch-button').disabled = false;
     byId('watch-label').textContent = episodes.length ? 'ეპიზოდების ყურება' : `${kind}ს ყურება`;
     playerEmbed = embed;
+    renderDetailHub(row, episodes, cast, creative, poster);
     document.title = `${title} — სტუდია პრიზმა`;
     document.querySelector('meta[name="description"]')?.setAttribute('content', value(row, 'description') || title);
     const saved = JSON.parse(localStorage.getItem('prisma-detail-saved') || '[]');
@@ -242,6 +347,7 @@
       });
     }
     const target = current ? current.video_url : playerEmbed;
+    renderWatchControls(items, current);
     if (push) history.pushState({ play: true }, '', watchHref(current));
     else if (current && new URLSearchParams(location.search).get('episode') !== String(current.episode)) history.replaceState({ play: true }, '', watchHref(current));
     document.title = current ? `${show} — ს${current.season} ე${current.episode}` : `${show} — ყურება`;
