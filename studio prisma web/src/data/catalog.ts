@@ -10,6 +10,10 @@ export interface CatalogItem extends Documentary {
   href: string;
   topPosition?: number;
   comingSoon?: boolean;
+  isSeries?: boolean;
+  playable?: boolean;
+  studioName?: string;
+  studioLogoUrl?: string;
   posterUrl?: string;
 }
 type Row = Record<string, unknown>;
@@ -48,17 +52,21 @@ export async function loadSection(section: Section, signal: AbortSignal) {
       : [text('category') || (section === 'Videos' ? 'აგრო' : 'ზოგადი')];
     const thumbnail = text('thumbnail_url') || text('photo_url') || text('card_url') || text('poster_url') || text('cover_url');
     const page = section === 'Movies' ? 'watch_movie' : section === 'Videos' ? 'watch_video' : 'watch_article';
+    const videoUrl = section === 'Videos' ? rumbleEmbed(text('rumble_link')) : section === 'Movies' ? rumbleEmbed(text('video_id')) : '';
+    const hasEpisodes = Array.isArray(row.seasons) && row.seasons.some(season =>
+      Array.isArray(season?.episodes) && season.episodes.some((episode: { video_url?: string }) => typeof episode?.video_url === 'string' && episode.video_url.trim()));
     const param = section === 'Articles' ? `slug=${encodeURIComponent(text('slug'))}` : `id=${encodeURIComponent(String(row.id))}`;
     return {
       id: `${section}:${row.id}`, section, categories, href: `/${page}.html?${param}`,
       topPosition: row.top_10_position == null ? undefined : Number(row.top_10_position),
-      comingSoon: row.is_coming_soon === true,
+      comingSoon: row.is_coming_soon === true, isSeries: row.content_type === 'series', playable: Boolean(videoUrl || hasEpisodes),
+      studioName: text('studio_name') || text('production_companies').split(/[\n,]/)[0]?.trim(), studioLogoUrl: text('studio_logo_url'),
       title: text('title'), category: categories.join(' / '), titleImageUrl: text('title_image_url'), hideHeroTitle: Boolean(row.hide_hero_title),
       description: text('excerpt') || text('description'), longDescription: text('description') || text('excerpt'),
       thumbnailUrl: thumbnail, posterUrl: text('poster_url') || text('card_url') || thumbnail, backdropUrl: text('cover_url') || thumbnail,
       duration: text('duration'), views: `${Number(row.views || 0).toLocaleString('ka-GE')} ნახვა`,
       rating: Number(row.rating || 0), year: Number(row.release_year || 0), quality: 'HD',
-      videoUrl: section === 'Videos' ? rumbleEmbed(text('rumble_link')) : section === 'Movies' ? rumbleEmbed(text('video_id')) : '', tags: categories,
+      videoUrl, tags: categories,
     };
   });
   let categories = [...new Set(items.flatMap(item => item.categories))];

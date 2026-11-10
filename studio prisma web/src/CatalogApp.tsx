@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Triangle } from 'lucide-react';
+import { Clapperboard } from 'lucide-react';
+import '../../cinema-shell.css';
 import './cinema.css';
 import { AppHeader } from './components/AppHeader';
 import { CatalogSkeleton } from './components/CatalogSkeleton';
 import { GenreRail } from './components/GenreRail';
 import { HeroCarousel } from './components/HeroCarousel';
-import { InlinePlayerModal } from './components/InlinePlayerModal';
 import { MediaCard } from './components/MediaCard';
 import { MediaRail } from './components/MediaRail';
 import { SearchOverlay } from './components/SearchOverlay';
+import { StudioRail } from './components/StudioRail';
 import { TopRankRail } from './components/TopRankRail';
 import { loadSection, sectionLabels, type CatalogItem, type Section } from './data/catalog';
 import type { ActiveNavTab } from './types';
@@ -16,8 +17,8 @@ import type { ActiveNavTab } from './types';
 const isSection = (value: string): value is Section => Object.hasOwn(sectionLabels, value);
 
 function initialTab(): ActiveNavTab {
-  const value = new URLSearchParams(location.search).get('section') || 'Movies';
-  return isSection(value) || value === 'Watchlist' || value === 'History' ? value : 'Movies';
+  const value = new URLSearchParams(location.search).get('section') || 'Home';
+  return isSection(value) || value === 'Watchlist' || value === 'History' || value === 'TV Series' || value === 'Discover' ? value : 'Home';
 }
 
 function readSaved(key: string): CatalogItem[] {
@@ -36,19 +37,31 @@ export default function CatalogApp() {
   const [error, setError] = useState('');
   const [warning, setWarning] = useState('');
   const [retry, setRetry] = useState(0);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => {
+    try { return localStorage.getItem('prisma-theme') !== 'soft'; } catch { return true; }
+  });
   const [scrolled, setScrolled] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(() => new URLSearchParams(location.search).has('search'));
   const [saved, setSaved] = useState(() => readSaved('prisma-saved'));
   const [history, setHistory] = useState(() => readSaved('prisma-history'));
-  const [player, setPlayer] = useState<CatalogItem | null>(null);
+  const [genre, setGenre] = useState<string | null>(null);
+  const home = activeTab === 'Home';
+  const section = isSection(activeTab) ? activeTab
+    : home || activeTab === 'TV Series' || activeTab === 'Discover' ? 'Movies' : null;
+
+  useEffect(() => {
+    try { localStorage.setItem('prisma-theme', darkMode ? 'dark' : 'soft'); } catch { /* storage unavailable */ }
+  }, [darkMode]);
 
   const selectTab = (tab: ActiveNavTab) => {
     setActiveTab(tab);
     setCategory(null);
     const url = new URL(location.href);
-    url.searchParams.set('section', tab);
-    window.history.pushState({}, '', url);
+    if (tab === 'Home') url.searchParams.delete('section');
+    else url.searchParams.set('section', tab);
+    url.searchParams.delete('search');
+    if (url.href !== location.href) window.history.pushState({}, '', url);
+    window.scrollTo(0, 0);
   };
 
   useEffect(() => {
@@ -70,14 +83,14 @@ export default function CatalogApp() {
     setWarning('');
     setItems([]);
     setCategories([]);
-    if (!isSection(activeTab)) { setLoading(false); return () => controller.abort(); }
+    if (!section) { setLoading(false); return () => controller.abort(); }
     setLoading(true);
-    loadSection(activeTab, controller.signal).then(result => {
+    loadSection(section, controller.signal).then(result => {
       if (!controller.signal.aborted) { setItems(result.items); setCategories(result.categories); setWarning(result.categoryWarning); }
     }).catch(loadError => { if (!controller.signal.aborted) setError(loadError.message); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [activeTab, retry]);
+  }, [section, retry]);
 
   useEffect(() => {
     if (!category) return;
@@ -89,7 +102,7 @@ export default function CatalogApp() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') { setPlayer(null); setSearchOpen(false); }
+      if (event.key === 'Escape') setSearchOpen(false);
       if ((event.ctrlKey || event.metaKey) && event.key === 'k') { event.preventDefault(); setSearchOpen(true); }
     };
     window.addEventListener('keydown', onKey);
@@ -100,7 +113,6 @@ export default function CatalogApp() {
     const next = [item, ...history.filter(entry => entry.id !== item.id)].slice(0, 50);
     try { localStorage.setItem('prisma-history', JSON.stringify(next)); } catch { /* ignore quota */ }
     setHistory(next);
-    return next;
   };
   const open = (item: CatalogItem) => {
     remember(item);
@@ -109,25 +121,33 @@ export default function CatalogApp() {
   };
   const visit = (item: CatalogItem) => {
     remember(item);
-    if (item.section === 'Articles') location.assign(item.href);
-    else location.assign(`${item.href}${item.href.includes('?') ? '&' : '?'}play=1`);
+    location.assign(item.href);
   };
   const toggleSaved = (item: CatalogItem) => setSaved(prev => prev.some(entry => entry.id === item.id) ? prev.filter(entry => entry.id !== item.id) : [...prev, item]);
 
-  const source = activeTab === 'Watchlist' ? saved : activeTab === 'History' ? history : items;
-  const availableCategories = isSection(activeTab) ? categories : [...new Set(source.flatMap(item => item.categories))];
+  const source = activeTab === 'Watchlist' ? saved
+    : activeTab === 'History' ? history
+    : activeTab === 'TV Series' ? items.filter(item => item.isSeries)
+    : activeTab === 'Movies' ? items.filter(item => !item.isSeries) : items;
+  const availableCategories = section === 'Articles' ? categories : [...new Set(source.flatMap(item => item.categories))];
   const filtered = source.filter(item => !category || item.categories.includes(category));
-  const title = isSection(activeTab) ? sectionLabels[activeTab] : activeTab === 'Watchlist' ? 'შენახული' : 'ისტორია';
+  const title = isSection(activeTab) ? sectionLabels[activeTab]
+    : { Watchlist: 'შენახული', History: 'ისტორია', 'TV Series': 'სერიალები', Discover: 'აღმოაჩინე', Home: 'კატალოგი', Categories: 'კატეგორიები' }[activeTab];
   const savedIds = useMemo(() => new Set(saved.map(item => item.id)), [saved]);
-  const ranked = items.filter(item => item.topPosition != null).sort((a, b) => a.topPosition! - b.topPosition!).slice(0, 10);
-  const featured = (activeTab === 'Movies' && ranked.length ? ranked : items.filter(item => !item.comingSoon)).slice(0, 5);
-  const browsing = !category && isSection(activeTab);
-  const fresh = items.filter(item => !item.comingSoon).slice(0, 14);
-  const categoryRails = availableCategories
-    .map(name => ({ name, items: items.filter(item => item.categories.includes(name) && !item.comingSoon).slice(0, 14) }))
-    .filter(rail => rail.items.length >= 3)
-    .slice(0, 4);
-  const recent = history.filter(item => item.section === activeTab).slice(0, 12);
+  const fresh = source.filter(item => !item.comingSoon);
+  const freshMovies = fresh.filter(item => !item.isSeries);
+  const freshSeries = fresh.filter(item => item.isSeries);
+  const ranked = source.filter(item => item.topPosition != null).sort((a, b) => a.topPosition! - b.topPosition!);
+  const topMovies = ranked.filter(item => !item.isSeries).slice(0, 10);
+  const topSeries = ranked.filter(item => item.isSeries).slice(0, 10);
+  const topRated = fresh.filter(item => item.rating > 0).sort((a, b) => b.rating - a.rating)
+    .slice(0, 10).map((item, index) => ({ ...item, topPosition: index + 1 }));
+  const browsing = !category && !!section && activeTab !== 'Discover';
+  const featured = browsing ? [...ranked, ...fresh.filter(item => item.topPosition == null)].slice(0, 10) : [];
+  const comingSoon = source.filter(item => item.comingSoon);
+  const recent = home ? history.slice(0, 12) : history.filter(item => item.section === section).slice(0, 12);
+  const activeGenre = genre && availableCategories.includes(genre) ? genre : fresh[0]?.categories[0];
+  const genreItems = activeGenre ? source.filter(item => item.categories.includes(activeGenre)) : [];
   const card = (item: CatalogItem) => (
     <MediaCard key={item.id} item={item} saved={savedIds.has(item.id)} onOpen={visit} onToggleSave={toggleSaved} />
   );
@@ -142,6 +162,7 @@ export default function CatalogApp() {
           <>
             {browsing && featured.length > 0 && (
               <HeroCarousel
+                key={featured.map(item => item.id).join('|')}
                 items={featured}
                 savedIds={savedIds}
                 actionLabel={activeTab === 'Articles' ? 'წაკითხვა' : 'ყურება'}
@@ -151,17 +172,25 @@ export default function CatalogApp() {
               />
             )}
             <div className={`cinema-content ${browsing && featured.length ? 'with-hero' : 'without-hero'}`}>
-              {browsing && ranked.length > 0 && <TopRankRail title="TOP 5" items={ranked} onOpen={visit} />}
-              {browsing && recent.length > 0 && <MediaRail title="ბოლოს გახსნილი" onSeeAll={() => selectTab('History')}>{recent.map(card)}</MediaRail>}
-              {browsing && fresh.length > 0 && <MediaRail title="ახალი დამატებული">{fresh.map(card)}</MediaRail>}
-              {browsing && categoryRails.map(rail => (
-                <MediaRail key={rail.name} title={rail.name} onSeeAll={() => setCategory(rail.name)}>{rail.items.map(card)}</MediaRail>
-              ))}
-              {browsing && activeTab === 'Movies' && items.some(item => item.comingSoon) && (
-                <MediaRail title="მალე დაემატება">{items.filter(item => item.comingSoon).map(card)}</MediaRail>
+              {browsing && recent.length > 0 && <MediaRail eyebrow="განაგრძე" title="ბოლოს გახსნილი" onSeeAll={() => selectTab('History')}>{recent.map(card)}</MediaRail>}
+              {browsing && freshMovies.length > 0 && (
+                <MediaRail eyebrow="უკვე ხელმისაწვდომია" title={home ? 'ახლად დამატებული ფილმები' : 'ახალი დამატებული'}>{freshMovies.slice(0, 12).map(card)}</MediaRail>
               )}
-              {browsing && <GenreRail categories={availableCategories} items={items} onSelect={setCategory} />}
-              <section className="catalog-section">
+              {browsing && freshSeries.length > 0 && <MediaRail eyebrow="უკვე ხელმისაწვდომია" title="ახალი სერიალები">{freshSeries.slice(0, 12).map(card)}</MediaRail>}
+              {browsing && <TopRankRail title="ტოპ ფილმები" items={topMovies} onOpen={visit} onSeeAll={() => selectTab('Movies')} />}
+              {browsing && <TopRankRail title="ტოპ სერიალები" items={topSeries} onOpen={visit} onSeeAll={() => selectTab('TV Series')} />}
+              {home && !category && <StudioRail items={source} renderCard={card} />}
+              {home && !category && <TopRankRail eyebrow="მაყურებლის რჩეული" title="მაღალრეიტინგული" items={topRated} onOpen={visit} onSeeAll={() => selectTab('Discover')} />}
+              {browsing && comingSoon.length > 0 && <MediaRail eyebrow="ანონსი" title="მალე დაემატება">{comingSoon.map(card)}</MediaRail>}
+              {browsing && activeGenre && (
+                <div className="genre-block">
+                  <GenreRail categories={availableCategories} items={source} active={activeGenre} onSelect={setGenre} />
+                  <MediaRail key={activeGenre} title={activeGenre} onSeeAll={() => setCategory(activeGenre)}>
+                    {genreItems.slice(0, 12).map(card)}
+                  </MediaRail>
+                </div>
+              )}
+              {(!home || category || !fresh.length) && <section className="catalog-section">
                 <div className="catalog-heading">
                   <div>
                     <p className="eyebrow">{category ? 'კატეგორია' : 'კატალოგი'}</p>
@@ -178,18 +207,17 @@ export default function CatalogApp() {
                 {filtered.length
                   ? <div className="cinema-grid">{filtered.map(card)}</div>
                   : <p className="cinema-empty" role="status">{category ? 'ამ არჩევანით ჩანაწერი ვერ მოიძებნა.' : 'ამ განყოფილებაში ჯერ ჩანაწერები არ არის.'}</p>}
-              </section>
+              </section>}
             </div>
           </>
         )}
       </main>
       <footer className="cinema-footer">
-        <div><div className="footer-brand"><Triangle size={16} /> სტუდია პრიზმა</div><p>სხვა კუთხით დანახული სამყარო.</p></div>
+        <div><div className="footer-brand"><Clapperboard size={18} /> სტუდია პრიზმა</div><p>სხვა კუთხით დანახული სამყარო.</p></div>
         <nav><a href="/about.html">ჩვენ შესახებ</a><a href="/privacy.html">კონფიდენციალურობა</a><a href="/terms.html">სარგებლობის წესები</a></nav>
         <p className="footer-note">ფილმები, ვიდეოები და სტატიები — ერთ სივრცეში.</p>
       </footer>
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} onOpen={visit} />
-      <InlinePlayerModal item={player} onClose={() => setPlayer(null)} />
     </div>
   );
 }

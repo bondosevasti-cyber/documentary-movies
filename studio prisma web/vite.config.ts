@@ -7,7 +7,7 @@ import {defineConfig, type Plugin} from 'vite';
 // Keep the existing players, article reader and local images available in dev and builds.
 function legacyAssets(): Plugin {
   const root = path.resolve(__dirname, '..');
-  const files = ['watch_movie.html', 'watch_video.html', 'watch_article.html', 'admin.html', 'admin_articles.html', 'style.css', 'detail-page.css', 'detail-page.js', 'supabase-config.js', 'about.html', 'privacy.html', 'terms.html'];
+  const files = ['watch_movie.html', 'watch_video.html', 'watch_article.html', 'admin.html', 'admin_articles.html', 'style.css', 'detail-page.css', 'cinema-shell.css', 'detail-page.js', 'watch-player.css', 'watch-player.js', 'supabase-config.js', 'about.html', 'privacy.html', 'terms.html'];
   function images(directory = 'images'): string[] {
     return readdirSync(path.join(root, directory), {withFileTypes: true}).flatMap(entry =>
       entry.isDirectory() ? images(`${directory}/${entry.name}`) : [`${directory}/${entry.name}`]);

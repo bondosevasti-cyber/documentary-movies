@@ -3,10 +3,10 @@
   const table = body.dataset.table;
   const videoField = body.dataset.videoField;
   const kind = table === 'movies' ? 'ფილმი' : 'ვიდეო';
+  const cinema = body.classList.contains('cinema-detail');
   let playerEmbed = '';
   let currentRow = null;
   let posterSrc = '';
-  let mountedSrc = '';
   const byId = id => document.getElementById(id);
   const value = (row, ...keys) => keys.map(key => row[key]).find(item => item !== null && item !== undefined && String(item).trim()) || '';
   const escapeHtml = text => String(text || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
@@ -93,37 +93,6 @@
     drawEpisodes(seasons[0]);
   }
 
-  function renderWatchControls(items, current) {
-    const info = document.querySelector('.watch-info');
-    byId('watch-source-card')?.remove();
-    byId('watch-selector-card')?.remove();
-    const source = document.createElement('section');
-    source.id = 'watch-source-card';
-    source.className = 'watch-side-card watch-source-card';
-    source.innerHTML = `<div class="watch-card-title"><span>◉</span> ვიდეოს წყარო</div><button type="button" class="source-option${current?.video_url || (!items.length && playerEmbed) ? ' is-ready' : ''}"><span><b>სტუდია პრიზმა</b><small>${current?.video_url || (!items.length && playerEmbed) ? 'მთავარი წყარო · მზადაა' : 'ვიდეო ჯერ არ ატვირთულა'}</small></span><strong>${current?.video_url || (!items.length && playerEmbed) ? '✓' : '—'}</strong></button><p class="source-note">ხარისხი ავტომატურად განისაზღვრება პლეიერის მიერ.</p>`;
-    info.append(source);
-
-    if (!items.length) return;
-    const picker = document.createElement('aside');
-    picker.id = 'watch-selector-card';
-    picker.className = 'watch-side-card watch-selector-card';
-    picker.innerHTML = `<div class="watch-card-title"><span>▤</span> ეპიზოდის არჩევა</div><label>სეზონი <select id="watch-season-side"></select></label><label>ეპიზოდი <select id="watch-episode-side"></select></label><p class="picker-count">${items.length} ეპიზოდი</p>`;
-    info.append(picker);
-    const seasonSelect = byId('watch-season-side');
-    const episodeSelect = byId('watch-episode-side');
-    const seasons = [...new Set(items.map(item => item.season))];
-    seasons.forEach(number => { const option = new Option(`სეზონი ${number}`, String(number), false, number === current?.season); seasonSelect.append(option); });
-    const drawEpisodeOptions = season => {
-      episodeSelect.replaceChildren();
-      items.filter(item => item.season === season).forEach(item => {
-        const option = new Option(`${item.episode}. ${item.title}`, String(item.episode), false, item.episode === current?.episode); episodeSelect.append(option);
-      });
-    };
-    drawEpisodeOptions(current?.season || seasons[0]);
-    seasonSelect.onchange = () => { drawEpisodeOptions(Number(seasonSelect.value)); const next = items.find(item => item.season === Number(seasonSelect.value)); if (next) paintWatch(true, next); };
-    episodeSelect.onchange = () => { const next = items.find(item => item.season === Number(seasonSelect.value) && item.episode === Number(episodeSelect.value)); if (next) paintWatch(true, next); };
-  }
-
   function prepareRumbleUrl(raw) {
     let input = String(raw || '').trim();
     const iframe = input.match(/src=["']([^"']+)["']/i);
@@ -146,7 +115,7 @@
     link.hidden = false;
   }
 
-  function render(row) {
+  function renderLegacyDetail(row) {
     const title = value(row, 'title');
     const poster = value(row, 'poster_url', 'photo_url', 'card_url', 'cover_url');
     const backdrop = value(row, 'cover_url', 'photo_url', 'poster_url');
@@ -177,30 +146,233 @@
       ['სცენარის ავტორი', value(row, 'writer_names')],
       ['პროდიუსერი', value(row, 'producer_names')],
     ].filter(item => item[1]);
+    renderDetailHub(row, playlist(row), cast, creative, poster);
+  }
+
+  function readList(key) {
+    try {
+      const stored = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(stored) ? stored : [];
+    } catch { return []; }
+  }
+
+  function movieGenres(row) {
+    return String(value(row, 'genre', 'category')).split(/\s*[/,]\s*/).filter(Boolean);
+  }
+
+  function trailerThumbnail(url, backdrop) {
+    try {
+      const parsed = new URL(url, location.href);
+      const host = parsed.hostname.replace(/^www\./, '');
+      const id = host === 'youtu.be' ? parsed.pathname.split('/')[1]
+        : host === 'youtube.com' || host === 'youtube-nocookie.com' ? parsed.searchParams.get('v') || parsed.pathname.split('/')[2] : '';
+      if (/^[A-Za-z0-9_-]{11}$/.test(id || '')) return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+    } catch { /* use the catalog artwork */ }
+    return backdrop;
+  }
+
+  function movieHeading(eyebrow, title, badge = '') {
+    return `<div class="movie-heading"><div><p class="movie-eyebrow">${eyebrow}</p><h2>${title}</h2></div>${badge ? `<span class="movie-heading-badge">${badge}</span>` : ''}</div>`;
+  }
+
+  function renderCinemaDetail(row, episodes) {
+    const title = String(value(row, 'title')).split('|')[0].trim();
+    const art = value(row, 'title_image_url');
+    const backdrop = value(row, 'cover_url', 'photo_url', 'card_url', 'poster_url');
+    const backdropStyle = backdrop ? `url("${String(backdrop).replaceAll('"', '%22')}")` : '';
+    byId('detail-backdrop').style.backgroundImage = backdropStyle;
+    byId('movie-ambient').style.backgroundImage = backdropStyle;
+    byId('detail-title').textContent = title;
+    byId('detail-title').hidden = Boolean(art);
+    if (art) { const image = byId('detail-title-art'); image.src = art; image.alt = title; image.hidden = false; }
+
+    const isSeries = row.content_type === 'series';
+    const type = isSeries ? 'სერიალი' : kind;
+    byId('movie-kicker').textContent = [type, row.release_year, row.duration, row.content_rating].filter(Boolean).join(' · ');
+    const tagline = byId('movie-tagline');
+    tagline.textContent = value(row, 'tagline');
+    tagline.hidden = !tagline.textContent;
+    const rating = Number(row.rating);
+    const ratingElement = byId('movie-rating');
+    ratingElement.hidden = !(rating > 0);
+    if (rating > 0) {
+      const stars = Array.from({ length: 5 }, (_, index) => `<i data-lucide="star" class="${index < Math.round(rating / 2) ? 'is-filled' : ''}"></i>`).join('');
+      ratingElement.innerHTML = `<span class="hero-stars" aria-hidden="true">${stars}</span><b>${Math.round(rating * 10)}%</b>${row.vote_count ? `<small>(${Number(row.vote_count).toLocaleString('ka-GE')})</small>` : ''}`;
+    }
+    setLink('movie-imdb', value(row, 'imdb_url') || (/^tt\d+$/.test(row.imdb_id || '') ? `https://www.imdb.com/title/${row.imdb_id}/` : ''));
+    const genres = movieGenres(row);
+    byId('detail-genres').innerHTML = genres.map(item => `<span>${escapeHtml(item)}</span>`).join('');
+    const description = byId('detail-description');
+    description.textContent = value(row, 'description') || 'აღწერა ჯერ არ არის დამატებული.';
+    const expand = byId('movie-expand');
+    expand.onclick = () => {
+      const expanded = expand.getAttribute('aria-expanded') !== 'true';
+      expand.setAttribute('aria-expanded', String(expanded));
+      description.classList.toggle('is-expanded', expanded);
+      expand.textContent = expanded ? 'ნაკლები' : 'ვრცლად';
+    };
+    const measure = () => { expand.hidden = !description.classList.contains('is-expanded') && description.scrollHeight <= description.clientHeight + 1; };
+    new ResizeObserver(measure).observe(description);
+
+    const director = byId('movie-director');
+    director.innerHTML = `<small>რეჟისორი</small>${escapeHtml(row.director_name)}`;
+    director.hidden = !row.director_name;
+    const trailer = externalUrl(value(row, 'trailer_url'));
+    setLink('trailer-link', trailer);
+    setLink('original-link', row.original_link);
+
+    const cast = splitNames(row.cast_members).map(person => person.split(/\s+[—–-]\s+/, 2));
+    const crew = [
+      ['რეჟისორი', splitNames(row.director_name)],
+      ['სცენარის ავტორი', splitNames(row.writer_names)],
+      ['პროდიუსერი', splitNames(row.producer_names)],
+    ].filter(([, names]) => names.length);
+    const thumb = trailerThumbnail(trailer, backdrop);
+    const artwork = thumb ? `<img src="${escapeHtml(thumb)}" alt="" decoding="async">` : '';
+    const trailerCard = `<span class="movie-trailer-image">${artwork}<span class="movie-trailer-play"><i data-lucide="play"></i></span></span>`;
+    const castTeaser = cast.length ? `<div class="movie-starring"><small>მსახიობები</small><div><span class="movie-avatar-stack">${cast.slice(0, 5).map(([name]) => createAvatar(name)).join('')}</span><span>${cast.slice(0, 3).map(([name]) => escapeHtml(name)).join(', ')}</span></div></div>` : '';
+    const preview = byId('movie-preview');
+    preview.innerHTML = (trailer ? `<a class="movie-preview-link" href="${escapeHtml(trailer)}" target="_blank" rel="noopener">
+      ${trailerCard}<span class="movie-trailer-label">ოფიციალური ტრეილერი</span><span class="movie-preview-caption">ტრეილერის ყურება <i data-lucide="arrow-right"></i></span></a>`
+      : backdrop ? `<div class="movie-preview-still"><img src="${escapeHtml(backdrop)}" alt="" decoding="async"></div>` : '') + castTeaser;
+    preview.hidden = !trailer && !backdrop && !cast.length;
+
+    const formatCurrency = value => Number(value) > 0 ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value)) : '';
+    const facts = [
+      ['სტატუსი', row.is_coming_soon ? 'მალე დაემატება' : 'გამოსულია'],
+      ['ხანგრძლივობა', row.duration], ['ენა', value(row, 'original_language', 'spoken_languages')],
+      ['გამოშვება', row.release_year], ['ბიუჯეტი', formatCurrency(row.budget)], ['შემოსავალი', formatCurrency(row.revenue)],
+      ['სეზონები', isSeries ? new Set(episodes.map(episode => episode.season)).size : 0],
+    ].filter(([, content]) => content);
+    const studio = value(row, 'studio_name', 'production_companies');
+    const studioLogo = externalUrl(row.studio_logo_url);
+    const website = externalUrl(value(row, 'studio_website_url', 'creator_url'));
+    const studioContent = `${studioLogo ? `<img src="${escapeHtml(studioLogo)}" alt="" loading="lazy">` : ''}<span>${escapeHtml(studio)}</span>`;
+    const person = ([name, role]) => `<article class="movie-person">${createAvatar(name)}<div><strong>${escapeHtml(name)}</strong>${role ? `<p>${escapeHtml(role)}</p>` : ''}</div></article>`;
+    const seasons = [...new Set(episodes.map(episode => episode.season))];
+    const seasonPicker = seasons.length > 1
+      ? `<label class="movie-season-picker">სეზონი <select aria-label="სეზონი">${seasons.map(season => `<option value="${season}">${season}</option>`).join('')}</select></label>` : '';
+    byId('movie-sections').innerHTML = `
+      <section class="movie-facts" aria-label="ფილმის მონაცემები"><dl>${facts.map(([label, content]) => `<div><dt>${label}</dt><dd>${escapeHtml(content)}</dd></div>`).join('')}</dl>
+        ${studio || studioLogo ? `<div class="movie-studio"><small>სტუდია</small>${website ? `<a href="${escapeHtml(website)}" target="_blank" rel="noopener">${studioContent}</a>` : studioContent}</div>` : ''}
+      </section>
+      ${trailer ? `<section class="movie-section">${movieHeading('უყურე', 'ტრეილერები', '1 ვიდეო')}<a class="movie-trailer-tile" href="${escapeHtml(trailer)}" target="_blank" rel="noopener">${trailerCard}<span>ოფიციალური ტრეილერი</span></a></section>` : ''}
+      ${episodes.length ? `<section class="movie-section">${movieHeading('სეზონები', 'ეპიზოდები')}${seasonPicker}<div class="movie-episode-track"></div></section>` : ''}
+      ${cast.length || crew.length ? `<section class="movie-cast movie-section">${movieHeading('მონაწილეობენ', 'მსახიობები და გუნდი', cast.length ? `${cast.length} მსახიობი` : '')}
+        <div class="movie-cast-body">
+          ${cast.length ? `<div><p class="movie-credits-label"><i data-lucide="users"></i> მსახიობები</p><div class="movie-people">${cast.map(person).join('')}</div></div>` : ''}
+          ${crew.length ? `<div><p class="movie-credits-label"><i data-lucide="clapperboard"></i> შემოქმედებითი გუნდი</p>${crew.map(([role, names]) => `<div class="movie-crew"><small>${role}</small>${names.map(name => person([name])).join('')}</div>`).join('')}</div>` : ''}
+        </div></section>` : ''}
+      <div id="movie-related"></div>`;
+    if (episodes.length) {
+      const episodeTrack = document.querySelector('.movie-episode-track');
+      const picker = document.querySelector('.movie-season-picker select');
+      const drawEpisodes = (season) => {
+        episodeTrack.replaceChildren();
+        episodes.filter(episode => episode.season === season).forEach(episode => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = `ე${episode.episode} — ${episode.title}`;
+          button.onclick = () => paintWatch(true, episode);
+          episodeTrack.append(button);
+        });
+      };
+      drawEpisodes(seasons[0]);
+      if (picker) picker.onchange = () => drawEpisodes(Number(picker.value));
+    }
+
+    const id = `Movies:${row.id}`;
+    const saved = byId('save-button');
+    const isSaved = () => readList('prisma-saved').some(item => item?.id === id)
+      || readList('prisma-detail-saved').includes(row.id);
+    saved.setAttribute('aria-pressed', String(isSaved()));
+    saved.onclick = () => {
+      const list = readList('prisma-saved');
+      const removing = isSaved();
+      const next = removing ? list.filter(item => item?.id !== id) : [...list, {
+        id, section: 'Movies', categories: genres, href: `/watch_movie.html?id=${encodeURIComponent(row.id)}`,
+        title, rating, year: Number(row.release_year), thumbnailUrl: value(row, 'card_url', 'poster_url'),
+        backdropUrl: backdrop, posterUrl: row.poster_url, isSeries, comingSoon: row.is_coming_soon === true,
+      }];
+      try {
+        localStorage.setItem('prisma-saved', JSON.stringify(next));
+        if (removing) {
+          const old = readList('prisma-detail-saved');
+          if (old.includes(row.id)) localStorage.setItem('prisma-detail-saved', JSON.stringify(old.filter(savedId => savedId !== row.id)));
+        }
+        saved.setAttribute('aria-pressed', String(isSaved()));
+      } catch { /* storage unavailable */ }
+    };
+  }
+
+  async function renderRecommendations(row) {
+    const { data } = await _supabase.from('movies')
+      .select('id,title,cover_url,card_url,poster_url,genre,release_year,rating,content_type')
+      .neq('id', row.id).order('created_at', { ascending: false }).limit(48);
+    if (!data?.length) return;
+    const genres = movieGenres(row);
+    const similar = data.filter(item => movieGenres(item).some(genre => genres.includes(genre)));
+    const recommended = data.filter(item => !similar.includes(item)).sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
+    const target = byId('movie-related');
+    target.innerHTML = [
+      ['განაგრძე ყურება', 'მსგავსი ფილმები', similar],
+      ['შერჩეული შენთვის', 'რეკომენდებული ფილმები', recommended],
+    ].filter(([, , items]) => items.length).map(([eyebrow, title, items]) => `
+      <section class="movie-section">
+        ${movieHeading(eyebrow, title)}
+        <div class="movie-rail-frame">
+          <div class="movie-rail">${items.slice(0, 12).map(item => {
+            const image = value(item, 'cover_url', 'card_url', 'poster_url');
+            return `<a class="movie-related-card" href="/watch_movie.html?id=${encodeURIComponent(item.id)}"><span class="movie-related-art">${image ? `<img src="${escapeHtml(image)}" alt="" loading="lazy" decoding="async">` : ''}</span><strong>${escapeHtml(String(item.title || '').split('|')[0].trim())}</strong><small>${escapeHtml([item.release_year, item.content_type === 'series' ? 'სერიალი' : 'ფილმი'].filter(Boolean).join(' · '))}${Number(item.rating) > 0 ? `<span>★ ${Number(item.rating).toFixed(1)}</span>` : ''}</small></a>`;
+          }).join('')}</div>
+          <button type="button" class="movie-rail-arrow previous" aria-label="წინა"><i data-lucide="chevron-left"></i></button>
+          <button type="button" class="movie-rail-arrow next" aria-label="შემდეგი"><i data-lucide="chevron-right"></i></button>
+        </div>
+      </section>`).join('');
+    target.querySelectorAll('.movie-rail-frame').forEach(frame => {
+      const rail = frame.querySelector('.movie-rail');
+      frame.querySelectorAll('button').forEach(button => {
+        button.hidden = rail.scrollWidth <= rail.clientWidth;
+        button.onclick = () => rail.scrollBy({
+          left: (button.classList.contains('previous') ? -1 : 1) * rail.clientWidth * .86,
+          behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        });
+      });
+    });
+    window.lucide?.createIcons();
+  }
+
+  function render(row) {
+    const title = value(row, 'title');
     currentRow = row;
-    posterSrc = poster;
+    posterSrc = value(row, 'poster_url', 'photo_url', 'card_url', 'cover_url');
     const episodes = playlist(row);
-    const embed = episodes.length ? prepareRumbleUrl(episodes.find(item => item.video_url)?.video_url || '') : prepareRumbleUrl(value(row, videoField));
+    playerEmbed = episodes.length
+      ? episodes.find(item => item.video_url)?.video_url || ''
+      : prepareRumbleUrl(value(row, videoField));
+    if (cinema) renderCinemaDetail(row, episodes);
+    else renderLegacyDetail(row);
     byId('watch-button').disabled = false;
-    byId('watch-label').textContent = episodes.length ? 'ეპიზოდების ყურება' : `${kind}ს ყურება`;
-    playerEmbed = embed;
-    renderDetailHub(row, episodes, cast, creative, poster);
+    byId('watch-label').textContent = episodes.length ? 'ეპიზოდების ყურება' : cinema ? 'ყურება' : `${kind}ს ყურება`;
     document.title = `${title} — სტუდია პრიზმა`;
     document.querySelector('meta[name="description"]')?.setAttribute('content', value(row, 'description') || title);
-    const saved = JSON.parse(localStorage.getItem('prisma-detail-saved') || '[]');
-    byId('save-button').classList.toggle('active', saved.includes(row.id));
-    byId('save-label').textContent = saved.includes(row.id) ? 'შენახულია' : 'შენახვა';
-    byId('save-button').onclick = () => {
-      const current = JSON.parse(localStorage.getItem('prisma-detail-saved') || '[]');
-      const next = current.includes(row.id) ? current.filter(id => id !== row.id) : [...current, row.id];
-      localStorage.setItem('prisma-detail-saved', JSON.stringify(next));
-      byId('save-button').classList.toggle('active', next.includes(row.id));
-      byId('save-label').textContent = next.includes(row.id) ? 'შენახულია' : 'შენახვა';
-    };
+    if (!cinema) {
+      const saved = readList('prisma-detail-saved');
+      byId('save-button').classList.toggle('active', saved.includes(row.id));
+      byId('save-label').textContent = saved.includes(row.id) ? 'შენახულია' : 'შენახვა';
+      byId('save-button').onclick = () => {
+        const current = readList('prisma-detail-saved');
+        const next = current.includes(row.id) ? current.filter(id => id !== row.id) : [...current, row.id];
+        localStorage.setItem('prisma-detail-saved', JSON.stringify(next));
+        byId('save-button').classList.toggle('active', next.includes(row.id));
+        byId('save-label').textContent = next.includes(row.id) ? 'შენახულია' : 'შენახვა';
+      };
+    }
     const playing = new URLSearchParams(location.search).get('play') === '1';
     byId('detail-content').hidden = playing;
     byId('detail-status').hidden = true;
     if (playing) paintWatch(false);
+    if (cinema && !playing) renderRecommendations(row).catch(() => {});
     if (window.lucide) window.lucide.createIcons();
   }
 
@@ -245,113 +417,49 @@
     return `${location.pathname}?${params}`;
   }
 
-  function mountPlayer(url) {
-    const frame = byId('watch-frame');
-    const error = byId('watch-error');
-    const skeleton = byId('watch-skeleton');
-    if (!url) {
-      frame.replaceChildren();
-      mountedSrc = '';
-      skeleton.hidden = true;
-      byId('watch-error-text').textContent = 'ვიდეო ჯერ არ ატვირთულა';
-      byId('watch-retry').hidden = true;
-      error.hidden = false;
-      return;
-    }
-    if (mountedSrc === url && frame.querySelector('iframe')) return;
-    mountedSrc = url;
-    error.hidden = true;
-    byId('watch-retry').hidden = false;
-    skeleton.hidden = false;
-    const iframe = document.createElement('iframe');
-    iframe.title = byId('watch-heading').textContent || 'ვიდეო';
-    iframe.allow = 'autoplay; fullscreen; picture-in-picture';
-    iframe.allowFullscreen = true;
-    iframe.addEventListener('load', () => { skeleton.hidden = true; });
-    frame.replaceChildren(iframe);
-    try {
-      const embedUrl = new URL(url);
-      if (embedUrl.hostname.endsWith('rumble.com')) embedUrl.searchParams.set('autoplay', '2');
-      iframe.src = embedUrl.href;
-    } catch {
-      iframe.src = url;
-    }
-  }
+  const watchPlayer = createWatchPlayer(byId('watch-shell'), {
+    onBack() {
+      if (history.state?.fromDetail && history.state?.episodeSteps >= 0) {
+        history.go(-1 - history.state.episodeSteps);
+      } else {
+        history.replaceState({}, '', detailHref());
+        leaveWatch();
+      }
+    },
+    onEpisodeSelect(episode) { paintWatch(true, episode); },
+  });
 
   function paintWatch(push, explicit) {
     if (!currentRow) return;
     const items = playlist(currentRow);
-    const current = explicit || (items.length ? chosenEpisode(items) : null);
-    const show = value(currentRow, 'title') || kind;
-    const facts = [value(currentRow, 'release_year'), value(currentRow, 'duration'), Number(currentRow.rating) ? Number(currentRow.rating).toFixed(1) : ''].filter(Boolean);
-    byId('watch-show').textContent = show;
-    byId('watch-position').textContent = current ? `სეზონი ${current.season} · ეპიზოდი ${current.episode}` : '';
-    byId('watch-kicker').textContent = current ? `${show}` : (table === 'movies' ? 'ფილმი' : 'ვიდეო');
-    byId('watch-heading').textContent = current ? current.title : show.split('|')[0].trim();
-    byId('watch-facts').textContent = current ? `სეზონი ${current.season} · ეპიზოდი ${current.episode}` : facts.join(' · ');
-    byId('watch-blurb').textContent = current?.description || value(currentRow, 'description') || '';
-    byId('watch-ambient').style.backgroundImage = posterSrc ? `url("${posterSrc.replaceAll('"', '%22')}")` : '';
-    const watchPoster = byId('watch-poster');
-    if (watchPoster) { watchPoster.src = posterSrc; watchPoster.alt = show; }
+    const current = explicit || chosenEpisode(items);
+    const show = String(value(currentRow, 'title') || kind);
+    const title = show.split('|')[0].trim();
+    const rating = Number(currentRow.rating);
+    const position = current ? `სეზონი ${current.season} · ეპიზოდი ${current.episode}` : '';
+    const facts = [currentRow.release_year, rating > 0 ? `${rating.toFixed(1)} ★` : '', currentRow.duration].filter(Boolean).join(' · ');
+    if (push) {
+      const fromDetail = byId('watch-shell').hidden || Boolean(history.state?.fromDetail);
+      const episodeSteps = byId('watch-shell').hidden ? 0 : (history.state?.episodeSteps ?? 0) + 1;
+      const href = watchHref(current);
+      if (href !== location.pathname + location.search) history.pushState({ fromDetail, episodeSteps }, '', href);
+    } else if (current && new URLSearchParams(location.search).get('episode') !== String(current.episode)) {
+      history.replaceState(history.state, '', watchHref(current));
+    }
     document.body.classList.add('is-watching');
     byId('watch-shell').hidden = false;
     byId('detail-content').hidden = true;
     document.querySelector('.detail-header').hidden = true;
-    const index = current ? items.indexOf(current) : -1;
-    const previous = index > 0 ? items[index - 1] : null;
-    const next = index >= 0 && index < items.length - 1 ? items[index + 1] : null;
-    byId('watch-jump').hidden = !items.length;
-    byId('watch-prev').hidden = !previous;
-    byId('watch-next').hidden = !next;
-    byId('watch-prev').onclick = () => previous && paintWatch(true, previous);
-    byId('watch-next').onclick = () => next && paintWatch(true, next);
-    const episodePanel = byId('watch-episodes');
-    episodePanel.hidden = !items.length;
-    if (items.length) {
-      const seasonNumbers = [...new Set(items.map(item => item.season))];
-      const seasonSelect = byId('watch-season');
-      const activeSeason = current ? current.season : seasonNumbers[0];
-      seasonSelect.replaceChildren();
-      seasonNumbers.forEach(number => {
-        const option = document.createElement('option');
-        option.value = String(number);
-        const named = items.find(item => item.season === number && item.seasonTitle);
-        option.textContent = named?.seasonTitle ? `სეზონი ${number} — ${named.seasonTitle}` : `სეზონი ${number}`;
-        option.selected = number === activeSeason;
-        seasonSelect.append(option);
-      });
-      seasonSelect.onchange = () => {
-        const first = items.find(item => item.season === Number(seasonSelect.value));
-        if (first) paintWatch(true, first);
-      };
-      const list = byId('watch-episode-list');
-      list.replaceChildren();
-      items.filter(item => item.season === activeSeason).forEach(item => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = `episode-row${current && item.season === current.season && item.episode === current.episode ? ' is-current' : ''}`;
-        const thumb = document.createElement('span');
-        thumb.className = 'episode-thumb';
-        if (posterSrc) { const image = document.createElement('img'); image.src = posterSrc; image.alt = ''; image.loading = 'lazy'; thumb.append(image); }
-        const copy = document.createElement('span');
-        const title = document.createElement('strong');
-        title.textContent = `${item.episode}. ${item.title}`;
-        copy.append(title);
-        if (current && item.season === current.season && item.episode === current.episode) {
-          const badge = document.createElement('em'); badge.textContent = 'ახლა უყურებ'; copy.append(badge);
-        }
-        if (item.description) { const text = document.createElement('small'); text.textContent = item.description; copy.append(text); }
-        button.append(thumb, copy);
-        button.addEventListener('click', () => paintWatch(true, item));
-        list.append(button);
-      });
-    }
-    const target = current ? current.video_url : playerEmbed;
-    renderWatchControls(items, current);
-    if (push) history.pushState({ play: true }, '', watchHref(current));
-    else if (current && new URLSearchParams(location.search).get('episode') !== String(current.episode)) history.replaceState({ play: true }, '', watchHref(current));
-    document.title = current ? `${show} — ს${current.season} ე${current.episode}` : `${show} — ყურება`;
-    mountPlayer(target);
+    document.title = current ? `${title} — ს${current.season} ე${current.episode}` : `${title} — ყურება`;
+    window.scrollTo(0, 0);
+    watchPlayer.show({
+      title, heading: current?.title || title, position, facts: position || facts,
+      art: !current ? value(currentRow, 'title_image_url') : '',
+      backdrop: value(currentRow, 'cover_url', 'photo_url', 'card_url') || posterSrc,
+      description: current?.description || value(currentRow, 'description'),
+      source: current ? current.video_url : playerEmbed,
+      items, current,
+    });
   }
 
   async function load() {
@@ -365,28 +473,41 @@
   }
 
   function leaveWatch() {
-    byId('watch-frame').querySelector('iframe')?.contentWindow?.postMessage('{"method":"pause"}', '*');
+    watchPlayer.clear();
     document.body.classList.remove('is-watching');
     byId('watch-shell').hidden = true;
     byId('detail-content').hidden = false;
     document.querySelector('.detail-header').hidden = false;
     document.title = `${value(currentRow || {}, 'title') || kind} — სტუდია პრიზმა`;
+    if (cinema && !byId('movie-related').hasChildNodes()) renderRecommendations(currentRow).catch(() => {});
   }
 
   byId('watch-button').addEventListener('click', () => paintWatch(true));
-  byId('watch-back').addEventListener('click', () => {
-    location.assign(table === 'movies' ? '/?section=Movies' : '/?section=Videos');
-  });
-  byId('watch-retry').addEventListener('click', () => { const src = mountedSrc; mountedSrc = ''; mountPlayer(src); });
   addEventListener('popstate', () => {
     if (!currentRow) return;
     if (new URLSearchParams(location.search).get('play') === '1') paintWatch(false);
     else leaveWatch();
   });
-  byId('share-button').addEventListener('click', async () => { try { if (navigator.share) await navigator.share({ title: document.title, url: location.href }); else { await navigator.clipboard.writeText(location.href); byId('share-label').textContent = 'დაკოპირდა'; } } catch {} });
-  addEventListener('keydown', event => {
-    if (event.key !== 'Escape' || event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) return;
-    if (document.body.classList.contains('is-watching')) byId('watch-back').click();
-  });
+  byId('share-button').addEventListener('click', async () => { try { if (navigator.share) await navigator.share({ title: document.title, url: location.href }); else { await navigator.clipboard.writeText(location.href); byId('share-label').textContent = 'ბმული დაკოპირდა'; } } catch {} });
+  if (cinema) {
+    const theme = byId('movie-theme');
+    const syncTheme = (soft) => {
+      body.classList.toggle('cinema-soft', soft);
+      theme.setAttribute('aria-pressed', String(soft));
+      theme.innerHTML = `<i data-lucide="${soft ? 'moon' : 'sun'}"></i>`;
+      window.lucide?.createIcons();
+    };
+    let soft = false;
+    try { soft = localStorage.getItem('prisma-theme') === 'soft'; } catch { /* storage unavailable */ }
+    syncTheme(soft);
+    theme.onclick = () => {
+      const next = theme.getAttribute('aria-pressed') !== 'true';
+      syncTheme(next);
+      try { localStorage.setItem('prisma-theme', next ? 'soft' : 'dark'); } catch { /* storage unavailable */ }
+    };
+    const nav = document.querySelector('.os-nav');
+    addEventListener('scroll', () => nav.classList.toggle('is-scrolled', scrollY > 24), { passive: true });
+    addEventListener('DOMContentLoaded', () => window.lucide?.createIcons());
+  }
   load();
 })();

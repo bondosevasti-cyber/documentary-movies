@@ -11,11 +11,11 @@ export function MediaCard({ item, saved, onOpen, onToggleSave }: {
   onToggleSave: (item: CatalogItem) => void;
 }) {
   const [loaded, setLoaded] = useState(false);
-  const src = item.posterUrl || item.thumbnailUrl;
+  const src = item.backdropUrl || item.thumbnailUrl || item.posterUrl;
   return (
     <article className="media-card">
       <div className="media-card-art">
-        <button type="button" onClick={() => onOpen(item)} aria-label={`${item.title} — ${item.section === 'Articles' ? 'წაკითხვა' : 'ყურება'}`}>
+        <button type="button" onClick={() => onOpen(item)} aria-label={`${item.title} — ${item.section === 'Articles' ? 'წაკითხვა' : 'დეტალები'}`}>
           {src && <img src={src} alt="" loading="lazy" decoding="async" className={loaded ? 'is-loaded' : ''} onLoad={() => setLoaded(true)} />}
           <span className="media-card-hover">
             <strong>{item.title.split('|')[0].trim()}</strong>
@@ -28,7 +28,7 @@ export function MediaCard({ item, saved, onOpen, onToggleSave }: {
       </div>
       <button type="button" className="card-title" onClick={() => onOpen(item)}>{item.title.split('|')[0].trim()}</button>
       <div className="card-meta">
-        <span className="kind">{kind[item.section]}</span>
+        <span className="kind">{item.isSeries ? 'სერიალი' : kind[item.section]}</span>
         {item.year > 0 && <span>{item.year}</span>}
         {item.rating > 0 && <span className="rating"><Star size={11} fill="currentColor" /> {item.rating}</span>}
       </div>
