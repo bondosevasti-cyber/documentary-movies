@@ -138,3 +138,16 @@
 .admin-page .upload-placeholder:focus-visible { outline-offset: -3px; }
 .admin-page .video-card-item { background: var(--admin-panel); border-color: var(--admin-line); }
 .admin-page .video-card-info p { color: var(--admin-muted); }
+
+.admin-page #series-editor h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.admin-page .series-count { padding: 4px 9px; border-radius: 999px; background: #f4dca819; color: var(--admin-accent); font-size: 12px; }
+.admin-page :is([data-series-season], [data-series-episode]) {
+  margin: 9px 0; border: 1px solid var(--admin-line); border-radius: 9px; background: #100e1670;
+}
+.admin-page #series-seasons summary { padding: 12px; cursor: pointer; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.admin-page #series-seasons summary::marker { color: var(--admin-accent); }
+.admin-page #series-seasons summary small { display: inline-block; margin-left: 8px; color: var(--admin-muted); font-weight: 400; }
+.admin-page #series-seasons summary:hover { color: var(--admin-accent); }
+.admin-page .series-fields { padding: 0 12px 12px; }
+.admin-page .series-fields > label { display: block; margin: 9px 0; font-size: 13px; }
+.admin-page .series-fields > button { margin: 4px 4px 4px 0; }

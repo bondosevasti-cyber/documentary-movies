@@ -492,9 +492,9 @@
                 </div>
                 <form id="movie-form">
                     <input type="hidden" name="movie_id" id="movie-id">
-                    <div class="form-group"><label>კონტენტის ტიპი</label><select name="content_type" onchange="document.getElementById('series-editor').hidden=this.value!=='series'"><option value="movie">ფილმი</option><option value="series">სერიალი</option></select></div>
+                    <div class="form-group"><label>კონტენტის ტიპი</label><select name="content_type" onchange="setSeriesEditorVisible(this.value==='series')"><option value="movie">ფილმი</option><option value="series">სერიალი</option></select></div>
                     <section id="series-editor" hidden class="tmdb-lookup">
-                        <h3>სეზონები და ეპიზოდები</h3>
+                        <h3>სეზონები და ეპიზოდები <span class="series-count" id="series-count">0 სეზონი</span></h3>
                         <p class="field-help">დაამატე სეზონი, შემდეგ ეპიზოდები და თითოეულის ვიდეოს embed ბმული. ცვლილებები ინახება ფილმის „შენახვა“ ღილაკით.</p>
                         <div id="series-seasons"></div>
                         <button type="button" class="btn-edit" onclick="addSeriesSeason()">+ სეზონის დამატება</button>
@@ -1449,23 +1449,36 @@
             }));
             return seasons;
         }
-        function renderSeriesEditor() {
+        function setSeriesEditorVisible(visible) {
+            const editor = document.getElementById('series-editor');
+            editor.hidden = !visible;
+            editor.querySelectorAll('input, textarea').forEach(control => { control.disabled = !visible; });
+        }
+        function renderSeriesEditor(openSeason = -1, openEpisode = -1) {
+            document.getElementById('series-count').textContent = seriesSeasons.length + ' სეზონი';
             document.getElementById('series-seasons').innerHTML = seriesSeasons.map((season, s) => `
-                <div data-series-season style="border:1px solid #343946;border-radius:12px;padding:16px;margin-bottom:16px">
+                <details data-series-season name="series-season" ${s === openSeason ? 'open' : ''}>
+                    <summary><span>სეზონი ${seriesEscape(season.number)}${season.title ? ' · ' + seriesEscape(season.title) : ''}</span><small>${(season.episodes || []).length} ეპიზოდი</small></summary>
+                    <div class="series-fields">
                     <label>სეზონის ნომერი<input data-season-number type="number" min="1" value="${season.number}" required></label>
                     <label>სეზონის სახელი (არჩევითი)<input data-season-title value="${seriesEscape(season.title)}"></label>
-                    ${(season.episodes || []).map((episode, e) => `<div data-series-episode style="background:#151820;padding:12px;margin:12px 0;border-radius:8px">
+                    ${(season.episodes || []).map((episode, e) => `<details data-series-episode name="series-episode-${s}" ${s === openSeason && e === openEpisode ? 'open' : ''}>
+                        <summary>ეპიზოდი ${seriesEscape(episode.number)}${episode.title ? ' · ' + seriesEscape(episode.title) : ''}</summary>
+                        <div class="series-fields">
                         <label>ეპიზოდის ნომერი<input data-episode-number type="number" min="1" value="${episode.number}" required></label>
                         <label>ეპიზოდის სათაური<input data-episode-title value="${seriesEscape(episode.title)}" required></label>
                         <label>ვიდეოს Embed URL (არასავალდებულო)<input data-episode-url type="url" value="${seriesEscape(episode.video_url)}" placeholder="https://rumble.com/embed/...">
                             <small class="field-help episode-video-hint" style="${episode.video_url ? 'display:none;' : ''}">ვიდეოს ბმული დასამატებელია, თუმცა შენახვა შეგიძლია მის გარეშეც. ცარიელი ბმულისას მაყურებელს ეჩვენება „ვიდეო ჯერ არ ატვირთულა“.</small>
                         </label>
                         <label>აღწერა<textarea data-episode-description>${seriesEscape(episode.description)}</textarea></label>
-                        <button type="button" onclick="seriesSeasons=readSeriesEditor();seriesSeasons[${s}].episodes.splice(${e},1);renderSeriesEditor()">ეპიზოდის ამოღება</button>
-                    </div>`).join('')}
+                        <button type="button" onclick="seriesSeasons=readSeriesEditor();seriesSeasons[${s}].episodes.splice(${e},1);renderSeriesEditor(${s})">ეპიზოდის ამოღება</button>
+                        </div>
+                    </details>`).join('')}
                     <button type="button" class="btn-edit" onclick="addSeriesEpisode(${s})">+ ეპიზოდი</button>
                     <button type="button" onclick="seriesSeasons=readSeriesEditor();seriesSeasons.splice(${s},1);renderSeriesEditor()">სეზონის ამოღება</button>
-                </div>`).join('');
+                    </div>
+                </details>`).join('');
+            setSeriesEditorVisible(document.getElementById('movie-form')['content_type'].value === 'series');
             document.querySelectorAll('[data-episode-url]').forEach(input => {
                 input.addEventListener('input', () => {
                     const hint = input.parentElement.querySelector('.episode-video-hint');
@@ -1476,14 +1489,22 @@
         function addSeriesSeason() {
             seriesSeasons = readSeriesEditor();
             seriesSeasons.push({number: Math.max(0, ...seriesSeasons.map(s => s.number)) + 1, title: '', episodes: []});
-            renderSeriesEditor();
+            renderSeriesEditor(seriesSeasons.length - 1);
         }
         function addSeriesEpisode(index) {
             seriesSeasons = readSeriesEditor();
             const episodes = seriesSeasons[index].episodes;
             episodes.push({number: Math.max(0, ...episodes.map(e => e.number)) + 1, title: '', video_url: '', description: ''});
-            renderSeriesEditor();
+            renderSeriesEditor(index, episodes.length - 1);
         }
+        document.getElementById('series-seasons').addEventListener('invalid', event => {
+            const season = event.target.closest('[data-series-season]');
+            if (!season || document.getElementById('series-editor').hidden) return;
+            if (event.target.form.querySelector(':invalid') !== event.target) return;
+            season.open = true;
+            const episode = event.target.closest('[data-series-episode]');
+            if (episode) episode.open = true;
+        }, true);
         function setupCropZone(type, aspectRatio) {
             const dropZone = document.getElementById(`${type}-drop-zone`), fileInput = document.getElementById(`${type}-input`), cropperImg = document.getElementById(`${type}-cropper-image`), cropperContainer = document.getElementById(`${type}-cropper-container`), placeholder = document.getElementById(`${type}-placeholder`), btnReset = document.getElementById(`${type}-reset`);
             ['dragenter', 'dragover'].forEach(n => dropZone.addEventListener(n, (e) => { e.preventDefault(); dropZone.classList.add('drag-active'); }));
@@ -1624,7 +1645,7 @@
                 const form = document.getElementById('movie-form');
                 const isSeries = movie.mediaType === 'tv';
                 form['content_type'].value = isSeries ? 'series' : 'movie';
-                document.getElementById('series-editor').hidden = !isSeries;
+                setSeriesEditorVisible(isSeries);
                 seriesSeasons = isSeries ? (movie.seasons || []) : [];
                 renderSeriesEditor();
                 setMovieField(form, 'title', movie.title);
@@ -1848,7 +1869,7 @@
             const form = document.getElementById('movie-form');
             form['movie_id'].value = movie.id; 
             form['content_type'].value = movie.content_type || 'movie';
-            document.getElementById('series-editor').hidden = form['content_type'].value !== 'series';
+            setSeriesEditorVisible(form['content_type'].value === 'series');
             seriesSeasons = structuredClone(movie.seasons || []);
             renderSeriesEditor();
             form['title'].value = movie.title || ''; 
@@ -1923,7 +1944,7 @@
         function resetForm() {
             document.getElementById('movie-form').reset(); 
             seriesSeasons = []; renderSeriesEditor();
-            document.getElementById('series-editor').hidden = true;
+            setSeriesEditorVisible(false);
             document.getElementById('poster-reset').click(); 
             document.getElementById('cover-reset').click(); 
             document.getElementById('card-reset').click();
