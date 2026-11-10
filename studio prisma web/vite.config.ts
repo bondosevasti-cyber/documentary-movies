@@ -7,7 +7,7 @@ import {defineConfig, type Plugin} from 'vite';
 // Keep the existing players, article reader and local images available in dev and builds.
 function legacyAssets(): Plugin {
   const root = path.resolve(__dirname, '..');
-  const files = ['watch_movie.html', 'watch_video.html', 'watch_article.html', 'admin.html', 'admin_articles.html', 'style.css', 'detail-page.css', 'cinema-shell.css', 'detail-page.js', 'watch-player.css', 'watch-player.js', 'supabase-config.js', 'about.html', 'privacy.html', 'terms.html'];
+  const files = ['watch_movie.html', 'watch_video.html', 'watch_article.html', 'admin.html', 'admin-workspace.css', 'admin_articles.html', 'style.css', 'detail-page.css', 'cinema-shell.css', 'detail-page.js', 'watch-player.css', 'watch-player.js', 'supabase-config.js', 'about.html', 'privacy.html', 'terms.html'];
   function images(directory = 'images'): string[] {
     return readdirSync(path.join(root, directory), {withFileTypes: true}).flatMap(entry =>
       entry.isDirectory() ? images(`${directory}/${entry.name}`) : [`${directory}/${entry.name}`]);
@@ -24,7 +24,7 @@ function legacyAssets(): Plugin {
         let file: string;
         try { file = decodeURIComponent((req.url || '').split('?')[0]).replace(/^\//, ''); } catch { return next(); }
         if (!allowed.has(file)) return next();
-        const types: Record<string, string> = {'.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.png': 'image/png', '.webp': 'image/webp', '.jpeg': 'image/jpeg'};
+        const types: Record<string, string> = {'.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.jpeg': 'image/jpeg'};
         res.setHeader('Content-Type', types[path.extname(file)] || 'application/octet-stream');
         res.end(read(file));
       });

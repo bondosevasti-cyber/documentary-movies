@@ -155,10 +155,10 @@
             </div>
         </section>
 
-        <!-- Top 5 Section -->
+        <!-- Top 10 Section -->
         <div class="top10-title">
             <div class="top10-left">
-                <h2>TOP 5</h2>
+                <h2>TOP 10</h2>
                 <div class="sub-title">დღევანდელი<br>კონტენტი</div>
             </div>
             <div class="section-ctrls">
@@ -167,7 +167,7 @@
             </div>
         </div>
         <div class="cards-container" id="top10-container">
-            <!-- Top 5 Content -->
+            <!-- Top 10 Content -->
         </div>
 
         <!-- Coming Soon Section -->
@@ -214,7 +214,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script>
-        let top5Movies = [];
+        let top10Movies = [];
         let allMoviesGlobal = [];
         let soonMoviesGlobal = [];
         let allVideosGlobal = [];
@@ -266,21 +266,23 @@
         hamburger.onclick = toggleMenu;
 
 
-        async function loadTop5() {
+        async function loadTop10() {
             const { data: movies, error } = await _supabase
                 .from('movies')
                 .select('*')
                 .not('top_10_position', 'is', null)
+                .gte('top_10_position', 1)
+                .lte('top_10_position', 10)
                 .order('top_10_position', { ascending: true })
-                .limit(5);
+                .limit(10);
 
             if (error) return console.error(error);
-            top5Movies = movies || [];
+            top10Movies = movies || [];
 
             const container = document.getElementById('top10-container');
             container.innerHTML = '';
 
-            top5Movies.forEach(movie => {
+            top10Movies.forEach(movie => {
                 const officialBadge = movie.is_official ? `<div class="official-badge" title="ოფიციალური დასტური ავტორისგან" onclick="event.stopPropagation(); openOfficialModal()"></div>` : '';
                 const infoIcon = '';
 
@@ -297,15 +299,15 @@
                 container.innerHTML += cardHtml;
             });
 
-            return top5Movies;
+            return top10Movies;
         }
 
         function startHeroSlider() {
             if (sliderInterval) clearInterval(sliderInterval);
             sliderInterval = setInterval(() => {
-                if (top5Movies.length === 0) return;
-                currentRankIndex = (currentRankIndex + 1) % top5Movies.length;
-                updateHeroFromDB(top5Movies[currentRankIndex], false);
+                if (top10Movies.length === 0) return;
+                currentRankIndex = (currentRankIndex + 1) % top10Movies.length;
+                updateHeroFromDB(top10Movies[currentRankIndex], false);
             }, 5000);
         }
 
@@ -313,7 +315,7 @@
             if (sliderInterval) clearInterval(sliderInterval);
             updateHeroFromDB(movie, true);
 
-            // Stay on manual choice for 15 seconds, then resume Top 5 cycle
+            // Stay on manual choice for 15 seconds, then resume Top 10 cycle
             setTimeout(() => {
                 startHeroSlider();
             }, 15000);
@@ -351,8 +353,8 @@
 
 
         async function initHome() {
-            // 1. Initial Load Top 5
-            const movies = await loadTop5();
+            // 1. Initial Load Top 10
+            const movies = await loadTop10();
             if (movies && movies.length > 0) {
                 updateHeroFromDB(movies[0], false);
                 startHeroSlider();

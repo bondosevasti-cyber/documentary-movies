@@ -1,0 +1,140 @@
+.admin-page {
+  --admin-bg: #0c0b10;
+  --admin-panel: #15131b;
+  --admin-panel-soft: #100e16;
+  --admin-line: #ffffff19;
+  --admin-muted: #ada7b5;
+  --admin-text: #f6f3f9;
+  --admin-accent: #f4dca8;
+  --admin-red: var(--admin-accent);
+  color-scheme: dark;
+  font-family: "Space Grotesk", "Noto Sans Georgian", system-ui, sans-serif;
+  background: radial-gradient(ellipse at 72% 0%, #32263888, transparent 45rem), var(--admin-bg);
+}
+.admin-page *, .admin-page *::before, .admin-page *::after { box-sizing: border-box; }
+.admin-page [hidden] { display: none !important; }
+.admin-page :focus-visible { outline: 2px solid var(--admin-accent); outline-offset: 3px; }
+.admin-page :is(button, input, select, textarea) { font-family: inherit; }
+.admin-page button:disabled { cursor: not-allowed; opacity: .65; }
+.admin-page .admin-topbar { background: #100e16cf; border-color: var(--admin-line); }
+.admin-page #admin-content.admin-container { padding-top: 112px; gap: 0; }
+.admin-page #admin-content > .admin-nav { background: linear-gradient(180deg, #19161ff5, #100e17f5); border-color: var(--admin-line); }
+.admin-page #admin-content .admin-nav .nav-item { background: transparent; text-align: left; font-family: inherit; color: #c5bfcb; }
+.admin-page #admin-content .admin-nav .nav-item.active { background: linear-gradient(90deg, #f4dca826, #fff1); border-left-color: var(--admin-accent); color: #fff; }
+.admin-page .admin-nav .nav-item.active .nav-icon { color: var(--admin-accent); }
+.admin-page .sidebar-label { color: var(--admin-muted); }
+.admin-page .movies-page-intro .eyebrow, .admin-page .login-card .eyebrow { color: var(--admin-accent); font-size: 11px; font-weight: 700; letter-spacing: .12em; margin: 0 0 7px; }
+.admin-page .movies-page-intro p { color: var(--admin-muted); line-height: 1.5; }
+.admin-page #section-movies.admin-section.active { grid-template-columns: minmax(0, 1fr) minmax(220px, .38fr) !important; }
+.admin-page #section-movies > .admin-form-container, .admin-page .upload-guide-card, .admin-page .movie-list-container, .admin-page .login-card {
+  min-width: 0;
+  border: 1px solid var(--admin-line);
+  border-radius: 16px;
+  background: linear-gradient(150deg, #1c1924, #14121a);
+  box-shadow: 0 15px 36px #0003;
+}
+.admin-page .admin-form-container { max-height: none; overflow: visible; }
+.admin-page #section-videos .admin-form-container { position: static; }
+.admin-page .form-card-heading h2 { margin: 5px 0 0; font-size: 20px; }
+.admin-page .draft-status { color: var(--admin-accent); white-space: nowrap; }
+.admin-page .editor-heading { font-size: 15px; margin: 26px 0 14px; padding-top: 16px; border-top: 1px solid var(--admin-line); }
+.admin-page .form-group label { color: #ded8e4; font-weight: 600; }
+.admin-page :is(.form-group, .admin-filters) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea),
+.admin-page #movie-form :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), textarea),
+.admin-page .rank-slot select {
+  width: 100%; min-width: 0; min-height: 43px; padding: 9px 11px;
+  border: 1px solid #ffffff29; border-radius: 9px;
+  background: #100e16; color: #f7f4fa; font-size: 13px;
+}
+.admin-page .field-help { color: var(--admin-muted); font-size: 12px; }
+.admin-page .tmdb-lookup { background: linear-gradient(145deg, #ead2fb14, #fff1); border-color: #d9c1ec3a; }
+.admin-page .tmdb-search-row button { background: #f4dca821; border-color: #f4dca855; color: var(--admin-accent); }
+.admin-page .tmdb-lookup-title small { color: var(--admin-muted); }
+.admin-page .tmdb-extended { margin-bottom: 12px; }
+.admin-page .tmdb-extended summary { color: var(--admin-text); }
+.admin-page .media-upload-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.admin-page .media-upload-grid > .form-group:first-child { grid-row: auto; }
+.admin-page .media-upload-grid .form-group:nth-child(n) .upload-wrapper {
+  aspect-ratio: auto; height: 155px; min-height: 0;
+  background: radial-gradient(ellipse at 50% 0, #f4dca812, transparent 90%), #100e16;
+  border-color: #ffffff39;
+}
+.admin-page .media-upload-grid .upload-wrapper.drag-active, .admin-page .media-upload-grid .upload-wrapper:hover { border-color: var(--admin-accent); }
+.admin-page .media-upload-grid .form-group > label { color: #ded8e4; }
+.admin-page .editor-preview { position: sticky; top: 100px; }
+.admin-page .editor-preview .guide-poster { aspect-ratio: 16 / 10; background: radial-gradient(ellipse at top, #62485d, #141018); }
+.admin-page .editor-preview .guide-poster img { display: block; filter: none; }
+.admin-page .editor-preview .guide-poster div { inset: auto 12px 13px; text-align: left; overflow-wrap: anywhere; }
+.admin-page .editor-preview .guide-poster small { color: #e0d9e5; }
+.admin-page .media-preview-grid p { color: var(--admin-muted) !important; }
+.admin-page .editor-actions {
+  position: sticky; z-index: 11; bottom: 0;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 9px;
+  margin-top: 15px; padding: 12px 0;
+  border-top: 1px solid var(--admin-line);
+  background: #191620f0; backdrop-filter: blur(16px);
+}
+.admin-page .editor-actions .admin-status { flex: 1 0 min(160px, 100%); margin: 0; }
+.admin-page .btn-submit { background: var(--admin-accent); color: #1b1420; border-radius: 9px; font-size: 14px; }
+.admin-page .editor-actions .btn-submit { width: auto; margin-left: auto; }
+.admin-page .admin-secondary {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 36px; padding: 6px 11px; border: 1px solid var(--admin-line);
+  border-radius: 8px; background: #ffffff08; color: #e2dce9;
+  text-decoration: none; font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.admin-page .admin-secondary:hover { background: #fff2; }
+.admin-page .danger-button { color: #ffb4b8; }
+.admin-page .admin-section.admin-collection.active { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.admin-page .admin-collection .movie-list-container { overflow-x: auto; padding: clamp(12px, 2vw, 24px); }
+.admin-page .admin-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(130px, 230px); gap: 12px; }
+.admin-page .admin-filters label { display: grid; gap: 6px; color: var(--admin-muted); font-size: 12px; }
+.admin-page .admin-status { color: var(--admin-muted); font-size: 12px; min-height: 1em; overflow-wrap: anywhere; }
+.admin-page .admin-status[data-state="success"] { color: #a3e8b1; }
+.admin-page .admin-status[data-state="error"] { color: #ffb4b8; }
+.admin-page .movie-table th { color: var(--admin-muted); font-size: 12px; }
+.admin-page .movie-table td { font-size: 13px; }
+.admin-page .library-title, .admin-page .library-actions { display: flex; align-items: center; gap: 9px; }
+.admin-page .library-title img { width: 38px; height: 54px; border-radius: 6px; object-fit: cover; flex: none; }
+.admin-page .library-title small { display: block; margin-top: 4px; color: var(--admin-muted); }
+.admin-page .library-actions { flex-wrap: wrap; }
+.admin-page .library-badge, .admin-page .rank-count { display: inline-block; margin: 2px 0; padding: 4px 8px; border: 1px solid var(--admin-line); border-radius: 999px; color: #e6dfee; white-space: nowrap; font-size: 11px; }
+.admin-page .rank-badge, .admin-page .rank-count { color: var(--admin-accent); background: #f4dca813; }
+.admin-page .rank-heading { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.admin-page .rank-heading h2 { margin: 0; font-size: 17px; }
+.admin-page .rank-manager { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.admin-page .rank-slot { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 8px; align-items: center; padding: 8px; background: #ffffff05; border: 1px solid var(--admin-line); border-radius: 10px; }
+.admin-page .rank-number-label { text-align: center; color: var(--admin-accent); font-weight: 700; }
+.admin-page #login-overlay { padding: 16px; background: radial-gradient(ellipse at 50% 8%, #423147, #0c0b10 66%); }
+.admin-page .login-card { position: static; width: min(100%, 400px); margin: 0; }
+.admin-page .login-card img { display: block; margin-bottom: 16px; }
+.admin-page .login-card h1 { margin: 0 0 20px; font-size: 22px; }
+.admin-page #login-error { color: #ffb4b8 !important; }
+
+@media (max-width: 900px) {
+  .admin-page #admin-content.admin-container { padding: 84px 14px 50px; }
+  .admin-page #admin-content > .admin-nav {
+    position: sticky; inset: 68px auto auto; z-index: 30;
+    height: auto; align-items: center; justify-content: flex-start; overflow-y: hidden;
+  }
+  .admin-page #admin-content .admin-nav .nav-item.active { border-left: 0; border-bottom-color: var(--admin-accent); }
+  .admin-page #section-movies.admin-section.active { grid-template-columns: minmax(0, 1fr) !important; }
+  .admin-page .editor-preview { position: static; }
+  .admin-page .editor-preview .guide-poster { max-width: 450px; }
+}
+@media (max-width: 620px) {
+  .admin-page .rank-manager, .admin-page .admin-filters { grid-template-columns: minmax(0, 1fr); }
+  .admin-page .media-upload-grid { gap: 10px; }
+  .admin-page .media-upload-grid .form-group:nth-child(n) .upload-wrapper { height: 125px; }
+  .admin-page .media-upload-grid .upload-placeholder { padding: 8px; }
+  .admin-page .media-upload-grid .upload-placeholder p { font-size: 11px; }
+  .admin-page .movie-table :is(th, td) { padding: 9px 6px; }
+  .admin-page .library-title img { display: none; }
+}
+.admin-page .media-field-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px; margin-bottom: 8px; color: #ded8e4; font-size: 13px; font-weight: 600; }
+.admin-page .media-ratios { display: flex; gap: 9px; }
+.admin-page .media-ratios label { display: inline-flex; align-items: center; gap: 3px; margin: 0; font-size: 11px; color: var(--admin-muted); cursor: pointer; }
+.admin-page .media-ratios input { width: auto; margin: 0; accent-color: var(--admin-accent); }
+.admin-page .upload-placeholder:focus-visible { outline-offset: -3px; }
+.admin-page .video-card-item { background: var(--admin-panel); border-color: var(--admin-line); }
+.admin-page .video-card-info p { color: var(--admin-muted); }

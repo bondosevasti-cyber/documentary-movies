@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ადმინ პანელი — სტუდია პრიზმა</title>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="images/logo/prisma-mark.svg">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
@@ -433,60 +433,62 @@
         }
         /* ==== End admin workspace ==== */
     </style>
+    <link rel="stylesheet" href="admin-workspace.css">
 </head>
 <body class="admin-page">
 
     <div id="login-overlay">
-        <div class="admin-form-container" style="width: 400px; position: static;">
-            <h1>ადმინ შესვლა</h1>
+        <form class="admin-form-container login-card" onsubmit="event.preventDefault(); handleLogin()">
+            <img src="images/logo/prisma-mark.svg" alt="" width="36" height="36">
+            <p class="eyebrow">STUDIO PRISMA</p>
+            <h1>ადმინპანელში შესვლა</h1>
             <div class="form-group">
-                <label>ელ-ფოსტა</label>
-                <input type="email" id="login-email" placeholder="Email" required>
+                <label for="login-email">ელ-ფოსტა</label>
+                <input type="email" id="login-email" autocomplete="username" placeholder="name@example.com" required>
             </div>
             <div class="form-group">
-                <label>პაროლი</label>
-                <input type="password" id="login-pass" placeholder="Password" required>
+                <label for="login-pass">პაროლი</label>
+                <input type="password" id="login-pass" autocomplete="current-password" required>
             </div>
-            <button class="btn-submit" id="btn-login" onclick="handleLogin()">შესვლა</button>
-            <p id="login-error" style="color:red; font-size: 12px; margin-top: 10px; display: none;"></p>
-        </div>
+            <button class="btn-submit" id="btn-login" type="submit">შესვლა</button>
+            <p id="login-error" role="alert" style="color:red; font-size: 12px; margin-top: 10px; display: none;"></p>
+        </form>
     </div>
 
     <header class="admin-topbar">
-        <a href="index.html" class="logo admin-brand">
+        <a href="/" class="logo admin-brand">
             <img src="images/logo/prisma-mark.svg" alt="სტუდია პრიზმა" class="logo-img">
             <span>STUDIO <strong>PRISMA</strong></span>
         </a>
         <div class="topbar-actions">
+            <a class="admin-secondary" href="/" target="_blank" rel="noopener">საიტის ნახვა ↗</a>
             <button class="btn-logout" id="logout-btn" onclick="handleLogout()">გამოსვლა</button>
         </div>
     </header>
 
     <div class="admin-container" id="admin-content" style="display: none; grid-template-columns: 1fr;">
-        <div class="admin-nav">
-            <div class="sidebar-label">ადმინპანელი</div>
-            <div class="nav-item active" id="nav-movies" onclick="switchSection('movies')"><span class="nav-icon">＋</span> ფილმის ატვირთვა</div>
-            <a href="admin_articles.html" class="nav-item"><span class="nav-icon">▤</span> სტატიები</a>
-            <div class="nav-item" id="nav-videos" onclick="switchSection('videos')"><span class="nav-icon">▶</span> ვიდეოების მართვა</div>
-            <div class="nav-item" id="nav-push" onclick="switchSection('push')"><span class="nav-icon">♢</span> შეტყობინებები</div>
-            <div class="nav-item" id="nav-settings" onclick="switchSection('settings')"><span class="nav-icon">⚙</span> პარამეტრები</div>
-            <div class="sidebar-support">
-                <span>?</span>
-                <div><strong>დახმარება?</strong><small>თუ რაიმე კითხვა გაქვს, დაგვიკავშირდი.</small></div>
-            </div>
-        </div>
+        <nav class="admin-nav" aria-label="ადმინპანელის ნავიგაცია">
+            <div class="sidebar-label">მართვის პანელი</div>
+            <button type="button" class="nav-item active" id="nav-movies" onclick="switchSection('movies')"><span class="nav-icon" aria-hidden="true">＋</span> დამატება</button>
+            <button type="button" class="nav-item" id="nav-library" onclick="switchSection('library')"><span class="nav-icon" aria-hidden="true">▦</span> კატალოგი</button>
+            <button type="button" class="nav-item" id="nav-top10" onclick="switchSection('top10')"><span class="nav-icon" aria-hidden="true">★</span> TOP 10</button>
+            <a href="admin_articles.html" class="nav-item"><span class="nav-icon" aria-hidden="true">▤</span> სტატიები</a>
+            <button type="button" class="nav-item" id="nav-videos" onclick="switchSection('videos')"><span class="nav-icon" aria-hidden="true">▶</span> ვიდეოები</button>
+            <button type="button" class="nav-item" id="nav-push" onclick="switchSection('push')"><span class="nav-icon" aria-hidden="true">♢</span> შეტყობინებები</button>
+            <button type="button" class="nav-item" id="nav-settings" onclick="switchSection('settings')"><span class="nav-icon" aria-hidden="true">⚙</span> პარამეტრები</button>
+        </nav>
 
         <!-- MOVIES SECTION -->
-        <div id="section-movies" class="admin-section active" style="grid-template-columns: 1fr 2fr;">
+        <main id="section-movies" class="admin-section active">
             <div class="movies-page-intro">
-                <div class="breadcrumb"><span>მთავარი</span><b>›</b>ფილმის ატვირთვა</div>
-                <h1>ფილმის ატვირთვა</h1>
-                <p>შეავსე ინფორმაცია, დაამატე ვიზუალური მასალა და გამოაქვეყნე ფილმი.</p>
+                <p class="eyebrow">კატალოგის რედაქტორი</p>
+                <h1>ფილმები და სერიალები</h1>
+                <p>შეავსე ინფორმაცია, დაამატე სურათები და ნახე, როგორ გამოჩნდება ჩანაწერი საიტზე.</p>
             </div>
             <div class="admin-form-container">
                 <div class="form-card-heading">
-                    <div><span class="eyebrow">ახალი ჩანაწერი</span><h1 id="form-title">ფილმის დამატება</h1></div>
-                    <span class="draft-status">● მონახაზი</span>
+                    <div><span class="eyebrow">ახალი ჩანაწერი</span><h2 id="form-title">ფილმის დამატება</h2></div>
+                    <span class="draft-status" id="editor-state">ახალი</span>
                 </div>
                 <form id="movie-form">
                     <input type="hidden" name="movie_id" id="movie-id">
@@ -509,15 +511,45 @@
                         <p class="tmdb-status" id="tmdb-status" aria-live="polite"></p>
                         <div class="tmdb-results" id="tmdb-results"></div>
                     </section>
+                    <h3 class="editor-heading">ძირითადი ინფორმაცია</h3>
+                    <div class="form-group"><label>დასახელება</label><input type="text" name="title" required></div>
+                    <div class="form-group"><label>ჟანრი</label><input type="text" name="genre"></div>
+                    <div class="form-group"><label>აღწერა</label><textarea name="description" rows="2"></textarea></div>
+                    <div class="form-row" style="display: flex; gap: 10px;">
+                        <div class="form-group" style="flex: 1;"><label>წელი</label><input type="text" name="release_year"></div>
+                        <div class="form-group" style="flex: 1;"><label>რეიტინგი</label><input type="text" name="rating"></div>
+                    </div>
+                    <div class="form-group"><label>ვიდეოს ბმული</label><input type="text" name="video_id" placeholder="https://rumble.com/embed/..."></div>
+                    <div class="form-group">
+                        <label>ხანგრძლივობა</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div style="flex: 1;"><input type="number" name="dur_h" min="0" placeholder="სთ"></div>
+                            <div style="color: #666;">სთ</div>
+                            <div style="flex: 1;"><input type="number" name="dur_m" min="0" max="59" placeholder="წთ"></div>
+                            <div style="color: #666;">წთ</div>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox" name="is_coming_soon"> მალე დაემატება</label>
+                        <label class="checkbox-item"><input type="checkbox" name="is_official" onchange="document.getElementById('creator-url-group').style.display = this.checked ? 'block' : 'none'"> ოფიციალური წყარო / სტუდია</label>
+                    </div>
+
+                    <div class="form-group" id="creator-url-group" style="display: none;">
+                        <input type="hidden" name="creator_url">
+                        <small class="field-help">ოფიციალური წყაროს ნიშნული დეტალურ გვერდზე გამოჩნდება. ვებსაიტი ქვემოთ, „სტუდიის ოფიციალური ვებსაიტის“ ველში მიუთითე.</small>
+                    </div>
+
+                    <h3 class="editor-heading">სურათები</h3>
                     <div class="media-upload-grid">
                     <div class="form-group">
-                        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                        <div class="media-field-heading">
                             <span>მთავარი გვერდის ბარათის ფოტო</span>
-                            <div style="display: flex; gap: 10px;">
-                                <label style="font-size: 11px; color: #888; display: flex; align-items: center; gap: 4px; cursor: pointer;"><input type="radio" name="ratio_choice" value="1:1" onchange="updateAllRatios()" style="width:14px; height:14px;"> 1:1</label>
-                                <label style="font-size: 11px; color: #888; display: flex; align-items: center; gap: 4px; cursor: pointer;"><input type="radio" name="ratio_choice" value="16:9" checked onchange="updateAllRatios()" style="width:14px; height:14px;"> 16:9</label>
+                            <div class="media-ratios" role="group" aria-label="ბარათის პროპორცია">
+                                <label><input type="radio" name="ratio_choice" value="1:1" onchange="updateAllRatios()"> 1:1</label>
+                                <label><input type="radio" name="ratio_choice" value="16:9" checked onchange="updateAllRatios()"> 16:9</label>
                             </div>
-                        </label>
+                        </div>
                         <p style="margin: -4px 0 10px; color: #aeb5c2; font-size: 12px;">აირჩიე <strong>16:9</strong>, თუ გინდა ისეთი ფართო ბარათი, როგორიც მთავარ გვერდზე ჩანს. ფოტოს პირდაპირ ამ ჩარჩოში გადმოათრევ — ქვემოთ „მთავარი გვერდის ბარათი“ ზუსტად საბოლოო შედეგს აჩვენებს.</p>
                         <div class="upload-wrapper poster-wrapper" id="card-drop-zone">
                             <button type="button" class="reset-upload" id="card-reset">&times;</button>
@@ -531,8 +563,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label>ვერტიკალური პოსტერი — TOP 5 და დეტალური გვერდი (2:3)</label>
-                        <p class="field-help">ატვირთე ვერტიკალური, წიგნის ყდის მსგავსი ფოტო. საბოლოო კადრი ინახება 600 × 900 px ზომით და გამოიყენება TOP 5-ში და ფილმის დეტალურ გვერდზე. ჩარჩოში გადაადგილებით აირჩიე მოსაჭრელი ნაწილი.</p>
+                        <label>ვერტიკალური პოსტერი (2:3)</label>
+                        <p class="field-help">ატვირთე ვერტიკალური, წიგნის ყდის მსგავსი ფოტო. საბოლოო კადრი ინახება 600 × 900 px ზომით. ჩარჩოში გადაადგილებით აირჩიე მოსაჭრელი ნაწილი.</p>
                         <div class="upload-wrapper poster-wrapper" id="poster-drop-zone">
                             <button type="button" class="reset-upload" id="poster-reset">&times;</button>
                             <div class="upload-placeholder" id="poster-placeholder" onclick="document.getElementById('poster-input').click()">
@@ -560,7 +592,7 @@
 
                     <div class="form-group">
                         <label>სათაურის გამჭვირვალე სურათი (არჩევითი)</label>
-                        <div class="upload-wrapper title-art-upload" id="title-art-preview" onclick="document.getElementById('title-art-input').click()">
+                        <div class="upload-wrapper title-art-upload" aria-label="სათაურის სურათის ატვირთვა" id="title-art-preview" onclick="document.getElementById('title-art-input').click()">
                             <div class="upload-placeholder"><p>PNG/WebP ლოგოს ან სათაურის ატვირთვა</p><small class="field-help">ატვირთე მხოლოდ მაშინ, როცა ბანერის ფოტოზე სათაური არ წერია.</small></div>
                         </div>
                         <input type="file" id="title-art-input" accept="image/png,image/webp" style="display:none;">
@@ -573,35 +605,8 @@
                         ბანერზე სათაური უკვე წერია — დამატებითი ტექსტი დამალე
                     </label>
 
-                    <div class="form-group"><label>დასახელება</label><input type="text" name="title"></div>
-                    <div class="form-group"><label>ჟანრი</label><input type="text" name="genre"></div>
-                    <div class="form-group"><label>აღწერა</label><textarea name="description" rows="2"></textarea></div>
-                    <div class="form-row" style="display: flex; gap: 10px;">
-                        <div class="form-group" style="flex: 1;"><label>წელი</label><input type="text" name="release_year"></div>
-                        <div class="form-group" style="flex: 1;"><label>რეიტინგი</label><input type="text" name="rating"></div>
-                    </div>
-                    <div class="form-group"><label>Embed IFRAME URL</label><input type="text" name="video_id" placeholder="https://rumble.com/embed/..."></div>
-                    <div class="form-group">
-                        <label>ხანგრძლივობა</label>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <div style="flex: 1;"><input type="number" name="dur_h" min="0" placeholder="სთ"></div>
-                            <div style="color: #666;">სთ</div>
-                            <div style="flex: 1;"><input type="number" name="dur_m" min="0" max="59" placeholder="წთ"></div>
-                            <div style="color: #666;">წთ</div>
-                        </div>
-                    </div>
-
-                    <div class="checkbox-group">
-                        <label class="checkbox-item"><input type="checkbox" name="is_top_10"> Top 5</label>
-                        <label class="checkbox-item"><input type="checkbox" name="is_coming_soon"> მალე</label>
-                        <label class="checkbox-item"><input type="checkbox" name="is_official" onchange="document.getElementById('creator-url-group').style.display = this.checked ? 'block' : 'none'"> ოფიციალური წყარო / სტუდია</label>
-                    </div>
-
-                    <div class="form-group" id="creator-url-group" style="display: none;">
-                        <input type="hidden" name="creator_url">
-                        <small class="field-help">ოფიციალური წყაროს ნიშნული დეტალურ გვერდზე გამოჩნდება. ვებსაიტი ქვემოთ, „სტუდიის ოფიციალური ვებსაიტის“ ველში მიუთითე.</small>
-                    </div>
-
+                    <details class="tmdb-extended">
+                        <summary>სტუდია, ტრეილერი და მონაწილეები</summary>
                     <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                         <div class="form-group"><label>სტუდიის / მწარმოებლის სახელი</label><input type="text" name="studio_name" placeholder="მაგ: Moving Art"></div>
                         <div class="form-group"><label>სტუდიის ლოგოს URL (არჩევითი)</label><input type="url" name="studio_logo_url" placeholder="https://.../logo.png"></div>
@@ -616,6 +621,8 @@
                         <div class="form-group"><label>სცენარის ავტორი</label><input type="text" name="writer_names"></div>
                         <div class="form-group"><label>პროდიუსერი</label><input type="text" name="producer_names"></div>
                     </div>
+
+                    </details>
 
                     <details class="tmdb-extended">
                         <summary>დამატებითი მონაცემები TMDb / IMDb-დან</summary>
@@ -638,7 +645,8 @@
                     </details>
 
                     <!-- Focal Point Controls -->
-                    <div style="background: #1a1a1a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333;">
+                    <details class="tmdb-extended editor-focal">
+                        <summary>სურათების ფოკუსის მორგება</summary>
                         <h4 style="margin-top: 0; color: #eee; font-size: 14px;">მთავარი გვერდის ბარათის ფოტო</h4>
                         <p style="color: #888; font-size: 12px; margin: -6px 0 12px;">ამ სლაიდერებით ასწორებ მხოლოდ მთავარ გვერდზე ნაჩვენებ ბარათის კადრს.</p>
                         <div class="form-group">
@@ -666,10 +674,13 @@
                                 <input type="range" name="mobile_pos_y" min="0" max="100" value="50" style="width: 150px;">
                             </label>
                         </div>
-                    </div>
+                    </details>
 
-                    <button type="submit" class="btn-submit" id="submit-btn" disabled>მონაცემების ჩატვირთვა...</button>
-                    <button type="button" class="btn-cancel" id="cancel-btn" onclick="resetForm()">გაუქმება</button>
+                    <div class="editor-actions">
+                        <p id="movie-save-status" class="admin-status" role="status"></p>
+                        <button type="button" class="btn-cancel admin-secondary" id="cancel-btn" onclick="resetForm()">გასუფთავება</button>
+                        <button type="submit" class="btn-submit" id="submit-btn" disabled>იტვირთება…</button>
+                    </div>
                 </form>
 
                 <!-- Live Preview Frames -->
@@ -691,7 +702,7 @@
                             </div>
                         </div>
                         <div style="text-align: center;">
-                            <p style="font-size: 11px; color: #aaa; margin-bottom: 5px;">TOP 5 და დეტალური გვერდი (2:3)</p>
+                            <p style="font-size: 11px; color: #aaa; margin-bottom: 5px;">ვერტიკალური პოსტერი (2:3)</p>
                             <div style="width: 100%; max-width: 120px; aspect-ratio: 2/3; margin: 0 auto; background: #000; border: 4px solid #444; border-radius: 10px; overflow: hidden; position: relative;" id="preview-poster-frame">
                                 <img id="preview-image-poster" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
@@ -706,39 +717,51 @@
                 </div>
             </div>
 
-            <div class="admin-lists-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-                <aside class="upload-guide-card">
-                    <h3>წინასწარი ნახვა</h3>
-                    <div class="guide-poster">
-                        <img src="images/first/ჰობიტი.webp" alt="ფილმის ბარათის მაგალითი">
-                        <div><strong>ფილმის სათაური</strong><small>დოკუმენტური • 2026</small></div>
-                    </div>
-                </aside>
-
-                <aside class="upload-guide-card requirements-card">
-                    <h3>მოთხოვნები</h3>
-                    <ul>
-                        <li><span>✓</span> გამოიყენე მაღალი ხარისხის ფოტო</li>
-                        <li><span>✓</span> მთავარი ბანერის ფორმატი — 16:9</li>
-                        <li><span>✓</span> შეავსე ყველა აუცილებელი ველი</li>
-                        <li><span>✓</span> გადაამოწმე ბმულები გამოქვეყნებამდე</li>
-                    </ul>
-                </aside>
-
-                <div class="movie-list-container">
-                    <h2>ფილმების სია</h2>
-                    <table class="movie-table">
-                        <thead><tr><th>პოსტერი</th><th>დასახელება</th><th>სექცია</th><th>მოქმედება</th></tr></thead>
-                        <tbody id="movies-tbody"></tbody>
-                    </table>
+            <aside class="upload-guide-card editor-preview">
+                <h3>წინასწარი ნახვა</h3>
+                <div class="guide-poster">
+                    <img id="editor-preview-image" alt="" hidden>
+                    <div><strong id="editor-preview-title">ჩანაწერის სათაური</strong><small id="editor-preview-meta">ფილმი</small></div>
                 </div>
+                <p class="field-help">სურათისა და ველების შეცვლისას წინასწარი ნახვა განახლდება.</p>
+            </aside>
+        </main>
 
-                <div class="movie-list-container">
-                    <h2>Top 5 მენეჯერი (რეიტინგი 1-5)</h2>
-                    <div id="top5-manager-list" style="padding-top:10px;"></div>
-                </div>
+        <main id="section-library" class="admin-section admin-collection">
+            <div class="movies-page-intro">
+                <p class="eyebrow">მართვის პანელი</p>
+                <h1>კატალოგი</h1>
+                <p>მოძებნე და დაარედაქტირე ფილმები და სერიალები.</p>
             </div>
-        </div>
+            <section class="movie-list-container">
+                <div class="admin-filters">
+                    <label>ძებნა <input id="movie-search" type="search" placeholder="სათაური ან ჟანრი" oninput="renderMovieList()"></label>
+                    <label>ფილტრი <select id="movie-filter" onchange="renderMovieList()">
+                        <option value="all">ყველა</option><option value="movie">ფილმები</option><option value="series">სერიალები</option>
+                        <option value="soon">მალე დაემატება</option><option value="ranked">TOP 10</option>
+                    </select></label>
+                </div>
+                <p class="admin-status" id="library-status" role="status"></p>
+                <table class="movie-table">
+                    <thead><tr><th scope="col">ჩანაწერი</th><th scope="col">სტატუსი</th><th scope="col">მოქმედება</th></tr></thead>
+                    <tbody id="movies-tbody"></tbody>
+                </table>
+            </section>
+        </main>
+
+        <main id="section-top10" class="admin-section admin-collection">
+            <div class="movies-page-intro">
+                <p class="eyebrow">მთავარი გვერდი</p>
+                <h1>TOP 10</h1>
+                <p>აირჩიე ფილმი ან სერიალი თითოეული პოზიციისთვის. არჩევანი ავტომატურად ინახება.</p>
+            </div>
+            <section class="movie-list-container">
+                <div class="rank-heading"><h2>პოზიციები</h2><span class="rank-count" id="top10-count"></span></div>
+                <p class="field-help">სხვა პოზიციაზე მყოფი ჩანაწერის არჩევისას მისი ძველი ადგილი გათავისუფლდება. პოზიციის გასათავისუფლებლად აირჩიე „ცარიელია“.</p>
+                <p id="top10-status" class="admin-status" role="status"></p>
+                <div id="top10-manager-list" class="rank-manager"></div>
+            </section>
+        </main>
 
         <!-- VIDEOS SECTION -->
         <div id="section-videos" class="admin-section" style="grid-template-columns: 1fr 1.5fr;">
@@ -1047,28 +1070,32 @@
             }
         };
 
+        const adminSections = ['movies', 'library', 'top10', 'videos', 'push', 'settings'];
+
         function switchSection(section) {
-            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            if (section === 'movies') {
-                document.getElementById('section-movies').classList.add('active');
-                document.getElementById('nav-movies').classList.add('active');
-                loadMovies();
-                loadTop5Manager();
-            } else if (section === 'videos') {
-                document.getElementById('section-videos').classList.add('active');
-                document.getElementById('nav-videos').classList.add('active');
-                loadVideos();
-            } else if (section === 'push') {
-                document.getElementById('section-push').classList.add('active');
-                document.getElementById('nav-push').classList.add('active');
-                loadPushSubscribers();
-            } else if (section === 'settings') {
-                document.getElementById('section-settings').classList.add('active');
-                document.getElementById('nav-settings').classList.add('active');
-                loadSiteSettings();
+            if (!adminSections.includes(section)) section = 'movies';
+            document.querySelectorAll('.admin-section').forEach(panel => panel.classList.toggle('active', panel.id === 'section-' + section));
+            document.querySelectorAll('.admin-nav .nav-item').forEach(item => {
+                const active = item.id === 'nav-' + section;
+                item.classList.toggle('active', active);
+                if (active) item.setAttribute('aria-current', 'page');
+                else item.removeAttribute('aria-current');
+            });
+            history.replaceState(null, '', section === 'movies' ? location.pathname + location.search : '#' + section);
+            window.scrollTo(0, 0);
+            const nav = document.querySelector('.admin-nav');
+            const activeItem = document.getElementById('nav-' + section);
+            if (nav.scrollWidth > nav.clientWidth) {
+                const menuBounds = nav.getBoundingClientRect();
+                const itemBounds = activeItem.getBoundingClientRect();
+                if (itemBounds.right > menuBounds.right) nav.scrollLeft += itemBounds.right - menuBounds.right + 8;
+                else if (itemBounds.left < menuBounds.left) nav.scrollLeft -= menuBounds.left - itemBounds.left + 8;
             }
+
+            if (section === 'library' || section === 'top10') loadMovies();
+            else if (section === 'videos') loadVideos();
+            else if (section === 'push') loadPushSubscribers();
+            else if (section === 'settings') loadSiteSettings();
         }
 
         async function loadSiteSettings() {
@@ -1315,15 +1342,17 @@
             btn.innerText = 'ავტორიზაცია...';
             errorEl.style.display = 'none';
 
-            const { data, error } = await _supabase.auth.signInWithPassword({ email, password: pass });
-
-            if (error) {
-                errorEl.innerText = 'ავტორიზაციის შეცდომა: ' + error.message;
-                errorEl.style.display = 'block';
-                btn.disabled = false;
-                btn.innerText = 'შესვლა';
-            } else {
+            try {
+                const { error } = await _supabase.auth.signInWithPassword({ email, password: pass });
+                if (error) throw error;
+                document.getElementById('login-pass').value = '';
                 showAdminPanel();
+            } catch (error) {
+                errorEl.textContent = 'ავტორიზაციის შეცდომა: ' + error.message;
+                errorEl.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'შესვლა';
             }
         }
 
@@ -1337,51 +1366,71 @@
             document.getElementById('admin-content').style.display = 'grid';
             document.getElementById('submit-btn').disabled = false;
             document.getElementById('submit-btn').innerText = 'ფილმის შენახვა';
-            const requestedSection = window.location.hash.replace('#', '');
-            if (['videos', 'push', 'settings'].includes(requestedSection)) {
-                switchSection(requestedSection);
-            } else {
-                loadMovies();
-                loadTop5Manager();
-            }
+            switchSection(location.hash.slice(1));
         }
 
         let allMovies = [];
-        async function loadTop5Manager() {
-            const { data: movies } = await _supabase.from('movies').select('*');
-            allMovies = movies || [];
-            
-            const container = document.getElementById('top5-manager-list');
-            container.innerHTML = '';
+        let rankSaving = false;
+        const rankLimit = 10;
+        const moviePosition = movie => {
+            const rank = Number(movie.top_10_position);
+            return Number.isInteger(rank) && rank >= 1 && rank <= rankLimit ? rank : null;
+        };
 
-            for (let i = 1; i <= 5; i++) {
-                const currentMovie = allMovies.find(m => m.top_10_position == i);
-                const div = document.createElement('div');
-                div.style = 'margin-bottom:12px; display:flex; align-items:center; gap:10px; background:#111; padding:10px; border-radius:5px; border-left: 3px solid #e31b23;';
-                
-                div.innerHTML = `
-                    <div style="font-weight:bold; color:red; min-width:25px;">#${i}</div>
-                    <select onchange="updateRank(${i}, this.value)" style="flex:1; background:#222; color:white; border:1px solid #333; padding:5px; border-radius:4px;">
-                        <option value="">ცარიელია</option>
-                        ${allMovies.map(m => `<option value="${m.id}" ${currentMovie && currentMovie.id === m.id ? 'selected' : ''}>${m.title}</option>`).join('')}
-                    </select>
-                `;
-                container.appendChild(div);
+        function renderTop10Manager(focusPosition) {
+            const container = document.getElementById('top10-manager-list');
+            container.replaceChildren();
+            const ranked = new Map(allMovies.filter(movie => moviePosition(movie)).map(movie => [moviePosition(movie), movie]));
+            document.getElementById('top10-count').textContent = ranked.size + ' / ' + rankLimit + ' შევსებული';
+
+            for (let position = 1; position <= rankLimit; position++) {
+                const row = document.createElement('label');
+                row.className = 'rank-slot';
+                const number = document.createElement('span');
+                number.className = 'rank-number-label';
+                number.textContent = '#' + position;
+                const select = document.createElement('select');
+                select.setAttribute('aria-label', 'TOP 10 — პოზიცია ' + position);
+                select.disabled = rankSaving;
+                select.add(new Option('ცარიელია', ''));
+                for (const movie of allMovies) {
+                    const rank = moviePosition(movie);
+                    const title = movie.title || 'უსათაურო';
+                    select.add(new Option(rank && rank !== position ? title + ' · #' + rank : title, movie.id));
+                }
+                select.value = ranked.get(position)?.id || '';
+                select.onchange = () => updateRank(position, select.value);
+                row.append(number, select);
+                container.append(row);
+                if (position === focusPosition && !rankSaving) select.focus();
             }
         }
 
-        async function updateRank(pos, movieId) {
-            // 1. Clear any movie currently in this position
-            await _supabase.from('movies').update({ top_10_position: null }).eq('top_10_position', pos);
-            
-            // 2. Set new movie if ID provided
-            if (movieId) {
-                await _supabase.from('movies').update({ top_10_position: null }).eq('id', movieId);
-                await _supabase.from('movies').update({ top_10_position: pos }).eq('id', movieId);
+        async function updateRank(position, movieId) {
+            if (rankSaving) return;
+            rankSaving = true;
+            const status = document.getElementById('top10-status');
+            document.querySelectorAll('#top10-manager-list select').forEach(select => { select.disabled = true; });
+            status.dataset.state = '';
+            status.textContent = 'ინახება…';
+            try {
+                const { error } = await _supabase.rpc('set_movie_top10_position', {
+                    p_position: position,
+                    p_movie_id: movieId || null,
+                });
+                if (error) throw error;
+                if (!await loadMovies({ keepRankStatus: true })) throw new Error('პოზიცია შენახულია, მაგრამ სია ვერ განახლდა. განყოფილება ხელახლა გახსენი.');
+                status.dataset.state = 'success';
+                status.textContent = 'პოზიცია #' + position + ' შენახულია.';
+            } catch (error) {
+                status.dataset.state = 'error';
+                status.textContent = error.code === 'PGRST202'
+                    ? 'TOP 10-ის გასააქტიურებლად Supabase SQL Editor-ში გაუშვი top10_upgrade.sql.'
+                    : 'შეცდომა: ' + error.message;
+            } finally {
+                rankSaving = false;
+                renderTop10Manager(document.getElementById('section-top10').classList.contains('active') ? position : undefined);
             }
-            
-            loadTop5Manager();
-            loadMovies();
         }
 
         // --- Generic Cropper Logic ---
@@ -1726,18 +1775,76 @@
             vCoverBtnReset.style.display = 'none'; vCoverFileInput.value = '';
         };
 
-        async function loadMovies() {
-            const { data: movies, error } = await _supabase.from('movies').select('*').order('created_at', { ascending: false });
-            if (error) return console.error(error);
-            const tbody = document.getElementById('movies-tbody'); tbody.innerHTML = '';
-            movies.forEach(movie => {
-                const badge = movie.is_top_10 ? '<span style="color:red">Top 10</span>' : (movie.is_coming_soon ? '<span style="color:green">Soon</span>' : 'Main');
-                tbody.innerHTML += `<tr><td><img src="${movie.poster_url}" style="width:40px;height:40px;border-radius:4px;object-fit:cover;"></td><td><b>${movie.title}</b><br><small>${movie.genre}</small></td><td>${badge}</td><td class="actions"><button class="btn-edit" onclick="editMovie('${movie.id}')">E</button><button class="btn-delete" onclick="deleteMovie('${movie.id}')">D</button></td></tr>`;
+        let movieLoadId = 0;
+        async function loadMovies({ keepRankStatus = false } = {}) {
+            const request = ++movieLoadId;
+            const libraryStatus = document.getElementById('library-status');
+            const rankStatus = document.getElementById('top10-status');
+            libraryStatus.dataset.state = '';
+            libraryStatus.textContent = 'იტვირთება…';
+            if (!keepRankStatus && !rankSaving) {
+                rankStatus.dataset.state = '';
+                rankStatus.textContent = 'იტვირთება…';
+            }
+
+            const { data, error } = await _supabase.from('movies')
+                .select('id,title,genre,poster_url,release_year,content_type,is_coming_soon,top_10_position')
+                .order('created_at', { ascending: false });
+            if (request !== movieLoadId) return true;
+            if (error) {
+                libraryStatus.dataset.state = 'error';
+                libraryStatus.textContent = 'კატალოგი ვერ ჩაიტვირთა: ' + error.message;
+                if (!keepRankStatus) {
+                    rankStatus.dataset.state = 'error';
+                    rankStatus.textContent = libraryStatus.textContent;
+                }
+                return false;
+            }
+            allMovies = data || [];
+            renderMovieList();
+            if (!keepRankStatus && !rankSaving) rankStatus.textContent = '';
+            renderTop10Manager();
+            return true;
+        }
+
+        function renderMovieList() {
+            const query = document.getElementById('movie-search').value.trim().toLocaleLowerCase();
+            const filter = document.getElementById('movie-filter').value;
+            const movies = allMovies.filter(movie => {
+                const type = movie.content_type === 'series' ? 'series' : 'movie';
+                const matchesFilter = filter === 'all' || filter === type
+                    || (filter === 'soon' && movie.is_coming_soon)
+                    || (filter === 'ranked' && moviePosition(movie));
+                return matchesFilter && [movie.title, movie.genre, movie.release_year].join(' ').toLocaleLowerCase().includes(query);
             });
+            const status = document.getElementById('library-status');
+            status.dataset.state = '';
+            status.textContent = movies.length ? movies.length + ' ჩანაწერი' : 'ჩანაწერი ვერ მოიძებნა.';
+            const tbody = document.getElementById('movies-tbody');
+            tbody.replaceChildren();
+            for (const movie of movies) {
+                const rank = moviePosition(movie);
+                const row = document.createElement('tr');
+                row.innerHTML = `<td><div class="library-title">${movie.poster_url ? `<img src="${seriesEscape(movie.poster_url)}" alt="" loading="lazy">` : ''}<span><strong>${seriesEscape(movie.title || 'უსათაურო')}</strong><small>${seriesEscape([movie.content_type === 'series' ? 'სერიალი' : 'ფილმი', movie.release_year, movie.genre].filter(Boolean).join(' · '))}</small></span></div></td>
+                    <td><span class="library-badge">${movie.is_coming_soon ? 'მალე დაემატება' : 'გამოქვეყნებულია'}</span>${rank ? ` <span class="library-badge rank-badge">#${rank} TOP 10</span>` : ''}</td>
+                    <td><div class="library-actions"><button type="button" class="admin-secondary">რედაქტირება</button><button type="button" class="admin-secondary danger-button">წაშლა</button></div></td>`;
+                const [edit, remove] = row.querySelectorAll('button');
+                edit.onclick = () => editMovie(movie.id);
+                remove.onclick = () => deleteMovie(movie.id);
+                tbody.append(row);
+            }
         }
 
         async function editMovie(id) {
-            const { data: movie } = await _supabase.from('movies').select('*').eq('id', id).single();
+            const { data: movie, error } = await _supabase.from('movies').select('*').eq('id', id).single();
+            if (error || !movie) {
+                const status = document.getElementById('library-status');
+                status.dataset.state = 'error';
+                status.textContent = 'ჩანაწერი ვერ გაიხსნა.';
+                return;
+            }
+            resetForm();
+            switchSection('movies');
             const form = document.getElementById('movie-form');
             form['movie_id'].value = movie.id; 
             form['content_type'].value = movie.content_type || 'movie';
@@ -1763,7 +1870,6 @@
                 form['dur_m'].value = '';
             }
 
-            form['is_top_10'].checked = movie.is_top_10; 
             form['is_coming_soon'].checked = movie.is_coming_soon;
             form['is_official'].checked = movie.is_official || false;
             form['hide_hero_title'].checked = movie.hide_hero_title || false;
@@ -1800,12 +1906,18 @@
             document.getElementById('poster-placeholder').innerHTML = `<img src="${movie.poster_url}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>`;
             document.getElementById('cover-placeholder').innerHTML = `<img src="${movie.cover_url}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>`;
             document.getElementById('card-placeholder').innerHTML = movie.card_url ? `<img src="${movie.card_url}" style="width:100%;height:100%;object-fit:cover;"><p style="font-size:10px">შეცვლა</p>` : `<p>ცარიელია</p>`;
-            isEditing = true; document.getElementById('form-title').innerText = 'განახლება'; document.getElementById('submit-btn').innerText = 'შენახვა'; document.getElementById('cancel-btn').style.display = 'block';
+            document.getElementById('editor-state').textContent = 'რედაქტირება';
+            isEditing = true; document.getElementById('form-title').innerText = 'ჩანაწერის რედაქტირება'; document.getElementById('submit-btn').innerText = 'შენახვა'; document.getElementById('cancel-btn').textContent = 'გაუქმება';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function deleteMovie(id) {
-            if (confirm('წაიშალოს?')) { await _supabase.from('movies').delete().eq('id', id); loadMovies(); }
+            if (!confirm('წაიშალოს ეს ჩანაწერი?')) return;
+            const { error } = await _supabase.from('movies').delete().eq('id', id);
+            if (!error) { await loadMovies(); return; }
+            const status = document.getElementById('library-status');
+            status.dataset.state = 'error';
+            status.textContent = 'წაშლა ვერ მოხერხდა: ' + error.message;
         }
 
         function resetForm() {
@@ -1830,8 +1942,11 @@
             tmdbResults.innerHTML = '';
             setTmdbStatus();
             lastMetadataLookup = '';
-            isEditing = false; document.getElementById('form-title').innerText = 'ფილმის დამატება'; document.getElementById('submit-btn').innerText = 'ფილმის შენახვა'; document.getElementById('cancel-btn').style.display = 'none';
+            isEditing = false; document.getElementById('form-title').innerText = 'ფილმის დამატება'; document.getElementById('submit-btn').innerText = 'ფილმის შენახვა'; document.getElementById('cancel-btn').textContent = 'გასუფთავება';
             document.getElementById('creator-url-group').style.display = 'none';
+            document.getElementById('editor-state').textContent = 'ახალი';
+            document.getElementById('movie-save-status').textContent = '';
+            updateLivePreview();
         }
 
         // Handle ratio switching globally
@@ -1861,7 +1976,7 @@
             // Find current Banner (16:9) image for preview
             let bannerImg = '';
             if (coverCropper) {
-                bannerImg = coverCropper.getCroppedCanvas().toDataURL();
+                bannerImg = coverCropper.getCroppedCanvas()?.toDataURL() || '';
             } else if (existingCoverUrl) {
                 bannerImg = existingCoverUrl;
             }
@@ -1877,7 +1992,7 @@
 
             let cardImg = '';
             if (cardCropper) {
-                cardImg = cardCropper.getCroppedCanvas().toDataURL();
+                cardImg = cardCropper.getCroppedCanvas()?.toDataURL() || '';
             } else if (existingCardUrl) {
                 cardImg = existingCardUrl;
             } else if (existingPosterUrl) {
@@ -1886,18 +2001,47 @@
             previewCard.src = cardImg;
             previewCard.style.objectPosition = `${currentCardX}% ${currentCardY}%`;
             const posterImg = posterCropper
-                ? posterCropper.getCroppedCanvas({ width: 300, height: 450 }).toDataURL()
+                ? posterCropper.getCroppedCanvas({ width: 300, height: 450 })?.toDataURL() || ''
                 : existingPosterUrl;
             previewPoster.src = posterImg;
             const cardRatio = document.querySelector('input[name="ratio_choice"]:checked')?.value;
             previewCardFrame.style.aspectRatio = cardRatio === '1:1' ? '1 / 1' : '16 / 9';
             document.getElementById('val-card-x').innerText = currentCardX;
             document.getElementById('val-card-y').innerText = currentCardY;
+            const image = document.getElementById('editor-preview-image');
+            const artwork = cardImg || bannerImg || posterImg;
+            if (artwork) image.src = artwork;
+            else image.removeAttribute('src');
+            image.hidden = !artwork;
+            document.getElementById('editor-preview-title').textContent = form['title'].value.trim() || 'ჩანაწერის სათაური';
+            document.getElementById('editor-preview-meta').textContent = [
+                form['content_type'].value === 'series' ? 'სერიალი' : 'ფილმი',
+                form['release_year'].value.trim(), form['genre'].value.trim(),
+            ].filter(Boolean).join(' · ');
         }
 
         // Focal Point Listeners
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('movie-form');
+            for (const name of ['title', 'content_type', 'release_year', 'genre']) {
+                form[name].addEventListener('input', updateLivePreview);
+            }
+            document.querySelectorAll('.form-group > label').forEach((label, index) => {
+                const control = label.nextElementSibling;
+                if (!label.htmlFor && control?.matches('input:not([type=hidden]), select, textarea')) {
+                    control.id ||= 'admin-field-' + index;
+                    label.htmlFor = control.id;
+                }
+            });
+            document.querySelectorAll('.upload-placeholder[onclick], .title-art-upload[onclick]').forEach(control => {
+                control.tabIndex = 0;
+                control.setAttribute('role', 'button');
+                control.addEventListener('keydown', event => {
+                    if (event.key !== 'Enter' && event.key !== ' ') return;
+                    event.preventDefault();
+                    control.click();
+                });
+            });
             form['mobile_pos_x'].addEventListener('input', (e) => {
                 currentX = e.target.value;
                 updateLivePreview();
@@ -1967,12 +2111,9 @@
                 // Smart Rumble Link Handling
                 const videoId = prepareRumbleUrl(getVal('video_id'));
                 const manualSoon = form['is_coming_soon'].checked;
-                let finalIsSoon = manualSoon;
-                if (!videoId) {
-                    finalIsSoon = true; // Auto-set if no video ID
-                } else if (!manualSoon) {
-                    finalIsSoon = false; // Auto-unset if video ID present and not manually checked
-                }
+                const contentType = form['content_type'].value;
+                const seasons = contentType === 'series' ? readSeriesEditor() : [];
+                const finalIsSoon = manualSoon || !videoId;
 
                 // Format Duration: 1h 30m
                 let durationStr = null;
@@ -1985,8 +2126,8 @@
                 const displayRatio = document.querySelector('input[name="ratio_choice"]:checked').value;
 
                 const movieData = {
-                    content_type: form['content_type'].value,
-                    seasons: form['content_type'].value === 'series' ? readSeriesEditor() : [],
+                    content_type: contentType,
+                    seasons,
                     title: getVal('title'),
                     genre: getVal('genre'),
                     description: getVal('description'),
@@ -2000,7 +2141,6 @@
                     hide_hero_title: Boolean(form['hide_hero_title'].checked),
                     duration: durationStr,
                     display_ratio: displayRatio,
-                    is_top_10: Boolean(form['is_top_10'].checked),
                     is_coming_soon: finalIsSoon,
                     is_official: Boolean(form['is_official'].checked),
                     creator_url: form['is_official'].checked ? getVal('creator_url') : null,
@@ -2047,12 +2187,14 @@
 
                 if (result.error) throw result.error;
 
-                alert('წარმატებით შეინახა!');
                 resetForm();
-                loadMovies();
-                loadTop5Manager();
+                const status = document.getElementById('movie-save-status');
+                status.dataset.state = 'success';
+                status.textContent = 'ჩანაწერი შენახულია.';
             } catch (err) {
-                alert('შეცდომა: ' + err.message);
+                const status = document.getElementById('movie-save-status');
+                status.dataset.state = 'error';
+                status.textContent = 'შეცდომა: ' + err.message;
             } finally {
                 btn.disabled = false;
                 btn.innerText = 'ფილმის შენახვა';

@@ -137,7 +137,7 @@ export default function CatalogApp() {
   const fresh = source.filter(item => !item.comingSoon);
   const freshMovies = fresh.filter(item => !item.isSeries);
   const freshSeries = fresh.filter(item => item.isSeries);
-  const ranked = source.filter(item => item.topPosition != null).sort((a, b) => a.topPosition! - b.topPosition!);
+  const ranked = source.filter(item => item.topPosition != null && item.topPosition >= 1 && item.topPosition <= 10).sort((a, b) => a.topPosition! - b.topPosition!);
   const topMovies = ranked.filter(item => !item.isSeries).slice(0, 10);
   const topSeries = ranked.filter(item => item.isSeries).slice(0, 10);
   const topRated = fresh.filter(item => item.rating > 0).sort((a, b) => b.rating - a.rating)
@@ -177,8 +177,8 @@ export default function CatalogApp() {
                 <MediaRail eyebrow="უკვე ხელმისაწვდომია" title={home ? 'ახლად დამატებული ფილმები' : 'ახალი დამატებული'}>{freshMovies.slice(0, 12).map(card)}</MediaRail>
               )}
               {browsing && freshSeries.length > 0 && <MediaRail eyebrow="უკვე ხელმისაწვდომია" title="ახალი სერიალები">{freshSeries.slice(0, 12).map(card)}</MediaRail>}
-              {browsing && <TopRankRail title="ტოპ ფილმები" items={topMovies} onOpen={visit} onSeeAll={() => selectTab('Movies')} />}
-              {browsing && <TopRankRail title="ტოპ სერიალები" items={topSeries} onOpen={visit} onSeeAll={() => selectTab('TV Series')} />}
+              {browsing && (home || activeTab === 'Movies') && <TopRankRail title="TOP 10 ფილმები" items={topMovies} onOpen={visit} onSeeAll={() => selectTab('Movies')} />}
+              {browsing && (home || activeTab === 'TV Series') && <TopRankRail title="TOP 10 სერიალები" items={topSeries} onOpen={visit} onSeeAll={() => selectTab('TV Series')} />}
               {home && !category && <StudioRail items={source} renderCard={card} />}
               {home && !category && <TopRankRail eyebrow="მაყურებლის რჩეული" title="მაღალრეიტინგული" items={topRated} onOpen={visit} onSeeAll={() => selectTab('Discover')} />}
               {browsing && comingSoon.length > 0 && <MediaRail eyebrow="ანონსი" title="მალე დაემატება">{comingSoon.map(card)}</MediaRail>}

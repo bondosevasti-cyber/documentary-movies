@@ -15,15 +15,14 @@ export function TopRankRail({ title, items, eyebrow = 'დღეს ტრენ
   if (!items.length) return null;
   return (
     <MediaRail title={title} eyebrow={eyebrow} onSeeAll={onSeeAll} ranked>
-      {items.map(item => <RankCard key={item.id} item={item} onOpen={onOpen} />)}
+      {items.map((item, index) => <RankCard key={item.id} item={item} rank={index + 1} onOpen={onOpen} />)}
     </MediaRail>
   );
 }
 
-function RankCard({ item, onOpen }: { item: CatalogItem; onOpen: (item: CatalogItem) => void }) {
+function RankCard({ item, rank, onOpen }: { item: CatalogItem; rank: number; onOpen: (item: CatalogItem) => void }) {
   const [loaded, setLoaded] = useState(false);
   const src = item.backdropUrl || item.thumbnailUrl;
-  const rank = item.topPosition ?? 0;
   return (
     <article className="rank-card">
       <div className="rank-visual">
